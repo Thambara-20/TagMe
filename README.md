@@ -4,7 +4,7 @@
 
 ## Project Proposal
 
-Find detailed information about our project in the [Project Proposal]().
+Find detailed information about our project in the [Project Proposal](/docs/TagMe%20-%20Project%20Proposal.pdf).
 
 ...
 ## Project Overview
