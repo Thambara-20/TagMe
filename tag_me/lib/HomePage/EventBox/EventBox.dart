@@ -42,12 +42,20 @@ class _EventBoxState extends State<EventBox> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(8.0),
-      color: Colors.black,
+      color: keventBoxColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        side: const BorderSide(
+          color: keventBoxBorderColor,
+          width: 0.5,
+        ),
+        
+      ),
       child: ListTile(
         title: Center(
           child: Text(
             widget.event.name,
-            style: klargeTextWhiteStyle,
+            style: keventBoxLargeTextStyle,
           ),
         ),
         subtitle: Column(
@@ -60,22 +68,21 @@ class _EventBoxState extends State<EventBox> {
             _buildDetailRow(
                 'Participants:', '${widget.event.participants}', Icons.people),
             _buildDetailRow(
-                'Location:', '${widget.event.location}', Icons.location_on),
+                'Location:', widget.event.location, Icons.location_on),
             _buildDetailRow(
                 'User Attending:', widget.event.userAttending, Icons.person),
             const SizedBox(height: 8.0),
             ElevatedButton(
-              onPressed: () {
-                _verifyAttendance();
-              },
+              onPressed: _userAttending ? null : _verifyAttendance,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _userAttending ? Colors.green : Colors.blue,
+                backgroundColor: kbuttonColorBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                
               ),
               child: Center(
                 child: Text(
                   _userAttending ? 'Attendance Marked' : 'Mark Attendance Now',
-                  style: knormalTextWhiteStyle,
+                  style: keventBoxNormalTextStyle,
                 ),
               ),
             ),
@@ -90,7 +97,7 @@ class _EventBoxState extends State<EventBox> {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.blue),
+          Icon(icon, color: kbuttonColorBlue),
           const SizedBox(width: 8.0),
           if (label == 'User Attending:')
             Expanded(
@@ -99,15 +106,14 @@ class _EventBoxState extends State<EventBox> {
                 children: [
                   Text(
                     '$label ',
-                    style: knormalTextWhiteStyle,
+                    style: keventBoxNormalTextStyle,
                   ),
                   Text(
                     _userAttending ? 'Yes' : 'No',
-                    style: TextStyle(
-                      color: _userAttending ? Colors.green : Colors.red,
-                      fontSize: 16.0,
+                    style: _userAttending
+                        ? kwarningTextGreenStyle
+                        : kwarningTextRedStyle
                     ),
-                  ),
                 ],
               ),
             )
@@ -115,7 +121,7 @@ class _EventBoxState extends State<EventBox> {
             Expanded(
               child: Text(
                 '$label $value',
-                style: knormalTextWhiteStyle,
+                style: keventBoxNormalTextStyle,
               ),
             ),
         ],
@@ -128,26 +134,15 @@ class _EventBoxState extends State<EventBox> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(_userAttending ? 'Warning' : 'Verify Attendance'),
-          content: _userAttending
-              ?const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'You have already marked your attendance. Pressing again will switch to "No".',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ],
-                )
-              : const Text(
+          title: const Text( 'Verify Attendance'),
+          content: const Text(
                   'Please provide the required verification to mark your attendance.'),
           actions: [
             TextButton(
               onPressed: () {
                 // Add logic for successful verification.
                 setState(() {
-                  _userAttending = !_userAttending; // Toggle attendance status.
+                  _userAttending = !_userAttending; 
                 });
                 Navigator.of(context).pop();
               },

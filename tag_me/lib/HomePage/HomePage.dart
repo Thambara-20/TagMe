@@ -29,27 +29,36 @@ class _HomePageState extends State<HomePage> {
       userAttending: false,
       location: 'Location 2',
     ),
+    Event(
+      name: 'Event 2',
+      startTime: DateTime.now().add(Duration(days: 1)),
+      endTime: DateTime.now().add(Duration(days: 1, hours: 3)),
+      participants: 15,
+      userAttending: false,
+      location: 'Location 2',
+    ),
+    Event(
+      name: 'Event 2',
+      startTime: DateTime.now().add(Duration(days: 1)),
+      endTime: DateTime.now().add(Duration(days: 1, hours: 3)),
+      participants: 15,
+      userAttending: false,
+      location: 'Location 2',
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ongoing Events', style: klargeTextWhiteStyle),
-        backgroundColor: Colors.black,
-         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ktextColorWhite),
-          onPressed: () {
-            Navigator.pop(context);
+      body: Container(
+        color: khomePageBackgroundColor,
+        child: ListView.builder(
+          
+          itemCount: ongoingEvents.length,
+          itemBuilder: (context, index) {
+            return EventBox(event: ongoingEvents[index]);
           },
         ),
-        
-      ),
-      body: ListView.builder(
-        itemCount: ongoingEvents.length,
-        itemBuilder: (context, index) {
-          return EventBox(event: ongoingEvents[index]);
-        },
       ),
     );
   }

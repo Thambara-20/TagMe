@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
+import 'package:tag_me/main.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -70,7 +71,7 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(height: 0.02 * screenHeight),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, HomePage.routeName);
+                  Navigator.pushNamed(context, MyHomePage.routeName);
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: Size(0.7 * screenWidth, 0.06 * screenHeight),
