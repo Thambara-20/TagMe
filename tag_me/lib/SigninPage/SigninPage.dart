@@ -1,6 +1,7 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
-import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/main.dart';
 
 class SignInPage extends StatefulWidget {

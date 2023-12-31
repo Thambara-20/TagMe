@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
 import 'package:tag_me/WelcomePage/WelcomePage.dart';
@@ -8,6 +10,7 @@ import 'package:tag_me/constants/constants.dart';
 void main() {
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -21,10 +24,9 @@ class MyApp extends StatelessWidget {
         WelcomePage.routeName: (context) => const WelcomePage(),
         HomePage.routeName: (context) => const HomePage(),
         SignUpPage.routeName: (context) => const SignUpPage(),
-        SignInPage.routeName: (context) => const SignInPage(),
+        SignInPage.routeName: (context) => const SignInPage(), // Fix the class name here
         MyHomePage.routeName: (context) => const MyHomePage(),
       },
-      home: const MyHomePage(), // Replace this line
     );
   }
 }
@@ -43,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Define the pages and their corresponding icons
   final List<Map<String, dynamic>> _pages = [
-    {'title': 'Ongoing Events', 'icon': Icons.home, 'page': const HomePage()},
+    {'title': 'Home', 'icon': Icons.home, 'page': const HomePage()},
     {'title': 'Profile', 'icon': Icons.person, 'page': const ProfilePage()},
     {'title': 'Settings', 'icon': Icons.settings, 'page': const SettingsPage()},
   ];
@@ -51,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-   
       appBar: AppBar(
         title: Text(_pages[_currentIndex]['title'], style: kappBarTextStyle),
         backgroundColor: Colors.black,
@@ -64,29 +65,37 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _pages[_currentIndex]['page'],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: kNavbarBackgroundColor,
+        selectedItemColor: kNavbarSelectedIconColor,
+        unselectedItemColor: kNavbarIconColor,
         currentIndex: _currentIndex,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: TextStyle(color: Colors.grey.withOpacity(0.7)),
+        items: _pages
+            .map(
+              (page) => BottomNavigationBarItem(
+                icon: Icon(page['icon']),
+                label: page['title'],
+              ),
+            )
+            .toList(),
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        items: _pages.map((page) {
-          return BottomNavigationBarItem(
-            icon: Icon(page['icon']),
-            label: page['title'],
-          );
-        }).toList(),
       ),
     );
   }
 }
+
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Welcome to Profile'),
     );
   }
@@ -97,7 +106,7 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Welcome to Settings'),
     );
   }

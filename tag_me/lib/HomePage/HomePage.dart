@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
@@ -16,31 +18,31 @@ class _HomePageState extends State<HomePage> {
     Event(
       name: 'Event 1',
       startTime: DateTime.now(),
-      endTime: DateTime.now().add(Duration(hours: 2)),
+      endTime: DateTime.now().add(const Duration(hours: 2)),
       participants: 20,
       userAttending: true,
       location: 'Location 1',
     ),
     Event(
       name: 'Event 2',
-      startTime: DateTime.now().add(Duration(days: 1)),
-      endTime: DateTime.now().add(Duration(days: 1, hours: 3)),
+      startTime: DateTime.now().add(const Duration(days: 1)),
+      endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
       participants: 15,
       userAttending: false,
       location: 'Location 2',
     ),
     Event(
       name: 'Event 2',
-      startTime: DateTime.now().add(Duration(days: 1)),
-      endTime: DateTime.now().add(Duration(days: 1, hours: 3)),
+      startTime: DateTime.now().add(const Duration(days: 1)),
+      endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
       participants: 15,
       userAttending: false,
       location: 'Location 2',
     ),
     Event(
       name: 'Event 2',
-      startTime: DateTime.now().add(Duration(days: 1)),
-      endTime: DateTime.now().add(Duration(days: 1, hours: 3)),
+      startTime: DateTime.now().add(const Duration(days: 1)),
+      endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
       participants: 15,
       userAttending: false,
       location: 'Location 2',

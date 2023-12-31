@@ -1,6 +1,8 @@
-// ignore: file_names
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/utilities/dateConvert.dart';
 
 class Event {
   final String name;
@@ -26,6 +28,7 @@ class EventBox extends StatefulWidget {
   const EventBox({Key? key, required this.event}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _EventBoxState createState() => _EventBoxState();
 }
 
@@ -44,12 +47,11 @@ class _EventBoxState extends State<EventBox> {
       margin: const EdgeInsets.all(8.0),
       color: keventBoxColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(25.0),
         side: const BorderSide(
           color: keventBoxBorderColor,
           width: 0.5,
         ),
-        
       ),
       child: ListTile(
         title: Center(
@@ -62,8 +64,8 @@ class _EventBoxState extends State<EventBox> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow('Start Time:',
-                _formatDateTime(widget.event.startTime), Icons.access_time),
-            _buildDetailRow('End Time:', _formatDateTime(widget.event.endTime),
+                formatDateTime(widget.event.startTime), Icons.access_time),
+            _buildDetailRow('End Time:', formatDateTime(widget.event.endTime),
                 Icons.access_time),
             _buildDetailRow(
                 'Participants:', '${widget.event.participants}', Icons.people),
@@ -77,12 +79,13 @@ class _EventBoxState extends State<EventBox> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: kbuttonColorBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                
               ),
               child: Center(
                 child: Text(
                   _userAttending ? 'Attendance Marked' : 'Mark Attendance Now',
-                  style: keventBoxNormalTextStyle,
+                  style: _userAttending
+                      ? keventBoxDisabledButtonStyle
+                      : keventBoxEnabledButtonStyle,
                 ),
               ),
             ),
@@ -108,12 +111,10 @@ class _EventBoxState extends State<EventBox> {
                     '$label ',
                     style: keventBoxNormalTextStyle,
                   ),
-                  Text(
-                    _userAttending ? 'Yes' : 'No',
-                    style: _userAttending
-                        ? kwarningTextGreenStyle
-                        : kwarningTextRedStyle
-                    ),
+                  Text(_userAttending ? 'Yes' : 'No',
+                      style: _userAttending
+                          ? kwarningTextGreenStyle
+                          : kwarningTextRedStyle),
                 ],
               ),
             )
@@ -134,15 +135,15 @@ class _EventBoxState extends State<EventBox> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text( 'Verify Attendance'),
+          title: const Text('Verify Attendance'),
           content: const Text(
-                  'Please provide the required verification to mark your attendance.'),
+              'Please provide the required verification to mark your attendance.'),
           actions: [
             TextButton(
               onPressed: () {
                 // Add logic for successful verification.
                 setState(() {
-                  _userAttending = !_userAttending; 
+                  _userAttending = !_userAttending;
                 });
                 Navigator.of(context).pop();
               },
@@ -158,9 +159,5 @@ class _EventBoxState extends State<EventBox> {
         );
       },
     );
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
   }
 }
