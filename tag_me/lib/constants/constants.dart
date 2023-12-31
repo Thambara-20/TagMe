@@ -16,6 +16,11 @@ const  knormalTextBlueStyle = TextStyle(
   color: Color(0xFF4285F4),
 );
 
+const kwarningTextRedStyle = TextStyle(
+  fontSize: 16.0,
+  fontWeight: FontWeight.bold,
+  color: Colors.red,
+);
 
 const  kbuttonColorBlue = Color(0xFF4285F4);
 const  ktextColorWhite = Colors.white;

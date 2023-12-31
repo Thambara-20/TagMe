@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/HomePage/HomePage.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -69,7 +70,7 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(height: 0.02 * screenHeight),
               ElevatedButton(
                 onPressed: () {
-                  // Implement sign-in functionality
+                  Navigator.pushNamed(context, HomePage.routeName);
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: Size(0.7 * screenWidth, 0.06 * screenHeight),
@@ -87,7 +88,6 @@ class _SignInPageState extends State<SignInPage> {
                       style: knormalTextWhiteStyle),
                   TextButton(
                     onPressed: () {
-                  
                       Navigator.pushReplacementNamed(context, '/SignUpPage');
                     },
                     child: const Text('Sign Up', style: knormalTextBlueStyle),
