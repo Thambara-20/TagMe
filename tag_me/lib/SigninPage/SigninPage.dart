@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+class SignInPage extends StatefulWidget {
+  const SignInPage({Key? key}) : super(key: key);
 
-  static const String routeName = '/SignUpPage';
+  static const String routeName = '/SignInPage';
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -18,12 +18,12 @@ class _SignUpPageState extends State<SignUpPage> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: true,
         backgroundColor: Colors.black,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: kiconColorWhite),
+          icon: const Icon(Icons.arrow_back, color: ktextColorWhite),
           onPressed: () {
-            Navigator.pop(context); 
+            Navigator.pop(context);
           },
         ),
       ),
@@ -39,19 +39,8 @@ class _SignUpPageState extends State<SignUpPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Sign Up for Tag Me!',
+                'Sign In to Tag Me!',
                 style: klargeTextWhiteStyle,
-              ),
-              SizedBox(height: 0.02 * screenHeight),
-              SizedBox(
-                width: 0.8 * screenWidth,
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Name',
-                    labelStyle: knormalTextWhiteStyle,
-                  ),
-                  style: knormalTextWhiteStyle,
-                ),
               ),
               SizedBox(height: 0.02 * screenHeight),
               SizedBox(
@@ -80,13 +69,13 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(height: 0.02 * screenHeight),
               ElevatedButton(
                 onPressed: () {
-                  // Implement signup functionality
+                  // Implement sign-in functionality
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: Size(0.7 * screenWidth, 0.06 * screenHeight),
                 ),
                 child: Text(
-                  'Sign Up',
+                  'Sign In',
                   style: TextStyle(fontSize: 0.04 * screenWidth),
                 ),
               ),
@@ -94,13 +83,14 @@ class _SignUpPageState extends State<SignUpPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have an account? ",
+                  const Text("Don't have an account? ",
                       style: knormalTextWhiteStyle),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/SignInPage');
+                  
+                      Navigator.pushReplacementNamed(context, '/SignUpPage');
                     },
-                    child: const Text('Sign In', style: knormalTextBlueStyle),
+                    child: const Text('Sign Up', style: knormalTextBlueStyle),
                   ),
                 ],
               ),

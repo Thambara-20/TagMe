@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:tag_me/constants/constants.dart";
 import 'package:tag_me/SignupPage/SignupPage.dart';
+import 'package:tag_me/SigninPage/SigninPage.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -75,7 +76,7 @@ class _HomePageState extends State<WelcomePage> {
                       style: knormalTextWhiteStyle),
                   TextButton(
                     onPressed: () {
-                     
+                      Navigator.pushNamed(context, SignInPage.routeName);
                     },
                     child: const Text('Sign In', style: knormalTextBlueStyle),
                   ),
