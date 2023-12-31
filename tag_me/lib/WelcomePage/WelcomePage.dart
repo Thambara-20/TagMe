@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import "package:tag_me/constants/constants.dart";
+import 'package:tag_me/SignupPage/SignupPage.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -13,62 +15,74 @@ class WelcomePage extends StatefulWidget {
 class _HomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Welcome to Tag Me!',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+                'assets/background.jpg'), 
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Welcome to Tag Me!',
+                style: klargeTextWhiteStyle,
               ),
-            ),
-            const SizedBox(height: 25),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                fixedSize: const Size(210, 50),
+              SizedBox(height: 0.04 * screenHeight),
+              ElevatedButton(
+                onPressed: () {
+                   Navigator.pushNamed(context, SignUpPage.routeName);
+                },
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(0.7 * screenWidth,
+                      0.06 * screenHeight), // Adjusted button size
+                ),
+                child: Text('Sign up',
+                    style: TextStyle(fontSize: 0.04 * screenWidth)),
               ),
-              child: const Text('Sign up', style: TextStyle(color: Colors.blue)),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Add functionality for Google Sign In button
-              },
-              style: ElevatedButton.styleFrom(
-                  fixedSize: const Size(210, 50),
-                  backgroundColor: Color(0xFF4285F4)),
-              child: const Row(
+              SizedBox(height: 0.02 * screenHeight),
+              ElevatedButton(
+                onPressed: () {
+                  // Add functionality for Google Sign In button
+                },
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(0.7 * screenWidth,
+                      0.06 * screenHeight), // Adjusted button size
+                  backgroundColor: kbuttonColorBlue,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const FaIcon(FontAwesomeIcons.google, color: ktextColorWhite),
+                    SizedBox(width: 0.05 * screenWidth),
+                    const Text('Login using Google',
+                        style: knormalTextWhiteStyle)
+                  ],
+                ),
+              ),
+              SizedBox(height: 0.04 * screenHeight),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  FaIcon(FontAwesomeIcons.google, color: Colors.white),
-                  SizedBox(width: 5),
-                  Text(
-                    'Login using Google',
-                    style: TextStyle(
-                      color: Colors.white
-                    ),
-                  )
+                  const Text("Already have an account? ",
+                      style: knormalTextWhiteStyle),
+                  TextButton(
+                    onPressed: () {
+                     
+                    },
+                    child: const Text('Sign In', style: knormalTextBlueStyle),
+                  ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Already have an account? "),
-                TextButton(
-                  onPressed: () {
-                    // Add functionality for "Sign In" button
-                  },
-                  child: const Text('Sign In', style: TextStyle(color: Colors.blue)),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
