@@ -55,7 +55,6 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         color: khomePageBackgroundColor,
         child: ListView.builder(
-          
           itemCount: ongoingEvents.length,
           itemBuilder: (context, index) {
             return EventBox(event: ongoingEvents[index]);

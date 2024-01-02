@@ -44,7 +44,7 @@ class _EventBoxState extends State<EventBox> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(10.0),
       color: keventBoxColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25.0),
