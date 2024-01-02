@@ -6,17 +6,73 @@ const klargeTextWhiteStyle = TextStyle(
   color: Colors.white,
 );
 
-const  knormalTextWhiteStyle = TextStyle(
+const knormalTextWhiteStyle = TextStyle(
   fontSize: 16.0,
   color: Colors.white,
 );
 
-const  knormalTextBlueStyle = TextStyle(
+const kappBarTextStyle = TextStyle(
+  fontSize: 20.0,
+  color: Color.fromARGB(220, 255, 255, 255),
+);
+
+const knormalTextBlackStyle = TextStyle(
   fontSize: 16.0,
-  color: Color(0xFF4285F4),
+  color: Colors.black,
+);
+const knormalTextBlueStyle = TextStyle(
+  fontSize: 16.0,
+  color: Colors.blue,
+);
+
+const kwarningTextGreenStyle = TextStyle(
+  fontSize: 16.0,
+  fontWeight: FontWeight.w700,
+  color: Colors.green,
+);
+
+const kwarningTextRedStyle = TextStyle(
+  fontSize: 16.0,
+  fontWeight: FontWeight.w700,
+  color: Color.fromARGB(255, 198, 13, 0),
+);
+
+const kbuttonColorBlue = Color.fromARGB(255, 20, 125, 212);
+const kbuttonColorRed = Color.fromARGB(255, 198, 13, 0);
+const kbuttonColorGreen = Colors.green;
+const ktextColorWhite = Colors.white;
+const kiconColorWhite = Colors.white;
+
+// -----------------------------------------------Home-page & EventBox--------------------------------------------------------------------------------
+
+const keventBoxColor = Color.fromARGB(255, 228, 228, 228);
+const keventBoxBorderColor = Color.fromARGB(255, 4, 4, 4);
+const khomePageBackgroundColor = Color.fromARGB(255, 68, 68, 68);
+const keventBoxEnabledButtonStyle = TextStyle(
+  fontSize: 16.0,
+  fontWeight: FontWeight.w500,
+  color: Color.fromARGB(255, 230, 230, 230),
+);
+const keventBoxDisabledButtonStyle = TextStyle(
+  fontSize: 16.0,
+  fontWeight: FontWeight.w500,
+  color: Color.fromARGB(255, 58, 58, 58),
+);
+
+const keventBoxLargeTextStyle = TextStyle(
+  fontSize: 20.0,
+  fontWeight: FontWeight.bold,
+  color: Color.fromARGB(255, 16, 16, 16),
+);
+const keventBoxNormalTextStyle = TextStyle(
+  fontSize: 16.0,
+  fontWeight: FontWeight.w500,
+  color: Color.fromARGB(255, 5, 5, 5),
 );
 
 
-const  kbuttonColorBlue = Color(0xFF4285F4);
-const  ktextColorWhite = Colors.white;
-const  kiconColorWhite = Colors.white;
+//------------------------------------------------Navbar--------------------------------------------------------------------------------  
+
+const kNavbarBackgroundColor = Colors.black;
+const kNavbarIconColor = Color.fromARGB(255, 157, 157, 157);
+const kNavbarSelectedIconColor = Colors.blue;
