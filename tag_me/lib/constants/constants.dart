@@ -70,9 +70,15 @@ const keventBoxNormalTextStyle = TextStyle(
   color: Color.fromARGB(255, 5, 5, 5),
 );
 
+//------------------------------------------------EventPage-------------------------------------------------------------------------------- 
+const ksearchBarColor = Colors.white;
+const kAddButtonColor = Colors.blue;
+const keventCardColor = Colors.white;
+const keventCardBorderColor = Colors.black;
 
 //------------------------------------------------Navbar--------------------------------------------------------------------------------  
 
 const kNavbarBackgroundColor = Colors.black;
-const kNavbarIconColor = Color.fromARGB(255, 157, 157, 157);
+const kNavbarButtonBackgroundColor = Colors.black;
+const kNavbarButtonColor = Color.fromARGB(255, 255, 255, 255);
 const kNavbarSelectedIconColor = Colors.blue;

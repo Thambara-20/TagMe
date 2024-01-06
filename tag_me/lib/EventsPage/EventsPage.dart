@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
 
 class Event {
   final String name;
   final DateTime startTime;
+  final DateTime endTime;
   final String location;
+  bool isParticipating;
 
   Event({
     required this.name,
     required this.startTime,
+    required this.endTime,
     required this.location,
+    required this.isParticipating,
   });
 }
 
@@ -23,15 +28,8 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  TextEditingController _searchController = TextEditingController();
-  List<Event> events = List.generate(
-    10,
-        (index) => Event(
-      name: 'Event $index',
-      startTime: DateTime.now().add(Duration(days: index)),
-      location: 'Location $index',
-    ),
-  );
+  final TextEditingController _searchController = TextEditingController();
+  List<Event> events = [];
 
   @override
   Widget build(BuildContext context) {
@@ -46,25 +44,17 @@ class _EventsPageState extends State<EventsPage> {
                 controller: _searchController,
                 onChanged: (value) {
                   setState(() {
-                    // Filter events based on the search query
-                    events = List.generate(
-                      10,
-                          (index) => Event(
-                        name: 'Event $index',
-                        startTime: DateTime.now().add(Duration(days: index)),
-                        location: 'Location $index',
-                      ),
-                    ).where(
-                          (event) =>
-                      event.name.toLowerCase().contains(value.toLowerCase()) ||
-                          event.location.toLowerCase().contains(value.toLowerCase()),
-                    ).toList();
+                    events = events.where((event) {
+                      return event.name
+                          .toLowerCase()
+                          .contains(value.toLowerCase());
+                    }).toList();
                   });
                 },
                 decoration: InputDecoration(
                   hintText: 'Search Events',
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: ksearchBarColor,
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
@@ -76,7 +66,10 @@ class _EventsPageState extends State<EventsPage> {
               child: ListView.builder(
                 itemCount: events.length,
                 itemBuilder: (context, index) {
+                  if (events[index].isParticipating == false ){
                   return _buildEventListItem(events[index]);
+
+                  }
                 },
               ),
             ),
@@ -85,51 +78,64 @@ class _EventsPageState extends State<EventsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Handle creating a new event
           _onCreateEvent(context);
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: kAddButtonColor,
         child: const Icon(Icons.add),
       ),
     );
   }
+Widget _buildEventListItem(Event event) {
+  return Card(
+    margin: const EdgeInsets.all(10.0),
+    color: keventCardColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(25.0),
+      side: const BorderSide(
+        color: keventCardBorderColor,
+        width: 0.5,
+      ),
+    ),
+    child: ListTile(
+      title: Center(
+        child: Column(
+          children: [
+            Text(
+              event.name,
+              style: const TextStyle(fontSize: 18.0),
+            ),
+            Text(
+              'Start Time: ${_formatDateTime(event.startTime)}',
+              style: const TextStyle(fontSize: 14.0),
+            ),
+            Text(
+              'End Time: ${_formatDateTime(event.endTime)}',
+              style: const TextStyle(fontSize: 14.0),
+            ),
+            Text(
+              'Location: ${event.location}',
+              style: const TextStyle(fontSize: 14.0),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  event.isParticipating = true;
+                });
+              },
+              child: Text(event.isParticipating ? 'Already Participated' : 'Participate'),
+            ),
+          ],
+        ),
+      ),
+      onTap: () {
+        _onEventTapped(context, event.name);
+        setState(() {
+        });
+      },
+    ),
+  );
+}
 
-  Widget _buildEventListItem(Event event) {
-    return Card(
-      margin: const EdgeInsets.all(10.0),
-      color: Colors.white, // Replace with your desired background color
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25.0),
-        side: const BorderSide(
-          color: Colors.black,
-          width: 0.5,
-        ),
-      ),
-      child: ListTile(
-        title: Center(
-          child: Column(
-            children: [
-              Text(
-                event.name,
-                style: TextStyle(fontSize: 18.0),
-              ),
-              Text(
-                'Start Time: ${_formatDateTime(event.startTime)}',
-                style: TextStyle(fontSize: 14.0),
-              ),
-              Text(
-                'Location: ${event.location}',
-                style: TextStyle(fontSize: 14.0),
-              ),
-            ],
-          ),
-        ),
-        onTap: () {
-          _onEventTapped(context, event.name);
-        },
-      ),
-    );
-  }
 
   void _onEventTapped(BuildContext context, String eventName) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -138,9 +144,13 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void _onCreateEvent(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Create Event tapped')),
-    );
+    Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AddEventForm(intialEvents: events)))
+        .then((value) => {
+              {setState(() {})}
+            });
   }
 
   String _formatDateTime(DateTime dateTime) {
