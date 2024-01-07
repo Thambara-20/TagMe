@@ -2,9 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
 import 'package:tag_me/Map/Map.dart';
+import 'package:geocoding/geocoding.dart';
+
 
 class AddEventForm extends StatefulWidget {
   final List<Event> initialEvents;
@@ -131,18 +134,26 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 
-  Future<void> _selectLocation() async {
-    GeoPoint selectedPoint = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const MapWidget()),
-    );
+Future<void> _selectLocation() async {
+  GeoPoint selectedPoint = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const MapWidget()),
+  );
 
-    print('Selected Location: $selectedPoint');
+  List<Placemark> placemarks = await placemarkFromCoordinates(
+    selectedPoint.latitude,
+    selectedPoint.longitude,
+  );
+
+  if (placemarks.isNotEmpty) {
+    Placemark placemark = placemarks[0];
+    String town = placemark.locality ?? 'Unknown Town';
+    
     setState(() {
-      _location = 'Lat: ${selectedPoint.latitude}, Lng: ${selectedPoint.longitude}';
+      _location = 'Town: $town';
     });
-    }
-
+  }
+}
 
   void _onSubmit() async {
     if (_nameController.text.isEmpty ||
