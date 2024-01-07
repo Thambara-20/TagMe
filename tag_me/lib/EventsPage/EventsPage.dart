@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
@@ -24,6 +26,7 @@ class EventsPage extends StatefulWidget {
   static const String routeName = '/EventsPage';
 
   @override
+  // ignore: library_private_types_in_public_api
   _EventsPageState createState() => _EventsPageState();
 }
 
@@ -70,6 +73,7 @@ class _EventsPageState extends State<EventsPage> {
                   return _buildEventListItem(events[index]);
 
                   }
+                  return null;
                 },
               ),
             ),
@@ -147,7 +151,7 @@ Widget _buildEventListItem(Event event) {
     Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => AddEventForm(intialEvents: events)))
+                builder: (context) => AddEventForm(initialEvents: events)))
         .then((value) => {
               {setState(() {})}
             });

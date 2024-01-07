@@ -8,11 +8,11 @@ import 'package:tag_me/WelcomePage/WelcomePage.dart';
 import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/Map/Map.dart';
 
 void main() {
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         HomePage.routeName: (context) => const HomePage(),
         EventsPage.routeName: (context) => const EventsPage(),
         SignUpPage.routeName: (context) => const SignUpPage(),
-        SignInPage.routeName: (context) => const SignInPage(), // Fix the class name here
+        SignInPage.routeName: (context) => const SignInPage(),
         MainPage.routeName: (context) => const MainPage(),
       },
     );
@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MainPage> {
 
   final List<Map<String, dynamic>> _pages = [
     {'title': 'Home', 'icon': Icons.home, 'page': const HomePage()},
-    {'title':'Events', 'icon': Icons.event, 'page':const EventsPage()},
+    {'title': 'Events', 'icon': Icons.event, 'page': const EventsPage()},
     {'title': 'Profile', 'icon': Icons.person, 'page': const ProfilePage()},
     {'title': 'Settings', 'icon': Icons.settings, 'page': const SettingsPage()},
   ];
@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MainPage> {
         items: _pages
             .map(
               (page) => Icon(page['icon'], size: 30, color: kNavbarButtonColor),
-        )
+            )
             .toList(),
         onTap: (index) {
           setState(() {
@@ -88,16 +88,12 @@ class _MyHomePageState extends State<MainPage> {
   }
 }
 
-
-
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Welcome to Profile'),
-    );
+    return const MapWidget();
   }
 }
 

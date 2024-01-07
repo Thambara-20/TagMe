@@ -1,26 +1,27 @@
+// ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:intl/intl.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-
+import 'package:tag_me/Map/Map.dart';
 
 class AddEventForm extends StatefulWidget {
-  final List<Event> intialEvents;
+  final List<Event> initialEvents;
 
-  const AddEventForm({Key? key, required this.intialEvents}) : super(key: key);
+  const AddEventForm({Key? key, required this.initialEvents}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _AddEventFormState createState() => _AddEventFormState();
 }
 
 class _AddEventFormState extends State<AddEventForm> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
   final TextEditingController _participantsController = TextEditingController();
+  String _location = '';
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +36,22 @@ class _AddEventFormState extends State<AddEventForm> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Event Name'),
+              decoration: const InputDecoration(labelText: 'Event Name'),
             ),
-            TextField(
-              controller: _locationController,
-              decoration: InputDecoration(labelText: 'Location'),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _selectLocation,
+              child: const Text('Select Location'),
             ),
-            Row(
+            const SizedBox(height: 10),
+            Text('Selected Location: $_location'),
+            const SizedBox(height: 10),
+           Row(
               children: [
-                Text('Start Time: ${DateFormat('yyyy-MM-dd HH:mm').format(_startTime)}'),
+                Text(
+                    'Start Time: ${DateFormat('yyyy-MM-dd HH:mm').format(_startTime)}'),
                 IconButton(
-                  icon: Icon(Icons.event),
+                  icon: const Icon(Icons.event),
                   onPressed: () async {
                     final selectedDate = await showDatePicker(
                       context: context,
@@ -77,9 +83,10 @@ class _AddEventFormState extends State<AddEventForm> {
             ),
             Row(
               children: [
-                Text('End Time: ${DateFormat('yyyy-MM-dd HH:mm').format(_endTime)}'),
+                Text(
+                    'End Time: ${DateFormat('yyyy-MM-dd HH:mm').format(_endTime)}'),
                 IconButton(
-                  icon: Icon(Icons.event),
+                  icon: const Icon(Icons.event),
                   onPressed: () async {
                     final selectedDate = await showDatePicker(
                       context: context,
@@ -111,13 +118,11 @@ class _AddEventFormState extends State<AddEventForm> {
             ),
             TextField(
               controller: _participantsController,
-              decoration: InputDecoration(labelText: 'Participants'),
+              decoration: const InputDecoration(labelText: 'Participants'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                _onSubmit();
-              },
+              onPressed: _onSubmit,
               child: const Text('Add Event'),
             ),
           ],
@@ -126,49 +131,62 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 
-void _onSubmit() async {
-  if (_nameController.text.isEmpty ||
-      _participantsController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Please fill in all required fields')),
+  Future<void> _selectLocation() async {
+    GeoPoint selectedPoint = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MapWidget()),
     );
-    return;
+
+    print('Selected Location: $selectedPoint');
+    setState(() {
+      _location = 'Lat: ${selectedPoint.latitude}, Lng: ${selectedPoint.longitude}';
+    });
+    }
+
+
+  void _onSubmit() async {
+    if (_nameController.text.isEmpty ||
+        _location.isEmpty ||
+        _participantsController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all required fields')),
+      );
+      return;
+    }
+
+    // Create the Event object
+    Event newEvent = Event(
+      name: _nameController.text,
+      location: _location,
+      startTime: _startTime,
+      endTime: _endTime, 
+      isParticipating: false,
+
+    );
+
+    setState(() {
+      widget.initialEvents.add(newEvent);
+    });
+
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Event added successfully')),
+    );
+
+    // Clear the form
+    _nameController.clear();
+    _participantsController.clear();
+    setState(() {
+      _startTime = DateTime.now();
+      _endTime = DateTime.now();
+      _location = '';
+    });
   }
-
-  String location = await _getLocation();
-
-  final newEvent = Event(
-    name: _nameController.text,
-    startTime: _startTime,
-    endTime: _endTime,
-    location: location,
-    isParticipating: false,
-  );
-
-  widget.intialEvents.add(newEvent);
-
-  Navigator.pop(context);
-}
-
 
   @override
   void dispose() {
     _nameController.dispose();
-    _locationController.dispose();
     _participantsController.dispose();
     super.dispose();
   }
 }
-
-Future<String> _getLocation() async {
-  try {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    return placemarks[0].name ?? "Unknown Location";
-  } catch (e) {
-    return "Error getting location";
-  }
-}
-
