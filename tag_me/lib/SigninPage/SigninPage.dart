@@ -72,7 +72,7 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(height: 0.02 * screenHeight),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, MyHomePage.routeName);
+                  Navigator.pushNamed(context, MainPage.routeName);
                 },
                 style: ElevatedButton.styleFrom(
                   fixedSize: Size(0.7 * screenWidth, 0.06 * screenHeight),
