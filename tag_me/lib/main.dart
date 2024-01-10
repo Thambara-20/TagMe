@@ -4,6 +4,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
+import 'package:tag_me/ProfilePage/History.dart';
 import 'package:tag_me/ProfilePage/ProfilePage.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
 import 'package:tag_me/WelcomePage/WelcomePage.dart';
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         SignUpPage.routeName: (context) => const SignUpPage(),
         SignInPage.routeName: (context) => const SignInPage(),
         MainPage.routeName: (context) => const MainPage(),
+        HistoryPage.routeName: (context) => const HistoryPage(),
       },
     );
   }
@@ -63,7 +65,7 @@ class _MyHomePageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_pages[_currentIndex]['title'], style: kappBarTextStyle),
-        backgroundColor: khomePageBackgroundColor,
+        backgroundColor: kNavbarBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: ktextColorWhite),
           onPressed: () {

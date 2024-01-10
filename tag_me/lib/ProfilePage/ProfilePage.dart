@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/ProfilePage/History.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -13,7 +14,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -21,7 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
               height: 200,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue, Colors.blueAccent],
+                  colors: [kProfilePageBackgroundColor, Color.fromARGB(255, 0, 0, 0)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -33,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Icon(
                     Icons.person,
                     size: 80,
-                    color: Colors.blue,
+                    color: kProfilePageBackgroundColor,
                   ),
                 ),
               ),
@@ -65,14 +65,32 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildProfileItem('Location', 'City, Country'),
                   _buildProfileItem("Events-Participated", "3"),
                   _buildProfileItem("Events-Created", "3"),
-                  
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HistoryPage(),
+                        ),
+                      );
+                    },
+                    child: const Row(children: [
+                      Icon(
+                        Icons.history,
+                        color: Color.fromARGB(255, 149, 149, 149),
+                      ),
+                      SizedBox(width: 8),
+                      Text("History")
+                    ]),
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
                       // Add functionality for editing profile
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: kbuttonColorBlue,
+                      backgroundColor: kProfileEditButtonColor,
                       padding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 24,
@@ -83,7 +101,26 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: const Text(
                         'Edit Profile',
                         style: TextStyle(fontSize: 16, color: Colors.white),
-                        
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add functionality for editing profile
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kLogoutButtonColor,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 24,
+                      ),
+                    ),
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
                   ),

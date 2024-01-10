@@ -76,9 +76,19 @@ const kAddButtonColor = Colors.blue;
 const keventCardColor = Colors.white;
 const keventCardBorderColor = Colors.black;
 
+//------------------------------------------------AppBar--------------------------------------------------------------------------------
+
+const knavbarBackgroundColor = Colors.black;
+
 //------------------------------------------------Navbar--------------------------------------------------------------------------------  
 
 const kNavbarBackgroundColor = Colors.black;
 const kNavbarButtonBackgroundColor = Colors.black;
 const kNavbarButtonColor = Color.fromARGB(255, 255, 255, 255);
 const kNavbarSelectedIconColor = Colors.blue;
+
+//------------------------------------------------ProfilePage--------------------------------------------------------------------------------
+
+const kLogoutButtonColor = Color.fromARGB(255, 159, 11, 0);
+const kProfilePageBackgroundColor = Color.fromARGB(255, 1, 166, 255);
+const kProfileEditButtonColor = Color.fromARGB(151, 0, 0, 0);
