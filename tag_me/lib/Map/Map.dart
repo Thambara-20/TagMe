@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:tag_me/utilities/Location.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({Key? key}) : super(key: key);
@@ -17,23 +18,26 @@ class _MapWidgetState extends State<MapWidget> with OSMMixinObserver {
   @override
   void initState() {
     super.initState();
-    mapController = MapController(
-      initPosition: GeoPoint(latitude: 47.4358055, longitude: 8.4737324),
-      areaLimit: BoundingBox(
-        east: 10.4922941,
-        north: 47.8084648,
-        south: 45.817995,
-        west: 5.9559113,
-      ),
-    );
+    try {
+      mapController = MapController(
+        initPosition: GeoPoint(latitude: 6.9271, longitude: 79.8612),
+        areaLimit: BoundingBox(
+          east: 8.88,
+          north: 7.0,
+          south: 5.9,
+          west: 79.52,
+        ),
+      );
 
-    mapController.addObserver(this);
+      mapController.addObserver(this);
+    } catch (e) {
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: Column(
         children: [
           Expanded(
@@ -89,7 +93,6 @@ class _MapWidgetState extends State<MapWidget> with OSMMixinObserver {
             ),
         ],
       ),
-     
     );
   }
 
@@ -106,13 +109,11 @@ class _MapWidgetState extends State<MapWidget> with OSMMixinObserver {
     setState(() {
       this.selectedPoint = selectedPoint;
     });
-
   }
 
   @override
   Future<void> mapIsReady(bool isReady) async {
-    if (isReady) {
-    }
+    if (isReady) {}
   }
 
   @override
