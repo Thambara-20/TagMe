@@ -1,18 +1,21 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-// ignore: depend_on_referenced_packages
-import 'package:intl/intl.dart';
-import 'package:tag_me/EventsPage/EventsPage.dart';
-import 'package:tag_me/Map/Map.dart';
 import 'package:geocoding/geocoding.dart';
-
+import 'package:geolocator/geolocator.dart';
+import 'package:tag_me/EventsPage/AddEventPage/DateTimePicker.dart';
+import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/Map/Map.dart';
+import 'package:tag_me/utilities/Location.dart';
 
 class AddEventForm extends StatefulWidget {
   final List<Event> initialEvents;
+  final Event? selectedEvent;
 
-  const AddEventForm({Key? key, required this.initialEvents}) : super(key: key);
+  const AddEventForm({
+    Key? key,
+    required this.initialEvents,
+    this.selectedEvent,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -23,8 +26,21 @@ class _AddEventFormState extends State<AddEventForm> {
   final TextEditingController _nameController = TextEditingController();
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
-  final TextEditingController _participantsController = TextEditingController();
   String _location = '';
+  List<String> _participants = ["user"]; // List of participants
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.selectedEvent != null) {
+      _nameController.text = widget.selectedEvent!.name;
+      _startTime = widget.selectedEvent!.startTime;
+      _endTime = widget.selectedEvent!.endTime;
+      _participants = widget.selectedEvent!.participants;
+      _location = widget.selectedEvent!.location;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,89 +60,65 @@ class _AddEventFormState extends State<AddEventForm> {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _selectLocation,
-              child: const Text('Select Location'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+              ),
+              child: const Text('Select Location',
+                  style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 10),
             Text('Selected Location: $_location'),
             const SizedBox(height: 10),
-           Row(
-              children: [
-                Text(
-                    'Start Time: ${DateFormat('yyyy-MM-dd HH:mm').format(_startTime)}'),
-                IconButton(
-                  icon: const Icon(Icons.event),
-                  onPressed: () async {
-                    final selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: _startTime,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2101),
-                    );
-                    if (selectedDate != null) {
-                      // ignore: use_build_context_synchronously
-                      final selectedTime = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(_startTime),
-                      );
-                      if (selectedTime != null) {
-                        setState(() {
-                          _startTime = DateTime(
-                            selectedDate.year,
-                            selectedDate.month,
-                            selectedDate.day,
-                            selectedTime.hour,
-                            selectedTime.minute,
-                          );
-                        });
-                      }
-                    }
-                  },
-                ),
+            DateTimePicker(
+              initialDateTime: _startTime,
+              onDateTimeChanged: (newDateTime) {
+                setState(() {
+                  _startTime = newDateTime;
+                });
+              },
+            ),
+            DateTimePicker(
+              initialDateTime: _endTime,
+              onDateTimeChanged: (newDateTime) {
+                setState(() {
+                  _endTime = newDateTime;
+                });
+              },
+            ),
+            //line of black
+            const Divider(
+              color: Colors.black,
+              thickness: 1.0,
+              height: 20.0,
+            ),
+
+            DataTable(
+              columns: const [
+                DataColumn(label: Text('Participants')),
               ],
+              rows: _participants.map<DataRow>((participant) {
+                return DataRow(
+                  cells: [
+                    DataCell(Text(participant)),
+                  ],
+                );
+              }).toList(),
             ),
-            Row(
-              children: [
-                Text(
-                    'End Time: ${DateFormat('yyyy-MM-dd HH:mm').format(_endTime)}'),
-                IconButton(
-                  icon: const Icon(Icons.event),
-                  onPressed: () async {
-                    final selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: _endTime,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime(2101),
-                    );
-                    if (selectedDate != null) {
-                      // ignore: use_build_context_synchronously
-                      final selectedTime = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(_endTime),
-                      );
-                      if (selectedTime != null) {
-                        setState(() {
-                          _endTime = DateTime(
-                            selectedDate.year,
-                            selectedDate.month,
-                            selectedDate.day,
-                            selectedTime.hour,
-                            selectedTime.minute,
-                          );
-                        });
-                      }
-                    }
-                  },
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: ElevatedButton(
+                  
+                  onPressed: (_location.isNotEmpty && _nameController.text.isNotEmpty )?  _onSubmit : null,
+                  
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                  child: const Text('Save Event',
+                      style: TextStyle(color: Colors.white)),
                 ),
-              ],
-            ),
-            TextField(
-              controller: _participantsController,
-              decoration: const InputDecoration(labelText: 'Participants'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _onSubmit,
-              child: const Text('Add Event'),
+              ),
             ),
           ],
         ),
@@ -134,70 +126,64 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 
-Future<void> _selectLocation() async {
-  GeoPoint selectedPoint = await Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const MapWidget()),
-  );
+  Future<void> _selectLocation() async {
+    try {
+      GeoPoint? selectedPoint = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MapWidget()),
+      );
+      List<Placemark> placemarks = [];
+      if (selectedPoint != null) {
+        placemarks = await placemarkFromCoordinates(
+            selectedPoint.latitude, selectedPoint.longitude);
+      } else {
+        Position position = await determinePosition();
+        placemarks = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+      }
+      Placemark placemark = placemarks[0];
+      String town = placemark.locality ?? 'Unknown Town';
 
-  List<Placemark> placemarks = await placemarkFromCoordinates(
-    selectedPoint.latitude,
-    selectedPoint.longitude,
-  );
-
-  if (placemarks.isNotEmpty) {
-    Placemark placemark = placemarks[0];
-    String town = placemark.locality ?? 'Unknown Town';
-    
-    setState(() {
-      _location = 'Town: $town';
-    });
+      setState(() {
+        _location = 'Town: $town';
+      });
+    } catch (e) {
+      _close();
+    }
   }
-}
 
   void _onSubmit() async {
     if (_nameController.text.isEmpty ||
-        _location.isEmpty ||
-        _participantsController.text.isEmpty) {
+        _location.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );
-      return;
     }
 
-    // Create the Event object
     Event newEvent = Event(
+      creator: 'User',
       name: _nameController.text,
-      location: _location,
       startTime: _startTime,
-      endTime: _endTime, 
-      isParticipating: false,
-
+      endTime: _endTime,
+      location: _location,
+      participants: _participants,
+      isParticipating: false
     );
-
-    setState(() {
-      widget.initialEvents.add(newEvent);
-    });
-
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event added successfully')),
+      const SnackBar(content: Text('Event saved successfully')),
     );
 
-    // Clear the form
-    _nameController.clear();
-    _participantsController.clear();
-    setState(() {
-      _startTime = DateTime.now();
-      _endTime = DateTime.now();
-      _location = '';
-    });
+    Navigator.pop(context, newEvent);
+  }
+
+  void _close() {
+    Navigator.pop(context);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _participantsController.dispose();
     super.dispose();
   }
 }

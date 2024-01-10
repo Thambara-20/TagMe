@@ -1,24 +1,13 @@
 // ignore_for_file: file_names
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
 
-class Event {
-  final String name;
-  final DateTime startTime;
-  final DateTime endTime;
-  final String location;
-  bool isParticipating;
-
-  Event({
-    required this.name,
-    required this.startTime,
-    required this.endTime,
-    required this.location,
-    required this.isParticipating,
-  });
-}
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -33,6 +22,18 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Event> events = [];
+  @override
+  void initState() {
+    super.initState();
+    _loadEventsFromCache();
+  }
+
+  Future<void> _loadEventsFromCache() async {
+    final loadedEvents = await loadEventsFromCache();
+    setState(() {
+      events = loadedEvents;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +70,7 @@ class _EventsPageState extends State<EventsPage> {
               child: ListView.builder(
                 itemCount: events.length,
                 itemBuilder: (context, index) {
-                  if (events[index].isParticipating == false ){
                   return _buildEventListItem(events[index]);
-
-                  }
-                  return null;
                 },
               ),
             ),
@@ -89,77 +86,99 @@ class _EventsPageState extends State<EventsPage> {
       ),
     );
   }
-Widget _buildEventListItem(Event event) {
-  return Card(
-    margin: const EdgeInsets.all(10.0),
-    color: keventCardColor,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(25.0),
-      side: const BorderSide(
-        color: keventCardBorderColor,
-        width: 0.5,
-      ),
-    ),
-    child: ListTile(
-      title: Center(
-        child: Column(
-          children: [
-            Text(
-              event.name,
-              style: const TextStyle(fontSize: 18.0),
-            ),
-            Text(
-              'Start Time: ${_formatDateTime(event.startTime)}',
-              style: const TextStyle(fontSize: 14.0),
-            ),
-            Text(
-              'End Time: ${_formatDateTime(event.endTime)}',
-              style: const TextStyle(fontSize: 14.0),
-            ),
-            Text(
-              'Location: ${event.location}',
-              style: const TextStyle(fontSize: 14.0),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  event.isParticipating = true;
-                });
-              },
-              child: Text(event.isParticipating ? 'Already Participated' : 'Participate'),
-            ),
-          ],
+
+  Widget _buildEventListItem(Event event) {
+    return Card(
+      margin: const EdgeInsets.all(10.0),
+      color: keventCardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25.0),
+        side: const BorderSide(
+          color: keventCardBorderColor,
+          width: 0.5,
         ),
       ),
-      onTap: () {
-        _onEventTapped(context, event.name);
-        setState(() {
-        });
-      },
-    ),
-  );
-}
-
-
-  void _onEventTapped(BuildContext context, String eventName) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Tapped on $eventName')),
+      child: ListTile(
+        title: Center(
+          child: Column(
+            children: [
+              Text(
+                event.name,
+                style: const TextStyle(fontSize: 18.0),
+              ),
+              Text(
+                'Start Time: ${_formatDateTime(event.startTime)}',
+                style: const TextStyle(fontSize: 14.0),
+              ),
+              Text(
+                'End Time: ${_formatDateTime(event.endTime)}',
+                style: const TextStyle(fontSize: 14.0),
+              ),
+              Text(
+                'Location: ${event.location}',
+                style: const TextStyle(fontSize: 14.0),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    event.isParticipating = true;
+                  });
+                },
+                child: Text(event.isParticipating
+                    ? 'Already Participated'
+                    : 'Participate'),
+              ),
+            ],
+          ),
+        ),
+        onTap: () {
+          _onEventTapped(context, event);
+          setState(() {});
+        },
+      ),
     );
   }
 
-  void _onCreateEvent(BuildContext context) {
-    Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AddEventForm(initialEvents: events)))
-        .then((value) => {
-              {setState(() {})}
-            });
+  void _onEventTapped(BuildContext context, Event event) async {
+    final editedEvent = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddEventForm(
+          initialEvents: events,
+          selectedEvent: event,
+        ),
+      ),
+    );
+
+    if (editedEvent != null) {
+      // Update the events list with the edited event
+      setState(() {
+        events[events.indexOf(event)] = editedEvent;
+      });
+    }
+  }
+
+  void _onCreateEvent(BuildContext context) async {
+    final newEvent = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddEventForm(initialEvents: events),
+      ),
+    );
+    saveEventsToCache(events);
+
+    if (newEvent != null) {
+      print(newEvent.toString());
+      setState(() {
+        events.add(newEvent);
+      });
+    }
   }
 
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
   }
+
 
   @override
   void dispose() {
