@@ -1,7 +1,4 @@
 // ignore_for_file: file_names
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:tag_me/utilities/event.dart';
 import 'package:tag_me/utilities/cache.dart';

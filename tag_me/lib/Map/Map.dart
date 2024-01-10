@@ -13,10 +13,10 @@ class MapWidget extends StatefulWidget {
 
 class _MapWidgetState extends State<MapWidget> with OSMMixinObserver {
   late MapController mapController;
-  GeoPoint? selectedPoint;
+  GeoPoint? selectedPoint = GeoPoint(latitude: 6.9271, longitude: 79.8612);
 
   @override
-  void initState() {
+  initState()  {
     super.initState();
     try {
       mapController = MapController(
@@ -31,7 +31,7 @@ class _MapWidgetState extends State<MapWidget> with OSMMixinObserver {
 
       mapController.addObserver(this);
     } catch (e) {
-      Navigator.pop(context);
+      _close();
     }
   }
 
@@ -101,7 +101,7 @@ class _MapWidgetState extends State<MapWidget> with OSMMixinObserver {
         markerIcon: const MarkerIcon(
           icon: Icon(
             Icons.place,
-            color: Colors.green,
+            color: Color.fromARGB(255, 191, 64, 0),
             size: 48,
           ),
         ));
@@ -126,5 +126,9 @@ class _MapWidgetState extends State<MapWidget> with OSMMixinObserver {
   void dispose() {
     mapController.dispose();
     super.dispose();
+  }
+
+  void _close() {
+    Navigator.pop(context);
   }
 }

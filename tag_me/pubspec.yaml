@@ -42,6 +42,7 @@ dependencies:
   flutter_osm_plugin: ^0.70.4
   get: ^4.6.6
   shared_preferences: ^2.2.2
+  pointer_interceptor: ^0.10.1
 
 dev_dependencies:
   flutter_test:

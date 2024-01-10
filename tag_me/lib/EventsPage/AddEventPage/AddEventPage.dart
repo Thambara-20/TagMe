@@ -4,7 +4,6 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tag_me/EventsPage/AddEventPage/DateTimePicker.dart';
 import 'package:tag_me/utilities/event.dart';
-import 'package:tag_me/Map/Map.dart';
 import 'package:tag_me/utilities/Location.dart';
 
 class AddEventForm extends StatefulWidget {
@@ -27,6 +26,7 @@ class _AddEventFormState extends State<AddEventForm> {
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
   String _location = '';
+  List<double> _geoPoint = [];
   List<String> _participants = ["user"]; // List of participants
 
   @override
@@ -39,6 +39,7 @@ class _AddEventFormState extends State<AddEventForm> {
       _endTime = widget.selectedEvent!.endTime;
       _participants = widget.selectedEvent!.participants;
       _location = widget.selectedEvent!.location;
+      _geoPoint = widget.selectedEvent!.geoPoint;
     }
   }
 
@@ -59,7 +60,40 @@ class _AddEventFormState extends State<AddEventForm> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _selectLocation,
+              onPressed: () async {
+                try {
+                  var p = await showSimplePickerLocation(
+                    context: context,
+                    isDismissible: true,
+                    title: "Select the location",
+                    textConfirmPicker: "pick",
+                    zoomOption: const ZoomOption(
+                      initZoom: 8,
+                    ),
+                    initPosition: GeoPoint(
+                      latitude: _geoPoint.isEmpty ? 6.9271 : _geoPoint[0],
+                      longitude: _geoPoint.isEmpty ? 79.861 : _geoPoint[1],
+                    ),
+                    radius: 10,
+                  );
+                  List<Placemark> placemarks = [];
+                  if (p != null) {
+                    placemarks =
+                        await placemarkFromCoordinates(p.latitude, p.longitude);
+                  } else {
+                    Position position = await determinePosition();
+                    placemarks = await placemarkFromCoordinates(
+                        position.latitude, position.longitude);
+                  }
+                  Placemark placemark = placemarks[0];
+                  String town = placemark.locality ?? 'Unknown Town';
+
+                  setState(() {
+                    _location = 'Town: $town';
+                    _geoPoint = [p!.latitude, p.longitude];
+                  });
+                } catch (e) {}
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
               ),
@@ -108,9 +142,10 @@ class _AddEventFormState extends State<AddEventForm> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: ElevatedButton(
-                  
-                  onPressed: (_location.isNotEmpty && _nameController.text.isNotEmpty )?  _onSubmit : null,
-                  
+                  onPressed:
+                      (_location.isNotEmpty && _nameController.text.isNotEmpty)
+                          ? _onSubmit
+                          : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     minimumSize: const Size(double.infinity, 48),
@@ -126,59 +161,28 @@ class _AddEventFormState extends State<AddEventForm> {
     );
   }
 
-  Future<void> _selectLocation() async {
-    try {
-      GeoPoint? selectedPoint = await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const MapWidget()),
-      );
-      List<Placemark> placemarks = [];
-      if (selectedPoint != null) {
-        placemarks = await placemarkFromCoordinates(
-            selectedPoint.latitude, selectedPoint.longitude);
-      } else {
-        Position position = await determinePosition();
-        placemarks = await placemarkFromCoordinates(
-            position.latitude, position.longitude);
-      }
-      Placemark placemark = placemarks[0];
-      String town = placemark.locality ?? 'Unknown Town';
-
-      setState(() {
-        _location = 'Town: $town';
-      });
-    } catch (e) {
-      _close();
-    }
-  }
-
   void _onSubmit() async {
-    if (_nameController.text.isEmpty ||
-        _location.isEmpty) {
+    if (_nameController.text.isEmpty || _location.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );
     }
 
     Event newEvent = Event(
-      creator: 'User',
-      name: _nameController.text,
-      startTime: _startTime,
-      endTime: _endTime,
-      location: _location,
-      participants: _participants,
-      isParticipating: false
-    );
+        creator: 'User',
+        name: _nameController.text,
+        startTime: _startTime,
+        endTime: _endTime,
+        location: _location,
+        geoPoint: _geoPoint,
+        participants: _participants,
+        isParticipating: false);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Event saved successfully')),
     );
 
     Navigator.pop(context, newEvent);
-  }
-
-  void _close() {
-    Navigator.pop(context);
   }
 
   @override

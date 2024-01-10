@@ -1,9 +1,11 @@
+
 class Event {
   final String creator;
   final String name;
   final DateTime startTime;
   final DateTime endTime;
   final String location;
+  List<double> geoPoint; 
   bool isParticipating;
   List<String> participants;
 
@@ -14,6 +16,7 @@ class Event {
     required this.endTime,
     required this.location,
     required this.isParticipating,
+    required this.geoPoint,
     required this.participants,
   });
 
@@ -36,6 +39,7 @@ class Event {
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       location: json['location'],
+      geoPoint: List<double>.from(json['geoPoint']),
       isParticipating: json['isParticipating'],
       participants: List<String>.from(json['participants']),
     );
