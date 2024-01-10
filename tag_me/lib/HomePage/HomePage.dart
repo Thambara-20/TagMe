@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
       participants: 20,
       userAttending: true,
       location: 'Location 1',
+      geoPoint: List<double>.from([ 7.0, 81.0]),
     ),
     Event(
       name: 'Event 2',
@@ -30,6 +31,7 @@ class _HomePageState extends State<HomePage> {
       participants: 15,
       userAttending: false,
       location: 'Location 2',
+      geoPoint: List<double>.from([ 6.08, 80.66]),
     ),
     Event(
       name: 'Event 2',
@@ -38,6 +40,7 @@ class _HomePageState extends State<HomePage> {
       participants: 15,
       userAttending: false,
       location: 'Location 2',
+      geoPoint: List<double>.from([ 7.0, 81.0]),
     ),
     Event(
       name: 'Event 2',
@@ -46,6 +49,7 @@ class _HomePageState extends State<HomePage> {
       participants: 15,
       userAttending: false,
       location: 'Location 2',
+      geoPoint: List<double>.from([ 7.0, 81.0]),
     ),
   ];
 

@@ -27,6 +27,7 @@ class Event {
       'startTime': startTime.toIso8601String(),
       'endTime': endTime.toIso8601String(),
       'location': location,
+      'geoPoint': geoPoint,
       'isParticipating': isParticipating,
       'participants': participants,
     };
@@ -39,8 +40,8 @@ class Event {
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       location: json['location'],
-      geoPoint: List<double>.from(json['geoPoint']),
       isParticipating: json['isParticipating'],
+      geoPoint: List<double>.from(json['geoPoint']),
       participants: List<String>.from(json['participants']),
     );
   }

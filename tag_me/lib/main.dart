@@ -4,6 +4,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
+import 'package:tag_me/ProfilePage/ProfilePage.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
 import 'package:tag_me/WelcomePage/WelcomePage.dart';
 import 'package:tag_me/SignupPage/SignupPage.dart';
@@ -92,16 +93,7 @@ class _MyHomePageState extends State<MainPage> {
   }
 }
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Welcome to Profile'),
-    );
-  }
-}
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);

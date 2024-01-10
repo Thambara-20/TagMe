@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:tag_me/EventsPage/AddEventPage/DateTimePicker.dart';
 import 'package:tag_me/utilities/event.dart';
 import 'package:tag_me/utilities/Location.dart';
+import 'package:tag_me/constants/constants.dart';
 
 class AddEventForm extends StatefulWidget {
   final List<Event> initialEvents;
@@ -23,6 +24,7 @@ class AddEventForm extends StatefulWidget {
 
 class _AddEventFormState extends State<AddEventForm> {
   final TextEditingController _nameController = TextEditingController();
+
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
   String _location = '';
@@ -62,6 +64,10 @@ class _AddEventFormState extends State<AddEventForm> {
             ElevatedButton(
               onPressed: () async {
                 try {
+                  GeoPoint geoPoint = await getGeoPoint();
+                  _geoPoint.add(geoPoint.latitude);
+                  _geoPoint.add(geoPoint.longitude);
+                  // ignore: use_build_context_synchronously
                   var p = await showSimplePickerLocation(
                     context: context,
                     isDismissible: true,
@@ -80,6 +86,10 @@ class _AddEventFormState extends State<AddEventForm> {
                   if (p != null) {
                     placemarks =
                         await placemarkFromCoordinates(p.latitude, p.longitude);
+                    setState(() {
+                      _geoPoint.add(p.latitude);
+                      _geoPoint.add(p.longitude);
+                    });
                   } else {
                     Position position = await determinePosition();
                     placemarks = await placemarkFromCoordinates(
@@ -89,8 +99,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   String town = placemark.locality ?? 'Unknown Town';
 
                   setState(() {
-                    _location = 'Town: $town';
-                    _geoPoint = [p!.latitude, p.longitude];
+                    _location = '$town';
                   });
                 } catch (e) {}
               },
@@ -101,7 +110,21 @@ class _AddEventFormState extends State<AddEventForm> {
                   style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 10),
-            Text('Selected Location: $_location'),
+            Row(
+              children: [
+                const Text('Location: ', style: knormalTextBlackStyle),
+                Text(_location, style: knormalTextBlueStyle),
+                //latitude and longtitude show
+                const SizedBox(width: 10),
+                Text(
+                  _geoPoint.isEmpty
+                      ? ''
+                      : '(${_geoPoint[0]}, ${_geoPoint[1]})',
+                  style: kwarningTextGreenStyle,
+                ),
+
+              ],
+            ),  
             const SizedBox(height: 10),
             DateTimePicker(
               initialDateTime: _startTime,
@@ -162,7 +185,9 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   void _onSubmit() async {
-    if (_nameController.text.isEmpty || _location.isEmpty) {
+    if (_geoPoint.isEmpty ||
+        _nameController.text.isEmpty ||
+        _location.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );

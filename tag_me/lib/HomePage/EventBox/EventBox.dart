@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/utilities/Location.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
 
 class Event {
@@ -11,6 +12,7 @@ class Event {
   final int participants;
   final bool userAttending;
   final String location;
+  final List<double> geoPoint;
 
   Event({
     required this.name,
@@ -19,6 +21,7 @@ class Event {
     required this.participants,
     required this.userAttending,
     required this.location,
+    required this.geoPoint,
   });
 }
 
@@ -131,21 +134,34 @@ class _EventBoxState extends State<EventBox> {
   }
 
   void _verifyAttendance() {
+    List<double> eventGeoPoint =
+        widget.event.geoPoint; // event's latitude and longitude
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Verify Attendance'),
           content: const Text(
-              'Please provide the required verification to mark your attendance.'),
+            'Please provide the required verification to mark your attendance.',
+          ),
           actions: [
             TextButton(
-              onPressed: () {
-                // Add logic for successful verification.
-                setState(() {
-                  _userAttending = !_userAttending;
-                });
-                Navigator.of(context).pop();
+              onPressed: () async {
+                bool isInGeoPointArea =
+                    await checkInGeoPointArea(eventGeoPoint);
+                if (isInGeoPointArea) {
+                  setState(() {
+                    _userAttending = !_userAttending;
+                  });
+                  _close();
+                }
+                 else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('You are not in the required area'),
+                    ),
+                  );
+                }
               },
               child: const Text('Verify'),
             ),
@@ -159,5 +175,9 @@ class _EventBoxState extends State<EventBox> {
         );
       },
     );
+  }
+
+  void _close() {
+    Navigator.of(context).pop();
   }
 }
