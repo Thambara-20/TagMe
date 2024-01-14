@@ -13,7 +13,7 @@ import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
 
-void main()  async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
 
@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -65,7 +66,25 @@ class _MainPageState extends State<MainPage> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          Builder(
+            builder: (BuildContext context) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: const Icon(Icons.person_2_outlined),
+                  color: ktextColorWhite,
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+
       ),
+      endDrawer: const ProfilePage(),
       body: PageView(
         controller: _pageController,
         onPageChanged: (index) {
@@ -76,7 +95,6 @@ class _MainPageState extends State<MainPage> {
         children: const [
           HomePage(),
           EventsPage(),
-          ProfilePage(),
           AboutPage(),
         ],
       ),
@@ -110,7 +128,6 @@ class _MainPageState extends State<MainPage> {
   final List<Map<String, dynamic>> _pages = [
     {'title': 'Home', 'icon': Icons.home},
     {'title': 'Events', 'icon': Icons.event},
-    {'title': 'Profile', 'icon': Icons.person},
     {'title': 'About', 'icon': Icons.description},
   ];
 }
