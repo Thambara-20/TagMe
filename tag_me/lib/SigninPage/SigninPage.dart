@@ -78,9 +78,9 @@ class _SignInPageState extends State<SignInPage> {
                   minimumSize: const Size(200, 50),
                   padding: const EdgeInsets.all(16),
                 ),
-                child: Text(
+                child: const Text(
                   'Sign In',
-                  style: TextStyle(fontSize: 0.04 * screenWidth),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
               SizedBox(height: 0.04 * screenHeight),
