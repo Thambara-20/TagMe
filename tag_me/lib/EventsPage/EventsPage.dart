@@ -5,7 +5,6 @@ import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
 
-
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
 
@@ -19,6 +18,7 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Event> events = [];
+  List<Event> searchResult = [];
   @override
   void initState() {
     super.initState();
@@ -29,6 +29,7 @@ class _EventsPageState extends State<EventsPage> {
     final loadedEvents = await loadEventsFromCache();
     setState(() {
       events = loadedEvents;
+      searchResult = loadedEvents;
     });
   }
 
@@ -45,7 +46,7 @@ class _EventsPageState extends State<EventsPage> {
                 controller: _searchController,
                 onChanged: (value) {
                   setState(() {
-                    events = events.where((event) {
+                    searchResult = events.where((event) {
                       return event.name
                           .toLowerCase()
                           .contains(value.toLowerCase());
@@ -65,9 +66,9 @@ class _EventsPageState extends State<EventsPage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: events.length,
+                itemCount: searchResult.length,
                 itemBuilder: (context, index) {
-                  return _buildEventListItem(events[index]);
+                  return _buildEventListItem(searchResult[index]);
                 },
               ),
             ),
@@ -174,7 +175,6 @@ class _EventsPageState extends State<EventsPage> {
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
   }
-
 
   @override
   void dispose() {

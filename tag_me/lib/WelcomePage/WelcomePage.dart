@@ -47,7 +47,7 @@ class _HomePageState extends State<WelcomePage> {
                       Navigator.pushNamed(context, SignUpPage.routeName);
                     },
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(200, 50),
+                      minimumSize: const Size(250, 50),
                       padding: const EdgeInsets.all(16),
                     ),
                     child:
@@ -65,16 +65,18 @@ class _HomePageState extends State<WelcomePage> {
                       // Add functionality for Google Sign In button
                     },
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(200, 50),
+                      minimumSize: const Size(250, 50),
                       padding: const EdgeInsets.all(16),
                       backgroundColor: kbuttonColorBlue,
                     ),
-                    child: Row(
+                    child:const  Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const FaIcon(FontAwesomeIcons.google,
+                        FaIcon(FontAwesomeIcons.google,
                             color: ktextColorWhite),
-                        SizedBox(width: 0.04 * screenWidth),
-                        const Text('Login using Google',
+                        SizedBox(width: 15),
+                        Text('Login using Google',
                             style: knormalTextWhiteStyle)
                       ],
                     ),
