@@ -1,12 +1,18 @@
+// ignore_for_file: file_names
+
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/ProfilePage/History.dart';
+import 'package:tag_me/constants/line.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
   static const String routeName = '/ProfilePage';
 
   @override
+  // ignore: library_private_types_in_public_api
   _ProfilePageState createState() => _ProfilePageState();
 }
 
@@ -18,17 +24,20 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           children: [
             Container(
-              height: 200,
+              height: 180,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [kProfilePageBackgroundColor, Color.fromARGB(255, 0, 0, 0)],
+                  colors: [
+                    kProfilePageBackgroundColor,
+                    Color.fromARGB(255, 0, 0, 0)
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
               ),
               child: const Center(
                 child: CircleAvatar(
-                  radius: 60,
+                  radius: 50,
                   backgroundColor: Colors.white,
                   child: Icon(
                     Icons.person,
@@ -38,12 +47,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
+            AnimatedStraightLine(
+                    width: 350,
+                    height: 10.0,
+                    duration: const Duration(milliseconds: 500),
+                    color: const Color.fromARGB(255, 0, 0, 0),
+                  ),
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                 
                   const Text(
                     'John Doe',
                     style: TextStyle(
@@ -59,6 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.grey[600],
                     ),
                   ),
+                 
                   const SizedBox(height: 16),
                   _buildProfileItem('Email', 'john.doe@example.com'),
                   _buildProfileItem('Phone', '+123 456 7890'),
@@ -71,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HistoryPage(),
+                          builder: (context) => const HistoryPage(),
                         ),
                       );
                     },
@@ -111,6 +128,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kLogoutButtonColor,
+                      elevation: 5,
+                      shadowColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 24,
@@ -141,7 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),

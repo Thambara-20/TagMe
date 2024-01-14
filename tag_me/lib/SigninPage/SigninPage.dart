@@ -75,7 +75,8 @@ class _SignInPageState extends State<SignInPage> {
                   Navigator.pushNamed(context, MainPage.routeName);
                 },
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(0.7 * screenWidth, 0.06 * screenHeight),
+                  minimumSize: const Size(200, 50),
+                  padding: const EdgeInsets.all(16),
                 ),
                 child: Text(
                   'Sign In',

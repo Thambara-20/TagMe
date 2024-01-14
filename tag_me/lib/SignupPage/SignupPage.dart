@@ -81,17 +81,16 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               SizedBox(height: 0.02 * screenHeight),
               ElevatedButton(
-                onPressed: () {
-                  // Implement signup functionality
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: Size(0.7 * screenWidth, 0.06 * screenHeight),
-                ),
-                child: Text(
-                  'Sign Up',
-                  style: TextStyle(fontSize: 0.04 * screenWidth),
-                ),
-              ),
+                    onPressed: () {
+                     //
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(200, 50),
+                      padding: const EdgeInsets.all(16),
+                    ),
+                    child:
+                        const Text('Sign up', style: TextStyle(fontSize: 16)),
+                  ),
               SizedBox(height: 0.04 * screenHeight),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

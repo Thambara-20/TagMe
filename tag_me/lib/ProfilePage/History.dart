@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
@@ -87,7 +89,7 @@ class HistoryPage extends StatelessWidget {
     ];
     return Scaffold(
       appBar: AppBar(
-        title: Text('My History'),
+        title: const Text('My History'),
         centerTitle: true,
       ),
       body: ListView.builder(

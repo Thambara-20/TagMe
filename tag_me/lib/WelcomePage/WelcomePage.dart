@@ -25,8 +25,7 @@ class _HomePageState extends State<WelcomePage> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(
-                'assets/background.jpg'), 
+            image: AssetImage('assets/background.jpg'),
             fit: BoxFit.cover,
           ),
         ),
@@ -39,36 +38,48 @@ class _HomePageState extends State<WelcomePage> {
                 style: klargeTextWhiteStyle,
               ),
               SizedBox(height: 0.04 * screenHeight),
-              ElevatedButton(
-                onPressed: () {
-                   Navigator.pushNamed(context, SignUpPage.routeName);
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: Size(0.7 * screenWidth,
-                      0.06 * screenHeight), // Adjusted button size
-                ),
-                child: Text('Sign up',
-                    style: TextStyle(fontSize: 0.04 * screenWidth)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, SignUpPage.routeName);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(200, 50),
+                      padding: const EdgeInsets.all(16),
+                    ),
+                    child:
+                        const Text('Sign up', style: TextStyle(fontSize: 16)),
+                  ),
+                ],
               ),
               SizedBox(height: 0.02 * screenHeight),
-              ElevatedButton(
-                onPressed: () {
-                  // Add functionality for Google Sign In button
-                },
-                style: ElevatedButton.styleFrom(
-                  fixedSize: Size(0.7 * screenWidth,
-                      0.06 * screenHeight), // Adjusted button size
-                  backgroundColor: kbuttonColorBlue,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const FaIcon(FontAwesomeIcons.google, color: ktextColorWhite),
-                    SizedBox(width: 0.05 * screenWidth),
-                    const Text('Login using Google',
-                        style: knormalTextWhiteStyle)
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add functionality for Google Sign In button
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(200, 50),
+                      padding: const EdgeInsets.all(16),
+                      backgroundColor: kbuttonColorBlue,
+                    ),
+                    child: Row(
+                      children: [
+                        const FaIcon(FontAwesomeIcons.google,
+                            color: ktextColorWhite),
+                        SizedBox(width: 0.04 * screenWidth),
+                        const Text('Login using Google',
+                            style: knormalTextWhiteStyle)
+                      ],
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 0.04 * screenHeight),
               Row(

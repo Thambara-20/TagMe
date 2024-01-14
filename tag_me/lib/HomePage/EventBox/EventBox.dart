@@ -156,6 +156,7 @@ class _EventBoxState extends State<EventBox> {
                   _close();
                 }
                  else {
+                  // ignore: use_build_context_synchronously
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('You are not in the required area'),
