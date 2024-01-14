@@ -13,7 +13,7 @@ import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
 
-void main()  async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
 
@@ -43,23 +43,16 @@ class MyApp extends StatelessWidget {
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
-
-  static const String routeName = '/MainPage';
+  const MainPage({super.key});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MainPageState createState() => _MainPageState();
+  static const String routeName = '/MainPage';
 }
 
-class _MyHomePageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
-
-  final List<Map<String, dynamic>> _pages = [
-    {'title': 'Home', 'icon': Icons.home, 'page': const HomePage()},
-    {'title': 'Events', 'icon': Icons.event, 'page': const EventsPage()},
-    {'title': 'Profile', 'icon': Icons.person, 'page': const ProfilePage()},
-    {'title': 'About', 'icon': Icons.description, 'page': const AboutPage()},
-  ];
+  final PageController _pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
@@ -73,14 +66,46 @@ class _MyHomePageState extends State<MainPage> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          Builder(
+            builder: (BuildContext context) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: const Icon(Icons.person_2_outlined),
+                  color: ktextColorWhite,
+                  onPressed: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+
       ),
-      body: _pages[_currentIndex]['page'],
+      endDrawer: const ProfilePage(),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: const [
+          HomePage(),
+          EventsPage(),
+          AboutPage(),
+        ],
+      ),
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: khomePageBackgroundColor,
         color: kNavbarBackgroundColor,
         buttonBackgroundColor: kNavbarButtonBackgroundColor,
         animationDuration: const Duration(milliseconds: 300),
+        animationCurve: Curves.easeOut,
         height: 50,
+        index: _currentIndex,
         items: _pages
             .map(
               (page) => Icon(page['icon'], size: 30, color: kNavbarButtonColor),
@@ -90,11 +115,19 @@ class _MyHomePageState extends State<MainPage> {
           setState(() {
             _currentIndex = index;
           });
+          _pageController.animateToPage(
+            index,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
         },
       ),
     );
   }
+
+  final List<Map<String, dynamic>> _pages = [
+    {'title': 'Home', 'icon': Icons.home},
+    {'title': 'Events', 'icon': Icons.event},
+    {'title': 'About', 'icon': Icons.description},
+  ];
 }
-
-
-

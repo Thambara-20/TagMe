@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -48,10 +50,10 @@ Future<bool> checkInGeoPointArea(List<double> eventGeoPoint) async {
       eventGeoPoint[1], // event's longitude
     );
     double thresholdDistance = 1000;
-    print(distanceInMeters);
+    // print(distanceInMeters);
     return distanceInMeters <= thresholdDistance;
   } catch (e) {
-    print('Error checking geolocation: $e');
+    // print('Error checking geolocation: $e');
     return false;
   }
 }

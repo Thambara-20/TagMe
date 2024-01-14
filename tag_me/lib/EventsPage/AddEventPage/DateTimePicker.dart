@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, depend_on_referenced_packages
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,6 +14,7 @@ class DateTimePicker extends StatefulWidget {
   }) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _DateTimePickerState createState() => _DateTimePickerState();
 }
 
@@ -33,6 +36,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
     );
 
     if (selectedDate != null) {
+      // ignore: use_build_context_synchronously
       final selectedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(_selectedDateTime),

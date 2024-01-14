@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart';
@@ -97,8 +99,9 @@ class _AddEventFormState extends State<AddEventForm> {
                   String town = placemark.locality ?? 'Unknown Town';
 
                   setState(() {
-                    _location = '$town';
+                    _location = town;
                   });
+                // ignore: empty_catches
                 } catch (e) {}
               },
               style: ElevatedButton.styleFrom(

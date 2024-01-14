@@ -1,159 +1,129 @@
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/ProfilePage/History.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
-  static const String routeName = '/ProfilePage';
 
-  @override
-  _ProfilePageState createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 200,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [kProfilePageBackgroundColor, Color.fromARGB(255, 0, 0, 0)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  kProfilePageBackgroundColor,
+                  Color.fromARGB(255, 0, 0, 0),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Stack(children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 ),
               ),
-              child: const Center(
+              const Center(
                 child: CircleAvatar(
-                  radius: 60,
+                  radius: 40,
                   backgroundColor: Colors.white,
                   child: Icon(
                     Icons.person,
-                    size: 80,
+                    size: 40,
                     color: kProfilePageBackgroundColor,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'John Doe',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+            ]),
+          ),
+          const ListTile(
+            title: Text('John Doe', style: TextStyle(fontSize: 24)),
+          ),
+          ListTile(
+            title: Text('Software Developer',
+                style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+          ),
+          _buildProfileItem(context, 'Email', 'john.doe@example.com'),
+          _buildProfileItem(context, 'Phone', '+123 456 7890'),
+          _buildProfileItem(context, 'Location', 'City, Country'),
+          _buildProfileItem(context, 'Events-Participated', '3'),
+          _buildProfileItem(context, 'Events-Created', '3'),
+          const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(Icons.history,
+                color: Color.fromARGB(255, 149, 149, 149)),
+            title: const Text('History'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HistoryPage(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          Column(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  // Add functionality for editing profile
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(200, 40),
+                  backgroundColor: kProfileEditButtonColor,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 20,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Software Developer',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildProfileItem('Email', 'john.doe@example.com'),
-                  _buildProfileItem('Phone', '+123 456 7890'),
-                  _buildProfileItem('Location', 'City, Country'),
-                  _buildProfileItem("Events-Participated", "3"),
-                  _buildProfileItem("Events-Created", "3"),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HistoryPage(),
-                        ),
-                      );
-                    },
-                    child: const Row(children: [
-                      Icon(
-                        Icons.history,
-                        color: Color.fromARGB(255, 149, 149, 149),
-                      ),
-                      SizedBox(width: 8),
-                      Text("History")
-                    ]),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add functionality for editing profile
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kProfileEditButtonColor,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 24,
-                      ),
-                    ),
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Edit Profile',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add functionality for editing profile
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kLogoutButtonColor,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 24,
-                      ),
-                    ),
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Logout',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
+                child: const Text(
+                  'Edit Profile',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  // Add functionality for logout
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(200, 40),
+                  backgroundColor: kLogoutButtonColor,
+                  elevation: 5,
+                  shadowColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 20,
+                  ),
+                ),
+                child: const Text(
+                  'Logout',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildProfileItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
+  Widget _buildProfileItem(BuildContext context, String label, String value) {
+    return ListTile(
+      title: Text(
+        '$label: $value',
+        style: const TextStyle(fontSize: 16),
       ),
     );
   }

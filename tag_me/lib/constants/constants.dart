@@ -7,7 +7,7 @@ const klargeTextWhiteStyle = TextStyle(
 );
 
 const knormalTextWhiteStyle = TextStyle(
-  fontSize: 16.0,
+  fontSize: 12.0,
   color: Colors.white,
 );
 
@@ -89,6 +89,6 @@ const kNavbarSelectedIconColor = Colors.blue;
 
 //------------------------------------------------ProfilePage--------------------------------------------------------------------------------
 
-const kLogoutButtonColor = Color.fromARGB(255, 159, 11, 0);
-const kProfilePageBackgroundColor = Color.fromARGB(255, 1, 166, 255);
+const kLogoutButtonColor = Color.fromARGB(255, 0, 0, 0);
+const kProfilePageBackgroundColor = Color.fromARGB(255, 0, 43, 103);
 const kProfileEditButtonColor = Color.fromARGB(151, 0, 0, 0);
