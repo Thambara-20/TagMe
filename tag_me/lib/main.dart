@@ -3,6 +3,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
 import 'package:tag_me/ProfilePage/History.dart';
 import 'package:tag_me/ProfilePage/ProfilePage.dart';
@@ -57,7 +58,7 @@ class _MyHomePageState extends State<MainPage> {
     {'title': 'Home', 'icon': Icons.home, 'page': const HomePage()},
     {'title': 'Events', 'icon': Icons.event, 'page': const EventsPage()},
     {'title': 'Profile', 'icon': Icons.person, 'page': const ProfilePage()},
-    {'title': 'Settings', 'icon': Icons.settings, 'page': const SettingsPage()},
+    {'title': 'About', 'icon': Icons.description, 'page': const AboutPage()},
   ];
 
   @override
@@ -97,13 +98,3 @@ class _MyHomePageState extends State<MainPage> {
 
 
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Welcome to Settings'),
-    );
-  }
-}

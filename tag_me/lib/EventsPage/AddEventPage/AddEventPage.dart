@@ -29,8 +29,7 @@ class _AddEventFormState extends State<AddEventForm> {
   DateTime _endTime = DateTime.now();
   String _location = '';
   List<double> _geoPoint = [];
-  List<String> _participants = ["user"]; // List of participants
-
+  List<String> _participants = ["user"]; 
   @override
   void initState() {
     super.initState();
@@ -64,9 +63,7 @@ class _AddEventFormState extends State<AddEventForm> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  GeoPoint geoPoint = await getGeoPoint();
-                  _geoPoint.add(geoPoint.latitude);
-                  _geoPoint.add(geoPoint.longitude);
+                  Position position = await determinePosition();
                   // ignore: use_build_context_synchronously
                   var p = await showSimplePickerLocation(
                     context: context,
@@ -91,9 +88,10 @@ class _AddEventFormState extends State<AddEventForm> {
                       _geoPoint.add(p.longitude);
                     });
                   } else {
-                    Position position = await determinePosition();
                     placemarks = await placemarkFromCoordinates(
                         position.latitude, position.longitude);
+                    _geoPoint.add(position.latitude);
+                    _geoPoint.add(position.longitude);
                   }
                   Placemark placemark = placemarks[0];
                   String town = placemark.locality ?? 'Unknown Town';
@@ -115,16 +113,9 @@ class _AddEventFormState extends State<AddEventForm> {
                 const Text('Location: ', style: knormalTextBlackStyle),
                 Text(_location, style: knormalTextBlueStyle),
                 //latitude and longtitude show
-                const SizedBox(width: 10),
-                Text(
-                  _geoPoint.isEmpty
-                      ? ''
-                      : '(${_geoPoint[0]}, ${_geoPoint[1]})',
-                  style: kwarningTextGreenStyle,
-                ),
-
+                const SizedBox(width: 10)
               ],
-            ),  
+            ),
             const SizedBox(height: 10),
             DateTimePicker(
               initialDateTime: _startTime,

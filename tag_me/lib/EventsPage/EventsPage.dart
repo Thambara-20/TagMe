@@ -165,7 +165,6 @@ class _EventsPageState extends State<EventsPage> {
     saveEventsToCache(events);
 
     if (newEvent != null) {
-      print(newEvent.toString());
       setState(() {
         events.add(newEvent);
       });
