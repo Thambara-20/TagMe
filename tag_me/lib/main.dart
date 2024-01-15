@@ -12,10 +12,17 @@ import 'package:tag_me/WelcomePage/WelcomePage.dart';
 import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+// ...
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(MyApp(prefs: prefs));
 }
@@ -82,7 +89,6 @@ class _MainPageState extends State<MainPage> {
             },
           ),
         ],
-
       ),
       endDrawer: const ProfilePage(),
       body: PageView(
