@@ -1,11 +1,21 @@
 // ignore_for_file: file_names
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/ProfilePage/History.dart';
+import 'package:tag_me/utilities/authService.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
+  static const String routeName = '/ProfilePage';
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -76,7 +86,7 @@ class ProfilePage extends StatelessWidget {
           Column(
             children: [
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Add functionality for editing profile
                 },
                 style: ElevatedButton.styleFrom(
@@ -94,7 +104,11 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  FirebaseAuthService authService = FirebaseAuthService();
+                  await authService.signOut();
+                  Navigator.pushNamed(context, '/WelcomePage');
+
                   // Add functionality for logout
                 },
                 style: ElevatedButton.styleFrom(
