@@ -43,6 +43,9 @@ dependencies:
   get: ^4.6.6
   shared_preferences: ^2.2.2
   pointer_interceptor: ^0.10.1
+  firebase_core: ^2.24.2
+  google_sign_in: ^6.2.1
+  firebase_auth: ^4.16.0
 
 dev_dependencies:
   flutter_test:

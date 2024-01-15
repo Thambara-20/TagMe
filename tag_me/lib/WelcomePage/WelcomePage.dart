@@ -2,9 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tag_me/HomePage/HomePage.dart';
 import "package:tag_me/constants/constants.dart";
 import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -16,9 +19,32 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<WelcomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+  
+  Future<User?> _handleSignIn() async {
+    try {
+      GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+      if (googleSignInAccount != null) {
+        GoogleSignInAuthentication googleSignInAuthentication =
+            await googleSignInAccount.authentication;
+        AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleSignInAuthentication.accessToken,
+          idToken: googleSignInAuthentication.idToken,
+        );
+        UserCredential authResult =
+            await _auth.signInWithCredential(credential);
+        return authResult.user;
+      }
+    } catch (error) {
+      print(error);
+      return null;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -61,23 +87,26 @@ class _HomePageState extends State<WelcomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      // Add functionality for Google Sign In button
+                    onPressed: () async {
+                      User? user = await _handleSignIn();
+                      if (user != null) {
+                        Navigator.pushNamed(context, HomePage.routeName);
+                      } else {
+                        print('Gmail signup failed.');
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(250, 50),
                       padding: const EdgeInsets.all(16),
                       backgroundColor: kbuttonColorBlue,
                     ),
-                    child:const  Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        FaIcon(FontAwesomeIcons.google,
-                            color: ktextColorWhite),
+                        FaIcon(FontAwesomeIcons.google, color: ktextColorWhite),
                         SizedBox(width: 15),
-                        Text('Login using Google',
-                            style: knormalTextWhiteStyle)
+                        Text('Login using Google', style: knormalTextWhiteStyle)
                       ],
                     ),
                   ),
