@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors_in_immutables, use_key_in_widget_constructors, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class AnimatedStraightLine extends StatefulWidget {
@@ -43,7 +45,7 @@ class _AnimatedStraightLineState extends State<AnimatedStraightLine>
       builder: (context, child) {
         return CustomPaint(
           painter: StraightLinePainter(_animation.value, widget.color),
-          child: Container(
+          child: SizedBox(
             width: widget.width,
             height: widget.height,
           ),
@@ -72,7 +74,7 @@ class StraightLinePainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 2.0;
 
-    final double startX = 0.0;
+    const double startX = 0.0;
     final double endX = size.width * progress;
     final double startY = size.height / 2;
     final double endY = size.height / 2;

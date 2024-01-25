@@ -1,10 +1,67 @@
 // ignore_for_file: file_names
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/ProfilePage/History.dart';
+import 'package:tag_me/utilities/authService.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
+
+  static const String routeName = '/ProfilePage';
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String _userName = '---'; // Updated dynamically from Firebase
+  String _userRole = '---'; // Updated dynamically from Firestore
+  String _userEmail = '---'; // Updated dynamically from Firebase
+  String _userLocation = '---'; // Updated dynamically from Geolocator
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        _userName = user.displayName ?? '';
+        _userEmail = user.email ?? '';
+
+        DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
+            .collection('members')
+            .doc(user.uid)
+            .get();
+
+        if (memberSnapshot.exists) {
+          _userRole = 'Member';
+        } else {
+          _userRole = 'Prospect';
+        }
+        try {
+          List<Placemark> placemarks = [];
+          Position position = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high);
+          placemarks = await placemarkFromCoordinates(
+              position.latitude, position.longitude);
+          Placemark place = placemarks[0];
+          _userLocation = '${place.locality}, ${place.country}';
+        // ignore: empty_catches
+        } catch (e) {}
+      }
+      setState(() {});
+    // ignore: empty_catches
+    } catch (e) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,18 +103,15 @@ class ProfilePage extends StatelessWidget {
               ),
             ]),
           ),
-          const ListTile(
-            title: Text('John Doe', style: TextStyle(fontSize: 24)),
+          ListTile(
+            title: Text(_userName, style: const TextStyle(fontSize: 20)),
           ),
           ListTile(
-            title: Text('Software Developer',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+            title: Text("Role: $_userRole", //member/prospect
+                style: const TextStyle(fontSize: 14, color: Colors.black)),
           ),
-          _buildProfileItem(context, 'Email', 'john.doe@example.com'),
-          _buildProfileItem(context, 'Phone', '+123 456 7890'),
-          _buildProfileItem(context, 'Location', 'City, Country'),
-          _buildProfileItem(context, 'Events-Participated', '3'),
-          _buildProfileItem(context, 'Events-Created', '3'),
+          _buildProfileItem(context, 'Email', _userEmail),
+          _buildProfileItem(context, 'Location', _userLocation),
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.history,
@@ -76,7 +130,8 @@ class ProfilePage extends StatelessWidget {
           Column(
             children: [
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  Navigator.pushNamed(context, EditProfilePage.routeName);
                   // Add functionality for editing profile
                 },
                 style: ElevatedButton.styleFrom(
@@ -94,7 +149,12 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  FirebaseAuthService authService = FirebaseAuthService();
+                  await authService.signOut();
+                  // ignore: use_build_context_synchronously
+                  Navigator.pushNamed(context, '/WelcomePage');
+
                   // Add functionality for logout
                 },
                 style: ElevatedButton.styleFrom(
@@ -123,7 +183,7 @@ class ProfilePage extends StatelessWidget {
     return ListTile(
       title: Text(
         '$label: $value',
-        style: const TextStyle(fontSize: 16),
+        style: const TextStyle(fontSize: 14),
       ),
     );
   }

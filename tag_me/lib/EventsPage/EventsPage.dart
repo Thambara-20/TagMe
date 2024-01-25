@@ -1,9 +1,14 @@
 // ignore_for_file: file_names
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tag_me/utilities/event.dart';
-import 'package:tag_me/utilities/cache.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/utilities/authService.dart';
+import 'package:tag_me/utilities/cache.dart';
+import 'package:tag_me/utilities/event.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -19,17 +24,57 @@ class _EventsPageState extends State<EventsPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Event> events = [];
   List<Event> searchResult = [];
+  bool isLoading = true;
+  bool isAddmin = false;
+
   @override
-  void initState() {
+  initState() {
     super.initState();
-    _loadEventsFromCache();
+    _listenToEvents();
+    _checkAdmin();
   }
 
-  Future<void> _loadEventsFromCache() async {
-    final loadedEvents = await loadEventsFromCache();
-    setState(() {
-      events = loadedEvents;
-      searchResult = loadedEvents;
+  Future<void> _checkAdmin() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    isAddmin = await FirebaseAuthService().isUserAdmin(user!.uid);
+  }
+
+  void _listenToEvents() {
+    FirebaseFirestore.instance
+        .collection('events')
+        .snapshots()
+        .listen((snapshot) {
+      setState(() {
+        events = snapshot.docs.map((document) {
+          Map<String, dynamic> data = document.data();
+
+          return Event(
+            id: document.id,
+            creator: data['creator'] ?? '',
+            name: data['name'] ?? '',
+            startTime: (data['startTime'] as Timestamp).toDate(),
+            endTime: (data['endTime'] as Timestamp).toDate(),
+            location: data['location'] ?? '',
+            geoPoint: List<double>.from(
+              (data['geoPoint'] as List<dynamic>?)?.cast<double>() ?? [],
+            ),
+            coordinates: Map<String, double>.from(data['coordinates'] ?? {}),
+            participants: List<String>.from(
+              (data['participants'] as List<dynamic>?)?.cast<String>() ?? [],
+            ),
+            isParticipating: data['isParticipating'] ?? false,
+          );
+        }).toList();
+
+        searchResult = events.where((event) {
+          return event.name
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase());
+        }).toList();
+        if (events.isNotEmpty) {
+          isLoading = false;
+        }
+      });
     });
   }
 
@@ -65,19 +110,26 @@ class _EventsPageState extends State<EventsPage> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: searchResult.length,
-                itemBuilder: (context, index) {
-                  return _buildEventListItem(searchResult[index]);
-                },
-              ),
+              child: isLoading
+                  ? const Center(
+                      child: Text(
+                        'No events available.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: searchResult.length,
+                      itemBuilder: (context, index) {
+                        return _buildEventListItem(searchResult[index]);
+                      },
+                    ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _onCreateEvent(context);
+          isAddmin ? _onCreateEvent(context) : null;
         },
         backgroundColor: kAddButtonColor,
         child: const Icon(Icons.add),
@@ -106,39 +158,33 @@ class _EventsPageState extends State<EventsPage> {
               ),
               Text(
                 'Start Time: ${_formatDateTime(event.startTime)}',
-                style: const TextStyle(fontSize: 14.0),
+                style: const TextStyle(fontSize: 15.0),
               ),
               Text(
                 'End Time: ${_formatDateTime(event.endTime)}',
-                style: const TextStyle(fontSize: 14.0),
+                style: const TextStyle(fontSize: 15.0),
               ),
               Text(
                 'Location: ${event.location}',
-                style: const TextStyle(fontSize: 14.0),
+                style: const TextStyle(fontSize: 15.0),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    event.isParticipating = true;
-                  });
-                },
-                child: Text(event.isParticipating
-                    ? 'Already Participated'
-                    : 'Participate'),
+              CountdownTimer(
+                endTime: event.startTime.millisecondsSinceEpoch,
+                textStyle: const TextStyle(
+                    fontSize: 15.0, color: Color.fromARGB(255, 185, 12, 0)),
               ),
             ],
           ),
         ),
         onTap: () {
-          _onEventTapped(context, event);
-          setState(() {});
+          isAddmin ? _onEventTapped(context, event): null;
         },
       ),
     );
   }
 
   void _onEventTapped(BuildContext context, Event event) async {
-    final editedEvent = await Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddEventForm(
@@ -147,29 +193,16 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
     );
-
-    if (editedEvent != null) {
-      // Update the events list with the edited event
-      setState(() {
-        events[events.indexOf(event)] = editedEvent;
-      });
-    }
   }
 
-  void _onCreateEvent(BuildContext context) async {
-    final newEvent = await Navigator.push(
+  void _onCreateEvent(BuildContext context) {
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddEventForm(initialEvents: events),
       ),
     );
     saveEventsToCache(events);
-
-    if (newEvent != null) {
-      setState(() {
-        events.add(newEvent);
-      });
-    }
   }
 
   String _formatDateTime(DateTime dateTime) {

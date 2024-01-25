@@ -4,26 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/Location.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
-
-class Event {
-  final String name;
-  final DateTime startTime;
-  final DateTime endTime;
-  final int participants;
-  final bool userAttending;
-  final String location;
-  final List<double> geoPoint;
-
-  Event({
-    required this.name,
-    required this.startTime,
-    required this.endTime,
-    required this.participants,
-    required this.userAttending,
-    required this.location,
-    required this.geoPoint,
-  });
-}
+import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/utilities/eventFunctions.dart';
 
 class EventBox extends StatefulWidget {
   final Event event;
@@ -41,7 +23,7 @@ class _EventBoxState extends State<EventBox> {
   @override
   void initState() {
     super.initState();
-    _userAttending = widget.event.userAttending;
+    _userAttending = widget.event.isParticipating;
   }
 
   @override
@@ -70,12 +52,12 @@ class _EventBoxState extends State<EventBox> {
                 formatDateTime(widget.event.startTime), Icons.access_time),
             _buildDetailRow('End Time:', formatDateTime(widget.event.endTime),
                 Icons.access_time),
-            _buildDetailRow(
-                'Participants:', '${widget.event.participants}', Icons.people),
+            _buildDetailRow('Participants:',
+                '${widget.event.participants.length}', Icons.people),
             _buildDetailRow(
                 'Location:', widget.event.location, Icons.location_on),
             _buildDetailRow(
-                'User Attending:', widget.event.userAttending, Icons.person),
+                'User Attending:', widget.event.isParticipating, Icons.person),
             const SizedBox(height: 8.0),
             ElevatedButton(
               onPressed: _userAttending ? null : _verifyAttendance,
@@ -134,8 +116,8 @@ class _EventBoxState extends State<EventBox> {
   }
 
   void _verifyAttendance() {
-    List<double> eventGeoPoint =
-        widget.event.geoPoint; // event's latitude and longitude
+    Map<String, double> eventGeoPoint =
+        widget.event.coordinates; // event's latitude and longitude
     showDialog(
       context: context,
       builder: (context) {
@@ -152,11 +134,14 @@ class _EventBoxState extends State<EventBox> {
                 if (isInGeoPointArea) {
                   setState(() {
                     _userAttending = !_userAttending;
+                    addParticipant(widget.event.id);
                   });
                   _close();
-                }
-                 else {
+                } else {
                   // ignore: use_build_context_synchronously
+                  if (!mounted) {
+                    return;
+                  }
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('You are not in the required area'),

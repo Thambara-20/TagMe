@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tag_me/HomePage/HomePage.dart';
 import "package:tag_me/constants/constants.dart";
 import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tag_me/main.dart';
+import 'package:tag_me/utilities/authService.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -19,29 +19,6 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<WelcomePage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-  
-  Future<User?> _handleSignIn() async {
-    try {
-      GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
-      if (googleSignInAccount != null) {
-        GoogleSignInAuthentication googleSignInAuthentication =
-            await googleSignInAccount.authentication;
-        AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleSignInAuthentication.accessToken,
-          idToken: googleSignInAuthentication.idToken,
-        );
-        UserCredential authResult =
-            await _auth.signInWithCredential(credential);
-        return authResult.user;
-      }
-    } catch (error) {
-      print(error);
-      return null;
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,12 +65,12 @@ class _HomePageState extends State<WelcomePage> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      User? user = await _handleSignIn();
+                      FirebaseAuthService authService = FirebaseAuthService();
+                      User? user = await authService.signInWithGoogle();
                       if (user != null) {
-                        Navigator.pushNamed(context, HomePage.routeName);
-                      } else {
-                        print('Gmail signup failed.');
-                      }
+                        // ignore: use_build_context_synchronously
+                        Navigator.pushNamed(context, MainPage.routeName);
+                      } else {}
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(250, 50),
