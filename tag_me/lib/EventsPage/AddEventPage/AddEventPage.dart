@@ -31,7 +31,7 @@ class _AddEventFormState extends State<AddEventForm> {
   DateTime _endTime = DateTime.now();
   String _location = '';
   List<double> _geoPoint = [];
-  List<String> _participants = ["user"]; 
+  List<String> _participants = ["user"];
   @override
   void initState() {
     super.initState();
@@ -65,7 +65,8 @@ class _AddEventFormState extends State<AddEventForm> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  Position position = await determinePosition();
+                  Position position = await Geolocator.getCurrentPosition(
+                      desiredAccuracy: LocationAccuracy.high);
                   // ignore: use_build_context_synchronously
                   var p = await showSimplePickerLocation(
                     context: context,
@@ -101,7 +102,7 @@ class _AddEventFormState extends State<AddEventForm> {
                   setState(() {
                     _location = town;
                   });
-                // ignore: empty_catches
+                  // ignore: empty_catches
                 } catch (e) {}
               },
               style: ElevatedButton.styleFrom(

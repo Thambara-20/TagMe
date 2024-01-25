@@ -1,10 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
+import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/ProfilePage/History.dart';
 import 'package:tag_me/ProfilePage/ProfilePage.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
@@ -23,7 +25,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  firestore.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
   runApp(MyApp(prefs: prefs));
 }
 
@@ -44,6 +50,7 @@ class MyApp extends StatelessWidget {
         SignInPage.routeName: (context) => const SignInPage(),
         MainPage.routeName: (context) => const MainPage(),
         HistoryPage.routeName: (context) => const HistoryPage(),
+        EditProfilePage.routeName: (context) => const EditProfilePage(),
       },
     );
   }
