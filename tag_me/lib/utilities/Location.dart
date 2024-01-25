@@ -57,14 +57,14 @@ Future<Position> determinePosition() async {
   return await Geolocator.getCurrentPosition();
 }
 
-Future<bool> checkInGeoPointArea(List<double> eventGeoPoint) async {
+Future<bool> checkInGeoPointArea(Map<String,double> eventGeoPoint) async {
   try {
     Position userPosition = await determinePosition();
     double distanceInMeters = Geolocator.distanceBetween(
       userPosition.latitude,
       userPosition.longitude,
-      eventGeoPoint[0], // event's latitude
-      eventGeoPoint[1], // event's longitude
+      eventGeoPoint['latitude']!,
+      eventGeoPoint['longtitude']!, 
     );
     double thresholdDistance = 1000;
     return distanceInMeters <= thresholdDistance;

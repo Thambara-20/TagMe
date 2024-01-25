@@ -1,5 +1,8 @@
+// ignore_for_file: file_names
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseAuthService {
   static final FirebaseAuthService _instance = FirebaseAuthService._internal();
@@ -36,6 +39,16 @@ class FirebaseAuthService {
       return user;
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<bool> isUserAdmin(String uid) async {
+    try {
+      final adminDoc =
+          await FirebaseFirestore.instance.collection('admins').doc(uid).get();
+      return adminDoc.exists;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -79,6 +92,7 @@ class FirebaseAuthService {
     try {
       await _googleSignIn.signOut();
       await _auth.signOut();
+      // ignore: empty_catches
     } catch (e) {}
   }
 }

@@ -55,11 +55,11 @@ class _ProfilePageState extends State<ProfilePage> {
               position.latitude, position.longitude);
           Placemark place = placemarks[0];
           _userLocation = '${place.locality}, ${place.country}';
-        } catch (e) {
-          print(e);
-        }
+        // ignore: empty_catches
+        } catch (e) {}
       }
       setState(() {});
+    // ignore: empty_catches
     } catch (e) {}
   }
 
@@ -104,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ]),
           ),
           ListTile(
-            title: Text(_userName, style: TextStyle(fontSize: 20)),
+            title: Text(_userName, style: const TextStyle(fontSize: 20)),
           ),
           ListTile(
             title: Text("Role: $_userRole", //member/prospect

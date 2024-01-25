@@ -48,7 +48,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         Navigator.pop(context);
       }
     } catch (e) {
-      print("Error updating profile: $e");
       // Handle errors, show a message, etc.
     }
   }

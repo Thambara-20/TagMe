@@ -38,7 +38,7 @@ class _AddEventFormState extends State<AddEventForm> {
     "latitude": 6.927079,
     "longtitude": 79.861
   };
-  List<String> _participants = ["user"];
+  List<String> _participants = [];
   @override
   void initState() {
     super.initState();
@@ -59,166 +59,183 @@ class _AddEventFormState extends State<AddEventForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Event'),
+        title: const Text('Add/Update Event'),
         actions: [
           if (widget.selectedEvent != null)
             IconButton(
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               onPressed: () {
                 _onDelete();
               },
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Event Name'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () async {
-                if (!mounted) {
-                  return;
-                }
-                try {
-                  Position position = await Geolocator.getCurrentPosition(
-                      desiredAccuracy: LocationAccuracy.high);
-                  // ignore: use_build_context_synchronously
-                  var p = await showSimplePickerLocation(
-                    context: context,
-                    isDismissible: true,
-                    title: "Select the location",
-                    textConfirmPicker: "pick",
-                    zoomOption: const ZoomOption(
-                      initZoom: 8,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(labelText: 'Event Name'),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (!mounted) {
+                        Navigator.pop(context);
+                        return;
+                      }
+                      try {
+                        var p = await showSimplePickerLocation(
+                          context: context,
+                          isDismissible: true,
+                          title: "Select the location",
+                          textConfirmPicker: "pick",
+                          zoomOption: const ZoomOption(
+                            initZoom: 8,
+                          ),
+                          initPosition:
+                              await getGeoPointFromLocation(_coordinates),
+                          radius: 10,
+                        );
+                        List<Placemark> placemarks = [];
+                        if (p != null) {
+                          placemarks = await placemarkFromCoordinates(
+                              p.latitude, p.longitude);
+                          setState(() {
+                            _coordinates["latitude"] = p.latitude;
+                            _coordinates["longtitude"] = p.longitude;
+                          });
+                        } else {
+                          Position position =
+                              await Geolocator.getCurrentPosition(
+                                  desiredAccuracy: LocationAccuracy.high);
+                          placemarks = await placemarkFromCoordinates(
+                              position.latitude, position.longitude);
+                        }
+                        Placemark placemark = placemarks[0];
+                        String town = placemark.locality ?? 'Unknown Town';
+
+                        setState(() {
+                          _location = town;
+                        });
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text('Failed to get current location')),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
                     ),
-                    initPosition: await getGeoPointFromLocation(_coordinates),
-                    radius: 10,
-                  );
-                  List<Placemark> placemarks = [];
-                  if (p != null) {
-                    placemarks =
-                        await placemarkFromCoordinates(p.latitude, p.longitude);
-                    setState(() {
-                      _coordinates["latitude"] = p.latitude;
-                      _coordinates["longtitude"] = p.longitude;
-                    });
-                  } else {
-                    placemarks = await placemarkFromCoordinates(
-                        position.latitude, position.longitude);
-                  }
-                  Placemark placemark = placemarks[0];
-                  String town = placemark.locality ?? 'Unknown Town';
+                    child: const Text('Select Location',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Text('Location: ', style: knormalTextBlackStyle),
+                      Text(_location, style: knormalTextBlueStyle),
+                      //latitude and longtitude show
+                      const SizedBox(width: 10)
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  DateTimePicker(
+                    initialDateTime: _startTime,
+                    onDateTimeChanged: (newDateTime) {
+                      setState(() {
+                        _startTime = newDateTime;
+                      });
+                    },
+                  ),
+                  DateTimePicker(
+                    initialDateTime: _endTime,
+                    onDateTimeChanged: (newDateTime) {
+                      setState(() {
+                        _endTime = newDateTime;
+                      });
+                    },
+                  ),
+                  //line of black
+                  const Divider(
+                    color: Colors.black,
+                    thickness: 1.0,
+                    height: 20.0,
+                  ),
 
-                  setState(() {
-                    _location = town;
-                  });
-                  // ignore: empty_catches
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Failed to get current location')),
-                    );
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-              ),
-              child: const Text('Select Location',
-                  style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Text('Location: ', style: knormalTextBlackStyle),
-                Text(_location, style: knormalTextBlueStyle),
-                //latitude and longtitude show
-                const SizedBox(width: 10)
-              ],
-            ),
-            const SizedBox(height: 10),
-            DateTimePicker(
-              initialDateTime: _startTime,
-              onDateTimeChanged: (newDateTime) {
-                setState(() {
-                  _startTime = newDateTime;
-                });
-              },
-            ),
-            DateTimePicker(
-              initialDateTime: _endTime,
-              onDateTimeChanged: (newDateTime) {
-                setState(() {
-                  _endTime = newDateTime;
-                });
-              },
-            ),
-            //line of black
-            const Divider(
-              color: Colors.black,
-              thickness: 1.0,
-              height: 20.0,
-            ),
-
-            DataTable(
-              columns: const [
-                DataColumn(label: Text('Participants')),
-              ],
-              rows: _participants.map<DataRow>((participant) {
-                return DataRow(
-                  cells: [
-                    DataCell(Text(participant)),
-                  ],
-                );
-              }).toList(),
-            ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ElevatedButton(
-                  onPressed:
-                      (_location.isNotEmpty && _nameController.text.isNotEmpty)
+                  DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Participants')),
+                    ],
+                    rows: _participants.map<DataRow>((participant) {
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(participant)),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: FractionalOffset.bottomCenter,
+                    child: ElevatedButton(
+                      onPressed: (_location.isNotEmpty &&
+                              _nameController.text.isNotEmpty)
                           ? _onSubmit
                           : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    minimumSize: const Size(double.infinity, 48),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                      child: const Text('Save Event',
+                          style: TextStyle(color: Colors.white)),
+                    ),
                   ),
-                  child: const Text('Save Event',
-                      style: TextStyle(color: Colors.white)),
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          ]),
     );
   }
 
   void _onDelete() {
     // Add logic to delete the event
-   showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return ConfirmationDialog(
-        onConfirm: () {
-          // Add logic to delete the event
-          if (widget.selectedEvent != null) {
-            deleteEvent(widget.selectedEvent!.id);
-            Navigator.pop(context); 
-          }
-        },
-        confirmationMessage: 'Are you sure you want to delete this event?',
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationDialog(
+          onConfirm: () async {
+            // Add logic to delete the event
+            if (widget.selectedEvent != null) {
+              try {
+                await deleteEvent(widget.selectedEvent!.id);
+                _exitPage();
+              } catch (e) {
+                _showError(e);
+              }
+            }
+          },
+          confirmationMessage: 'Are you sure you want to delete this event?',
+        );
+      },
+    );
+  }
+
+  void _showError(e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete event: $e')),
       );
-    },
-  );
+    }
   }
 
   void _onSubmit() {
@@ -270,6 +287,9 @@ class _AddEventFormState extends State<AddEventForm> {
         );
       }
     }
+  }
+  void _exitPage() {
+    Navigator.pop(context);
   }
 
   @override

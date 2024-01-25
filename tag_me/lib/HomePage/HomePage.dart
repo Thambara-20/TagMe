@@ -1,9 +1,11 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
-
+// Import necessary packages
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
 import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/utilities/eventFunctions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,82 +13,71 @@ class HomePage extends StatefulWidget {
   static const String routeName = '/HomePage';
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Event> ongoingEvents = [
-    Event(
-      id: '1',
-      creator: 'User 1',
-      name: 'Event 1',
-      startTime: DateTime.now(),
-      endTime: DateTime.now().add(const Duration(hours: 2)),
-      participants: ['User 1', 'User 2', 'User 3'],
-      coordinates: {
-        'latitude': 37.7749,
-        'longitude': -122.4194,
-      },
-      isParticipating: true,
-      location: 'Location 1',
-      geoPoint: List<double>.from([7.0, 81.0]),
-    ),
-    Event(
-      id: '2',
-      creator: 'User 2',
-      name: 'Event 2',
-      startTime: DateTime.now().add(const Duration(days: 1)),
-      endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
-      participants: ['User 1', 'User 2', 'User 3'],
-      coordinates: {
-        'latitude': 37.7749,
-        'longitude': -122.4194,
-      },
-      isParticipating: false,
-      location: 'Location 2',
-      geoPoint: List<double>.from([6.08, 80.66]),
-    ),
-    Event(
-      id: '3',
-      creator: 'User 3',
-      name: 'Event 2',
-      startTime: DateTime.now().add(const Duration(days: 1)),
-      endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
-      participants: ['User 1', 'User 2', 'User 3'],
-      coordinates: {
-        'latitude': 37.7749,
-        'longitude': -122.4194,
-      },
-      isParticipating: false,
-      location: 'Location 2',
-      geoPoint: List<double>.from([7.0, 81.0]),
-    ),
-    Event(
-      id: '4',
-      creator: 'User 4',
-      name: 'Event 2',
-      startTime: DateTime.now().add(const Duration(days: 1)),
-      endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
-      participants: ['User 1', 'User 2', 'User 3'],
-      coordinates: {
-        'latitude': 37.7749,
-        'longitude': -122.4194,
-      },
-      isParticipating: false,
-      location: 'Location 2',
-      geoPoint: List<double>.from([7.0, 81.0]),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         color: khomePageBackgroundColor,
-        child: ListView.builder(
-          itemCount: ongoingEvents.length,
-          itemBuilder: (context, index) {
-            return EventBox(event: ongoingEvents[index]);
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance.collection('events').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No ongoing events available.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
+
+            // Process the data
+            List<Event> ongoingEvents =
+                snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
+
+              return Event(
+                id: document.id,
+                creator: data['creator'] ?? '',
+                name: data['name'] ?? '',
+                startTime: (data['startTime'] as Timestamp).toDate(),
+                endTime: (data['endTime'] as Timestamp).toDate(),
+                location: data['location'] ?? '',
+                geoPoint: List<double>.from(
+                  (data['geoPoint'] as List<dynamic>?)?.cast<double>() ?? [],
+                ),
+                coordinates:
+                    Map<String, double>.from(data['coordinates'] ?? {}),
+                participants: List<String>.from(
+                  (data['participants'] as List<dynamic>?)?.cast<String>() ??
+                      [],
+                ),
+                isParticipating: data['participants'].contains(
+                        FirebaseAuth.instance.currentUser?.displayName) ??
+                    false,
+              );
+            }).toList();
+
+            return ListView.builder(
+              itemCount: ongoingEvents.length,
+              itemBuilder: (context, index) {
+                if (!checkStartTime(ongoingEvents[index].startTime)) {
+                  return EventBox(event: ongoingEvents[index]);
+                }
+                return null;
+              },
+            );
           },
         ),
       ),

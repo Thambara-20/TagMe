@@ -1,9 +1,12 @@
 // ignore_for_file: file_names
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/utilities/authService.dart';
 import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/utilities/event.dart';
 
@@ -22,15 +25,25 @@ class _EventsPageState extends State<EventsPage> {
   List<Event> events = [];
   List<Event> searchResult = [];
   bool isLoading = true;
+  bool isAddmin = false;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
     _listenToEvents();
+    _checkAdmin();
+  }
+
+  Future<void> _checkAdmin() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    isAddmin = await FirebaseAuthService().isUserAdmin(user!.uid);
   }
 
   void _listenToEvents() {
-    FirebaseFirestore.instance.collection('events').snapshots().listen((snapshot) {
+    FirebaseFirestore.instance
+        .collection('events')
+        .snapshots()
+        .listen((snapshot) {
       setState(() {
         events = snapshot.docs.map((document) {
           Map<String, dynamic> data = document.data();
@@ -60,9 +73,7 @@ class _EventsPageState extends State<EventsPage> {
         }).toList();
         if (events.isNotEmpty) {
           isLoading = false;
-          
         }
-
       });
     });
   }
@@ -100,7 +111,12 @@ class _EventsPageState extends State<EventsPage> {
             ),
             Expanded(
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                      child: Text(
+                        'No events available.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
                   : ListView.builder(
                       itemCount: searchResult.length,
                       itemBuilder: (context, index) {
@@ -113,7 +129,7 @@ class _EventsPageState extends State<EventsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _onCreateEvent(context);
+          isAddmin ? _onCreateEvent(context) : null;
         },
         backgroundColor: kAddButtonColor,
         child: const Icon(Icons.add),
@@ -142,31 +158,26 @@ class _EventsPageState extends State<EventsPage> {
               ),
               Text(
                 'Start Time: ${_formatDateTime(event.startTime)}',
-                style: const TextStyle(fontSize: 14.0),
+                style: const TextStyle(fontSize: 15.0),
               ),
               Text(
                 'End Time: ${_formatDateTime(event.endTime)}',
-                style: const TextStyle(fontSize: 14.0),
+                style: const TextStyle(fontSize: 15.0),
               ),
               Text(
                 'Location: ${event.location}',
-                style: const TextStyle(fontSize: 14.0),
+                style: const TextStyle(fontSize: 15.0),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    event.isParticipating = true;
-                  });
-                },
-                child: Text(event.isParticipating
-                    ? 'Already Participated'
-                    : 'Participate'),
+              CountdownTimer(
+                endTime: event.startTime.millisecondsSinceEpoch,
+                textStyle: const TextStyle(
+                    fontSize: 15.0, color: Color.fromARGB(255, 185, 12, 0)),
               ),
             ],
           ),
         ),
         onTap: () {
-          _onEventTapped(context, event);
+          isAddmin ? _onEventTapped(context, event): null;
         },
       ),
     );
@@ -182,23 +193,16 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
     );
-
   }
 
-  void _onCreateEvent(BuildContext context) async {
-    final newEvent = await Navigator.push(
+  void _onCreateEvent(BuildContext context) {
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddEventForm(initialEvents: events),
       ),
     );
     saveEventsToCache(events);
-
-    if (newEvent != null) {
-      setState(() {
-        events.add(newEvent);
-      });
-    }
   }
 
   String _formatDateTime(DateTime dateTime) {
