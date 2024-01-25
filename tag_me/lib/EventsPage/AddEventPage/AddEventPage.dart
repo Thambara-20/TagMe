@@ -1,12 +1,13 @@
 // ignore_for_file: file_names
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tag_me/EventsPage/AddEventPage/DateTimePicker.dart';
-import 'package:tag_me/utilities/event.dart';
 import 'package:tag_me/utilities/Location.dart';
+import 'package:tag_me/utilities/event.dart';
 import 'package:tag_me/constants/constants.dart';
 
 class AddEventForm extends StatefulWidget {
@@ -29,20 +30,27 @@ class _AddEventFormState extends State<AddEventForm> {
 
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
+  String _id = '';
   String _location = '';
   List<double> _geoPoint = [];
+  Map<String, double> _coordinates = {
+    "latitude": 6.927079,
+    "longtitude": 79.861
+  };
   List<String> _participants = ["user"];
   @override
   void initState() {
     super.initState();
 
     if (widget.selectedEvent != null) {
+      _id = widget.selectedEvent!.id;
       _nameController.text = widget.selectedEvent!.name;
       _startTime = widget.selectedEvent!.startTime;
       _endTime = widget.selectedEvent!.endTime;
       _participants = widget.selectedEvent!.participants;
       _location = widget.selectedEvent!.location;
       _geoPoint = widget.selectedEvent!.geoPoint;
+      _coordinates = widget.selectedEvent!.coordinates;
     }
   }
 
@@ -64,6 +72,9 @@ class _AddEventFormState extends State<AddEventForm> {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
+                if (!mounted) {
+                  return;
+                }
                 try {
                   Position position = await Geolocator.getCurrentPosition(
                       desiredAccuracy: LocationAccuracy.high);
@@ -76,10 +87,7 @@ class _AddEventFormState extends State<AddEventForm> {
                     zoomOption: const ZoomOption(
                       initZoom: 8,
                     ),
-                    initPosition: GeoPoint(
-                      latitude: _geoPoint.isEmpty ? 6.9271 : _geoPoint[0],
-                      longitude: _geoPoint.isEmpty ? 79.861 : _geoPoint[1],
-                    ),
+                    initPosition: await getGeoPointFromLocation(_coordinates),
                     radius: 10,
                   );
                   List<Placemark> placemarks = [];
@@ -87,14 +95,12 @@ class _AddEventFormState extends State<AddEventForm> {
                     placemarks =
                         await placemarkFromCoordinates(p.latitude, p.longitude);
                     setState(() {
-                      _geoPoint.add(p.latitude);
-                      _geoPoint.add(p.longitude);
+                      _coordinates["latitude"] = p.latitude;
+                      _coordinates["longtitude"] = p.longitude;
                     });
                   } else {
                     placemarks = await placemarkFromCoordinates(
                         position.latitude, position.longitude);
-                    _geoPoint.add(position.latitude);
-                    _geoPoint.add(position.longitude);
                   }
                   Placemark placemark = placemarks[0];
                   String town = placemark.locality ?? 'Unknown Town';
@@ -178,32 +184,83 @@ class _AddEventFormState extends State<AddEventForm> {
       ),
     );
   }
+void _onSubmit() async {
+  if (!mounted) {
+    return;
+  }
 
-  void _onSubmit() async {
-    if (_geoPoint.isEmpty ||
-        _nameController.text.isEmpty ||
-        _location.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all required fields')),
-      );
-    }
+  if (_coordinates.isEmpty ||
+      _nameController.text.isEmpty ||
+      _location.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please fill in all required fields')),
+    );
+    return;
+  }
 
-    Event newEvent = Event(
-        creator: 'User',
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      Event newEvent = Event(
+        id: _id, // Include id in the constructor
+        creator: user.uid,
         name: _nameController.text,
         startTime: _startTime,
         endTime: _endTime,
         location: _location,
+        coordinates: _coordinates,
         geoPoint: _geoPoint,
         participants: _participants,
-        isParticipating: false);
+        isParticipating: false,
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Event saved successfully')),
-    );
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    Navigator.pop(context, newEvent);
+      if (_id.isNotEmpty) {
+        await firestore.collection('events').doc(_id).update({
+          'creator': newEvent.creator,
+          'name': newEvent.name,
+          'startTime': newEvent.startTime,
+          'endTime': newEvent.endTime,
+          'location': newEvent.location,
+          'coordinates': newEvent.coordinates,
+          'geoPoint': newEvent.geoPoint,
+          'participants': newEvent.participants,
+          'isParticipating': newEvent.isParticipating,
+        });
+      } else {
+        DocumentReference documentReference =
+            await firestore.collection('events').add({
+          'creator': newEvent.creator,
+          'name': newEvent.name,
+          'startTime': newEvent.startTime,
+          'endTime': newEvent.endTime,
+          'location': newEvent.location,
+          'coordinates': newEvent.coordinates,
+          'geoPoint': newEvent.geoPoint,
+          'participants': newEvent.participants,
+          'isParticipating': newEvent.isParticipating,
+        });
+
+        newEvent.id = documentReference.id; 
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Event saved successfully')),
+      );
+
+      Navigator.pop(context, newEvent);
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save event')),
+      );
+    }
   }
+}
+
 
   @override
   void dispose() {

@@ -1,9 +1,12 @@
 // ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
-import 'package:tag_me/utilities/event.dart';
-import 'package:tag_me/utilities/cache.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/utilities/Appprovider.dart';
+import 'package:tag_me/utilities/cache.dart';
+import 'package:tag_me/utilities/event.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -19,17 +22,49 @@ class _EventsPageState extends State<EventsPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Event> events = [];
   List<Event> searchResult = [];
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    _loadEventsFromCache();
+    _listenToEvents();
   }
 
-  Future<void> _loadEventsFromCache() async {
-    final loadedEvents = await loadEventsFromCache();
-    setState(() {
-      events = loadedEvents;
-      searchResult = loadedEvents;
+  void _listenToEvents() {
+    FirebaseFirestore.instance.collection('events').snapshots().listen((snapshot) {
+      setState(() {
+        events = snapshot.docs.map((document) {
+          Map<String, dynamic> data = document.data();
+
+          return Event(
+            id: document.id,
+            creator: data['creator'] ?? '',
+            name: data['name'] ?? '',
+            startTime: (data['startTime'] as Timestamp).toDate(),
+            endTime: (data['endTime'] as Timestamp).toDate(),
+            location: data['location'] ?? '',
+            geoPoint: List<double>.from(
+              (data['geoPoint'] as List<dynamic>?)?.cast<double>() ?? [],
+            ),
+            coordinates: Map<String, double>.from(data['coordinates'] ?? {}),
+            participants: List<String>.from(
+              (data['participants'] as List<dynamic>?)?.cast<String>() ?? [],
+            ),
+            isParticipating: data['isParticipating'] ?? false,
+          );
+        }).toList();
+
+        searchResult = events.where((event) {
+          return event.name
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase());
+        }).toList();
+        if (events.isNotEmpty) {
+          isLoading = false;
+          
+        }
+
+      });
     });
   }
 
@@ -65,12 +100,14 @@ class _EventsPageState extends State<EventsPage> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: searchResult.length,
-                itemBuilder: (context, index) {
-                  return _buildEventListItem(searchResult[index]);
-                },
-              ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: searchResult.length,
+                      itemBuilder: (context, index) {
+                        return _buildEventListItem(searchResult[index]);
+                      },
+                    ),
             ),
           ],
         ),
@@ -131,14 +168,13 @@ class _EventsPageState extends State<EventsPage> {
         ),
         onTap: () {
           _onEventTapped(context, event);
-          setState(() {});
         },
       ),
     );
   }
 
   void _onEventTapped(BuildContext context, Event event) async {
-    final editedEvent = await Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddEventForm(
@@ -148,12 +184,6 @@ class _EventsPageState extends State<EventsPage> {
       ),
     );
 
-    if (editedEvent != null) {
-      // Update the events list with the edited event
-      setState(() {
-        events[events.indexOf(event)] = editedEvent;
-      });
-    }
   }
 
   void _onCreateEvent(BuildContext context) async {

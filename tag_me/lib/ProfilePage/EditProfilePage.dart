@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
-  
+
   static const String routeName = '/EditProfilePage';
 
   @override
@@ -25,10 +25,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // Update user display name
         await user.updateDisplayName(_nameController.text);
 
-        // Update Firestore database based on the selected role
         if (_selectedRole == 'member') {
           await FirebaseFirestore.instance
               .collection('members')
@@ -46,6 +44,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           });
         }
 
+        // ignore: use_build_context_synchronously
         Navigator.pop(context);
       }
     } catch (e) {

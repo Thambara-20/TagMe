@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
@@ -15,6 +16,10 @@ import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:tag_me/utilities/Location.dart';
+import 'package:tag_me/utilities/cache.dart';
+import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/utilities/Appprovider.dart';
 import 'firebase_options.dart';
 
 // ...
@@ -22,6 +27,7 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  await askForLocationPermission();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -30,7 +36,16 @@ void main() async {
     persistenceEnabled: true,
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
-  runApp(MyApp(prefs: prefs));
+
+  List<Event> loadedEvents = await loadEventsFromCache();
+
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AppState()..updateEvents(loadedEvents)),
+        // Add any other providers you might need
+      ],
+      child: MyApp(prefs: prefs,),
+    ),);
 }
 
 class MyApp extends StatelessWidget {
@@ -74,30 +89,22 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: Text(_pages[_currentIndex]['title'], style: kappBarTextStyle),
         backgroundColor: kNavbarBackgroundColor,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: ktextColorWhite),
-          onPressed: () {
-            Navigator.pop(context);
+        leading: Builder(
+          builder: (BuildContext context) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                icon: const Icon(Icons.person_2_outlined),
+                color: ktextColorWhite,
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
+            );
           },
         ),
-        actions: [
-          Builder(
-            builder: (BuildContext context) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  icon: const Icon(Icons.person_2_outlined),
-                  color: ktextColorWhite,
-                  onPressed: () {
-                    Scaffold.of(context).openEndDrawer();
-                  },
-                ),
-              );
-            },
-          ),
-        ],
       ),
-      endDrawer: const ProfilePage(),
+      drawer: const ProfilePage(),
       body: PageView(
         controller: _pageController,
         onPageChanged: (index) {
@@ -115,7 +122,7 @@ class _MainPageState extends State<MainPage> {
         backgroundColor: khomePageBackgroundColor,
         color: kNavbarBackgroundColor,
         buttonBackgroundColor: kNavbarButtonBackgroundColor,
-        animationDuration: const Duration(milliseconds: 300),
+        animationDuration: const Duration(milliseconds: 600),
         animationCurve: Curves.easeOut,
         height: 50,
         index: _currentIndex,
@@ -130,7 +137,7 @@ class _MainPageState extends State<MainPage> {
           });
           _pageController.animateToPage(
             index,
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 700),
             curve: Curves.easeOut,
           );
         },

@@ -17,44 +17,64 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<Event> ongoingEvents = [
     Event(
+      id: '1',
       creator: 'User 1',
       name: 'Event 1',
       startTime: DateTime.now(),
       endTime: DateTime.now().add(const Duration(hours: 2)),
       participants: ['User 1', 'User 2', 'User 3'],
+      coordinates: {
+        'latitude': 37.7749,
+        'longitude': -122.4194,
+      },
       isParticipating: true,
       location: 'Location 1',
-      geoPoint: List<double>.from([ 7.0, 81.0]),
+      geoPoint: List<double>.from([7.0, 81.0]),
     ),
     Event(
+      id: '2',
       creator: 'User 2',
       name: 'Event 2',
       startTime: DateTime.now().add(const Duration(days: 1)),
       endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
       participants: ['User 1', 'User 2', 'User 3'],
+      coordinates: {
+        'latitude': 37.7749,
+        'longitude': -122.4194,
+      },
       isParticipating: false,
       location: 'Location 2',
-      geoPoint: List<double>.from([ 6.08, 80.66]),
+      geoPoint: List<double>.from([6.08, 80.66]),
     ),
     Event(
+      id: '3',
       creator: 'User 3',
       name: 'Event 2',
       startTime: DateTime.now().add(const Duration(days: 1)),
       endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
       participants: ['User 1', 'User 2', 'User 3'],
+      coordinates: {
+        'latitude': 37.7749,
+        'longitude': -122.4194,
+      },
       isParticipating: false,
       location: 'Location 2',
-      geoPoint: List<double>.from([ 7.0, 81.0]),
+      geoPoint: List<double>.from([7.0, 81.0]),
     ),
     Event(
+      id: '4',
       creator: 'User 4',
       name: 'Event 2',
       startTime: DateTime.now().add(const Duration(days: 1)),
       endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
       participants: ['User 1', 'User 2', 'User 3'],
+      coordinates: {
+        'latitude': 37.7749,
+        'longitude': -122.4194,
+      },
       isParticipating: false,
       location: 'Location 2',
-      geoPoint: List<double>.from([ 7.0, 81.0]),
+      geoPoint: List<double>.from([7.0, 81.0]),
     ),
   ];
 

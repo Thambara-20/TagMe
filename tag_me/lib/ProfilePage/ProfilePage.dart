@@ -55,7 +55,9 @@ class _ProfilePageState extends State<ProfilePage> {
               position.latitude, position.longitude);
           Placemark place = placemarks[0];
           _userLocation = '${place.locality}, ${place.country}';
-        } catch (e) {}
+        } catch (e) {
+          print(e);
+        }
       }
       setState(() {});
     } catch (e) {}
