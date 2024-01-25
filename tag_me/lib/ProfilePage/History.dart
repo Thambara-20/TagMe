@@ -3,8 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
-
-import '../HomePage/EventBox/EventBox.dart';
+import 'package:tag_me/utilities/event.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -15,75 +14,73 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var userHistory = [
       Event(
+        creator: 'User 1',
         name: 'Event 1',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        participants: 1,
-        userAttending: true,
+        participants: ['User 1', 'User 2', 'User 3'],
+        isParticipating: true,
         location: 'Location 1',
         geoPoint: [0, 0],
       ),
       Event(
+        creator: 'User 2',
         name: 'Event 2',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        participants: 2,
-        userAttending: false,
+        participants: ['User 1', 'User 2', 'User 3'],
+        isParticipating: false,
         location: 'Location 2',
         geoPoint: [0, 0],
       ),
       Event(
+        creator: 'User 3',
         name: 'Event 3',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        participants: 3,
-        userAttending: true,
+        participants: ['User 1', 'User 2', 'User 3'],
+        isParticipating: true,
         location: 'Location 3',
         geoPoint: [0, 0],
       ),
       Event(
+        creator: 'User 4',
         name: 'Event 4',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        participants: 4,
-        userAttending: false,
+        participants: ['User 1', 'User 2', 'User 3'],
+        isParticipating: false,
         location: 'Location 4',
         geoPoint: [0, 0],
       ),
       Event(
+        creator: 'User 5',
         name: 'Event 5',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        participants: 5,
-        userAttending: true,
+        participants: ['User 1', 'User 2', 'User 3'],
+        isParticipating: true,
         location: 'Location 5',
         geoPoint: [0, 0],
       ),
       Event(
+        creator: 'User 6',
         name: 'Event 6',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        participants: 6,
-        userAttending: false,
+        participants: ['User 1', 'User 2', 'User 3'],
+        isParticipating: false,
         location: 'Location 6',
         geoPoint: [0, 0],
       ),
       Event(
+        creator: 'User 7',
         name: 'Event 7',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        participants: 7,
-        userAttending: true,
+        participants: ['User 1', 'User 2', 'User 3'],
+        isParticipating: true,
         location: 'Location 7',
-        geoPoint: [0, 0],
-      ),
-      Event(
-        name: 'Event 8',
-        startTime: DateTime.now(),
-        endTime: DateTime.now(),
-        participants: 8,
-        userAttending: false,
-        location: 'Location 8',
         geoPoint: [0, 0],
       ),
     ];
@@ -144,7 +141,7 @@ class HistoryPage extends StatelessWidget {
             ),
             _buildDetailRow(
               'User Attending:',
-              event.userAttending ? 'Yes' : 'No',
+              event.isParticipating ? 'Yes' : 'No',
               Icons.person,
             ),
           ],

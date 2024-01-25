@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
+import 'package:tag_me/utilities/event.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,38 +17,42 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<Event> ongoingEvents = [
     Event(
+      creator: 'User 1',
       name: 'Event 1',
       startTime: DateTime.now(),
       endTime: DateTime.now().add(const Duration(hours: 2)),
-      participants: 20,
-      userAttending: true,
+      participants: ['User 1', 'User 2', 'User 3'],
+      isParticipating: true,
       location: 'Location 1',
       geoPoint: List<double>.from([ 7.0, 81.0]),
     ),
     Event(
+      creator: 'User 2',
       name: 'Event 2',
       startTime: DateTime.now().add(const Duration(days: 1)),
       endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
-      participants: 15,
-      userAttending: false,
+      participants: ['User 1', 'User 2', 'User 3'],
+      isParticipating: false,
       location: 'Location 2',
       geoPoint: List<double>.from([ 6.08, 80.66]),
     ),
     Event(
+      creator: 'User 3',
       name: 'Event 2',
       startTime: DateTime.now().add(const Duration(days: 1)),
       endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
-      participants: 15,
-      userAttending: false,
+      participants: ['User 1', 'User 2', 'User 3'],
+      isParticipating: false,
       location: 'Location 2',
       geoPoint: List<double>.from([ 7.0, 81.0]),
     ),
     Event(
+      creator: 'User 4',
       name: 'Event 2',
       startTime: DateTime.now().add(const Duration(days: 1)),
       endTime: DateTime.now().add(const Duration(days: 1, hours: 3)),
-      participants: 15,
-      userAttending: false,
+      participants: ['User 1', 'User 2', 'User 3'],
+      isParticipating: false,
       location: 'Location 2',
       geoPoint: List<double>.from([ 7.0, 81.0]),
     ),

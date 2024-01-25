@@ -68,6 +68,7 @@ class _HomePageState extends State<WelcomePage> {
                       FirebaseAuthService authService = FirebaseAuthService();
                       User? user = await authService.signInWithGoogle();
                       if (user != null) {
+                        // ignore: use_build_context_synchronously
                         Navigator.pushNamed(context, MainPage.routeName);
                       } else {}
                     },

@@ -35,7 +35,42 @@ class FirebaseAuthService {
       final User? user = authResult.user;
       return user;
     } catch (e) {
-      print("Error signing in with Google: $e");
+      return null;
+    }
+  }
+
+  Future<User?> signInWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      final UserCredential authResult = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final User? user = authResult.user;
+      if (user != null && user.emailVerified) {
+        // User is signed in and email is verified
+        return user;
+      } else {
+        // Either user is null or email is not verified
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<User?> signUpWithEmailAndPassword(
+      String email, String password) async {
+    try {
+      final UserCredential authResult =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final User? user = authResult.user;
+      return user;
+    } catch (e) {
       return null;
     }
   }
@@ -44,8 +79,6 @@ class FirebaseAuthService {
     try {
       await _googleSignIn.signOut();
       await _auth.signOut();
-    } catch (e) {
-      print("Error signing out: $e");
-    }
+    } catch (e) {}
   }
 }

@@ -1,8 +1,8 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/main.dart';
+import 'package:tag_me/utilities/authService.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -14,6 +14,18 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -49,6 +61,7 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(
                 width: 0.8 * screenWidth,
                 child: TextFormField(
+                  controller: _emailController,
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     labelStyle: knormalTextWhiteStyle,
@@ -61,6 +74,7 @@ class _SignInPageState extends State<SignInPage> {
               SizedBox(
                 width: 0.8 * screenWidth,
                 child: TextFormField(
+                  controller: _passwordController,
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     labelStyle: knormalTextWhiteStyle,
@@ -71,8 +85,22 @@ class _SignInPageState extends State<SignInPage> {
               ),
               SizedBox(height: 0.02 * screenHeight),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, MainPage.routeName);
+                onPressed: () async {
+                  // Call the sign in with email and password method
+                  User? user =
+                      await FirebaseAuthService().signInWithEmailAndPassword(
+                    _emailController.text,
+                    _passwordController.text,
+                  );
+
+                  if (user != null) {
+                    // Successfully signed in
+                    // ignore: use_build_context_synchronously
+                    Navigator.pushNamed(context, MainPage.routeName);
+                  } else {
+                    // Failed to sign in
+                    _showSnackBar("Failed to sign in");
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(200, 50),

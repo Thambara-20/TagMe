@@ -4,26 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/Location.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
+import 'package:tag_me/utilities/event.dart';
 
-class Event {
-  final String name;
-  final DateTime startTime;
-  final DateTime endTime;
-  final int participants;
-  final bool userAttending;
-  final String location;
-  final List<double> geoPoint;
-
-  Event({
-    required this.name,
-    required this.startTime,
-    required this.endTime,
-    required this.participants,
-    required this.userAttending,
-    required this.location,
-    required this.geoPoint,
-  });
-}
 
 class EventBox extends StatefulWidget {
   final Event event;
@@ -41,7 +23,7 @@ class _EventBoxState extends State<EventBox> {
   @override
   void initState() {
     super.initState();
-    _userAttending = widget.event.userAttending;
+    _userAttending = widget.event.isParticipating;
   }
 
   @override
@@ -71,11 +53,11 @@ class _EventBoxState extends State<EventBox> {
             _buildDetailRow('End Time:', formatDateTime(widget.event.endTime),
                 Icons.access_time),
             _buildDetailRow(
-                'Participants:', '${widget.event.participants}', Icons.people),
+                'Participants:', '${widget.event.participants.length}', Icons.people),
             _buildDetailRow(
                 'Location:', widget.event.location, Icons.location_on),
             _buildDetailRow(
-                'User Attending:', widget.event.userAttending, Icons.person),
+                'User Attending:', widget.event.isParticipating, Icons.person),
             const SizedBox(height: 8.0),
             ElevatedButton(
               onPressed: _userAttending ? null : _verifyAttendance,
