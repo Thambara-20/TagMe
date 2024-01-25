@@ -1,5 +1,4 @@
 // ignore_for_file: file_names
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
@@ -7,8 +6,10 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tag_me/EventsPage/AddEventPage/DateTimePicker.dart';
 import 'package:tag_me/utilities/Location.dart';
+import 'package:tag_me/utilities/comfirmationDialog.dart';
 import 'package:tag_me/utilities/event.dart';
 import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/utilities/eventFunctions.dart';
 
 class AddEventForm extends StatefulWidget {
   final List<Event> initialEvents;
@@ -59,6 +60,15 @@ class _AddEventFormState extends State<AddEventForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Event'),
+        actions: [
+          if (widget.selectedEvent != null)
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                _onDelete();
+              },
+            ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -109,7 +119,14 @@ class _AddEventFormState extends State<AddEventForm> {
                     _location = town;
                   });
                   // ignore: empty_catches
-                } catch (e) {}
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Failed to get current location')),
+                    );
+                  }
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
@@ -184,83 +201,76 @@ class _AddEventFormState extends State<AddEventForm> {
       ),
     );
   }
-void _onSubmit() async {
-  if (!mounted) {
-    return;
-  }
 
-  if (_coordinates.isEmpty ||
-      _nameController.text.isEmpty ||
-      _location.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please fill in all required fields')),
-    );
-    return;
-  }
-
-  try {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      Event newEvent = Event(
-        id: _id, // Include id in the constructor
-        creator: user.uid,
-        name: _nameController.text,
-        startTime: _startTime,
-        endTime: _endTime,
-        location: _location,
-        coordinates: _coordinates,
-        geoPoint: _geoPoint,
-        participants: _participants,
-        isParticipating: false,
+  void _onDelete() {
+    // Add logic to delete the event
+   showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return ConfirmationDialog(
+        onConfirm: () {
+          // Add logic to delete the event
+          if (widget.selectedEvent != null) {
+            deleteEvent(widget.selectedEvent!.id);
+            Navigator.pop(context); 
+          }
+        },
+        confirmationMessage: 'Are you sure you want to delete this event?',
       );
+    },
+  );
+  }
 
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
+  void _onSubmit() {
+    if (!mounted) {
+      return;
+    }
 
-      if (_id.isNotEmpty) {
-        await firestore.collection('events').doc(_id).update({
-          'creator': newEvent.creator,
-          'name': newEvent.name,
-          'startTime': newEvent.startTime,
-          'endTime': newEvent.endTime,
-          'location': newEvent.location,
-          'coordinates': newEvent.coordinates,
-          'geoPoint': newEvent.geoPoint,
-          'participants': newEvent.participants,
-          'isParticipating': newEvent.isParticipating,
-        });
-      } else {
-        DocumentReference documentReference =
-            await firestore.collection('events').add({
-          'creator': newEvent.creator,
-          'name': newEvent.name,
-          'startTime': newEvent.startTime,
-          'endTime': newEvent.endTime,
-          'location': newEvent.location,
-          'coordinates': newEvent.coordinates,
-          'geoPoint': newEvent.geoPoint,
-          'participants': newEvent.participants,
-          'isParticipating': newEvent.isParticipating,
-        });
+    if (_coordinates.isEmpty ||
+        _nameController.text.isEmpty ||
+        _location.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all required fields')),
+      );
+      return;
+    }
 
-        newEvent.id = documentReference.id; 
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        Event newEvent = Event(
+          id: _id, // Include id in the constructor
+          creator: user.uid,
+          name: _nameController.text,
+          startTime: _startTime,
+          endTime: _endTime,
+          location: _location,
+          coordinates: _coordinates,
+          geoPoint: _geoPoint,
+          participants: _participants,
+          isParticipating: false,
+        );
+        if (_id.isNotEmpty) {
+          updateEvent(newEvent);
+        } else {
+          addEvent(newEvent);
+        }
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Event saved successfully')),
+        );
+
+        Navigator.pop(context, newEvent);
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Event saved successfully')),
-      );
-
-      Navigator.pop(context, newEvent);
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to save event')),
-      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to save event')),
+        );
+      }
     }
   }
-}
-
 
   @override
   void dispose() {

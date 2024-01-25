@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
-import 'package:tag_me/utilities/Appprovider.dart';
 import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/utilities/event.dart';
 
