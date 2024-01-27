@@ -40,40 +40,11 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void _listenToEvents() {
-    FirebaseFirestore.instance
-        .collection('events')
-        .snapshots()
-        .listen((snapshot) {
+   loadEventsFromCache().then((loadedEvents) {
       setState(() {
-        events = snapshot.docs.map((document) {
-          Map<String, dynamic> data = document.data();
-
-          return Event(
-            id: document.id,
-            creator: data['creator'] ?? '',
-            name: data['name'] ?? '',
-            startTime: (data['startTime'] as Timestamp).toDate(),
-            endTime: (data['endTime'] as Timestamp).toDate(),
-            location: data['location'] ?? '',
-            geoPoint: List<double>.from(
-              (data['geoPoint'] as List<dynamic>?)?.cast<double>() ?? [],
-            ),
-            coordinates: Map<String, double>.from(data['coordinates'] ?? {}),
-            participants: List<String>.from(
-              (data['participants'] as List<dynamic>?)?.cast<String>() ?? [],
-            ),
-            isParticipating: data['isParticipating'] ?? false,
-          );
-        }).toList();
-
-        searchResult = events.where((event) {
-          return event.name
-              .toLowerCase()
-              .contains(_searchController.text.toLowerCase());
-        }).toList();
-        if (events.isNotEmpty) {
-          isLoading = false;
-        }
+        events = loadedEvents;
+        searchResult = events;
+        isLoading = false;
       });
     });
   }
@@ -177,7 +148,7 @@ class _EventsPageState extends State<EventsPage> {
           ),
         ),
         onTap: () {
-          isAddmin ? _onEventTapped(context, event): null;
+          isAddmin ? _onEventTapped(context, event) : null;
         },
       ),
     );
@@ -188,7 +159,6 @@ class _EventsPageState extends State<EventsPage> {
       context,
       MaterialPageRoute(
         builder: (context) => AddEventForm(
-          initialEvents: events,
           selectedEvent: event,
         ),
       ),
@@ -199,7 +169,7 @@ class _EventsPageState extends State<EventsPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddEventForm(initialEvents: events),
+        builder: (context) => const AddEventForm(),
       ),
     );
     saveEventsToCache(events);

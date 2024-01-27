@@ -12,12 +12,10 @@ import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/eventFunctions.dart';
 
 class AddEventForm extends StatefulWidget {
-  final List<Event> initialEvents;
   final Event? selectedEvent;
 
   const AddEventForm({
     Key? key,
-    required this.initialEvents,
     this.selectedEvent,
   }) : super(key: key);
 
