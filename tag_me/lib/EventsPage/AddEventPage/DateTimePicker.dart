@@ -28,6 +28,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
   }
 
   Future<void> _selectDateTime(BuildContext context) async {
+    try{
     final selectedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDateTime,
@@ -55,6 +56,10 @@ class _DateTimePickerState extends State<DateTimePicker> {
         widget.onDateTimeChanged(_selectedDateTime);
       }
     }
+  }
+  catch(e){
+    print(e);
+  }
   }
 
   @override

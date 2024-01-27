@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
             return ListView.builder(
               itemCount: ongoingEvents.length,
               itemBuilder: (context, index) {
-                if (!checkStartTime(ongoingEvents[index].startTime)) {
+                if (checkStartTime(ongoingEvents[index].startTime)) {
                   return EventBox(event: ongoingEvents[index]);
                 }
                 return null;

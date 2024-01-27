@@ -18,8 +18,6 @@ import 'package:tag_me/constants/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:tag_me/utilities/Location.dart';
 import 'package:tag_me/utilities/cache.dart';
-import 'package:tag_me/utilities/event.dart';
-import 'package:tag_me/utilities/Appprovider.dart';
 import 'firebase_options.dart';
 
 // ...
@@ -37,15 +35,8 @@ void main() async {
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
 
-  List<Event> loadedEvents = await loadEventsFromCache();
-
-  runApp(MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => AppState()..updateEvents(loadedEvents)),
-        // Add any other providers you might need
-      ],
-      child: MyApp(prefs: prefs,),
-    ),);
+  listenToEvents();
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {

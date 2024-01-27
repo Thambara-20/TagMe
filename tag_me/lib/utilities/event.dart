@@ -2,9 +2,9 @@ class Event {
   String id;
   final String creator;
   final String name;
-  final DateTime startTime;
-  final DateTime endTime;
-  final String location;
+  late DateTime startTime;
+  late DateTime endTime;
+  late String location;
   List<double> geoPoint;
   Map<String, double> coordinates;
   bool isParticipating;
@@ -25,7 +25,7 @@ class Event {
 
   Map<String, dynamic> toJson() {
     return {
-      "id":id,
+      "id": id,
       'creator': creator,
       'name': name,
       'startTime': startTime.toIso8601String(),
@@ -48,7 +48,7 @@ class Event {
       location: json['location'],
       isParticipating: json['isParticipating'],
       geoPoint: List<double>.from(json['geoPoint']),
-      coordinates: Map<String, double>.from(json['coordinates']), 
+      coordinates: Map<String, double>.from(json['coordinates']),
       participants: List<String>.from(json['participants']),
     );
   }
