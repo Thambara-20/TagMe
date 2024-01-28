@@ -3,6 +3,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tag_me/models/user.dart';
+import 'package:tag_me/utilities/cache.dart';
 
 class FirebaseAuthService {
   static final FirebaseAuthService _instance = FirebaseAuthService._internal();
@@ -16,7 +18,7 @@ class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Future<User?> signInWithGoogle() async {
+  Future<AppUser?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleSignInAccount =
           await _googleSignIn.signIn();
@@ -35,8 +37,15 @@ class FirebaseAuthService {
 
       final UserCredential authResult =
           await _auth.signInWithCredential(credential);
-      final User? user = authResult.user;
-      return user;
+      final User? firebaseUser = authResult.user;
+
+      if (firebaseUser != null) {
+        final bool isAdmin = await isUserAdmin(firebaseUser.uid);
+        final AppUser user = AppUser.fromFirebaseUser(firebaseUser, isAdmin);
+        return user;
+      }
+
+      return null;
     } catch (e) {
       return null;
     }
@@ -52,7 +61,7 @@ class FirebaseAuthService {
     }
   }
 
-  Future<User?> signInWithEmailAndPassword(
+  Future<AppUser?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
       final UserCredential authResult = await _auth.signInWithEmailAndPassword(
@@ -62,15 +71,20 @@ class FirebaseAuthService {
 
       final User? user = authResult.user;
       if (user != null && user.emailVerified) {
-        // User is signed in and email is verified
-        return user;
+        final User? firebaseUser = authResult.user;
+
+        if (firebaseUser != null) {
+          final bool isAdmin = await isUserAdmin(firebaseUser.uid);
+          final AppUser user = AppUser.fromFirebaseUser(firebaseUser, isAdmin);
+          return user;
+        }
       } else {
-        // Either user is null or email is not verified
         return null;
       }
     } catch (e) {
       return null;
     }
+    return null;
   }
 
   Future<User?> signUpWithEmailAndPassword(
@@ -92,6 +106,7 @@ class FirebaseAuthService {
     try {
       await _googleSignIn.signOut();
       await _auth.signOut();
+      await removeLoggedInUser();
       // ignore: empty_catches
     } catch (e) {}
   }

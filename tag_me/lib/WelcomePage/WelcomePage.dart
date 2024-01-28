@@ -2,12 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import "package:tag_me/constants/constants.dart";
 import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tag_me/main.dart';
+import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
+import 'package:tag_me/constants/constants.dart';
+import 'package:tag_me/utilities/cache.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -19,6 +20,16 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<WelcomePage> {
+  bool isLoggedIn = false;
+  @override
+  void initState() {
+    super.initState();
+    checkLoginStatus();
+  }
+
+  Future<void> checkLoginStatus() async {
+    isLoggedIn = await checkLoggedInUser();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +76,23 @@ class _HomePageState extends State<WelcomePage> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      FirebaseAuthService authService = FirebaseAuthService();
-                      User? user = await authService.signInWithGoogle();
-                      if (user != null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.pushNamed(context, MainPage.routeName);
-                      } else {}
+                      try {
+                        if (isLoggedIn) {
+                          Navigator.pushNamed(context, MainPage.routeName);
+                        } else {
+                          FirebaseAuthService authService =
+                              FirebaseAuthService();
+                          AppUser? user = await authService.signInWithGoogle();
+                          if (user != null) {
+                            await storeLoggedInUser(user);
+                            Navigator.pushNamed(context, MainPage.routeName);
+                          }
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to logged in')),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(250, 50),

@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({Key? key}) : super(key: key);

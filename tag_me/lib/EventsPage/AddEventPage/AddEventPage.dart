@@ -299,7 +299,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tag_me/utilities/comfirmationDialog.dart';
 import 'package:tag_me/utilities/eventFunctions.dart';
-import '../../utilities/event.dart';
+import '../../models/event.dart';
 import 'NamePage.dart';
 import 'LocationPage.dart';
 import 'DateTimePage.dart';
@@ -318,9 +318,7 @@ class AddEventForm extends StatefulWidget {
 }
 
 class _AddEventFormState extends State<AddEventForm> {
-  // ... (rest of your code remains unchanged)
-
-  PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController(initialPage: 0);
 
   final TextEditingController _nameController = TextEditingController();
 
@@ -444,16 +442,12 @@ class _AddEventFormState extends State<AddEventForm> {
   }
 
   void _onSubmit() {
-    print(event.coordinates);
-    print(event.location);
-    print(_nameController.text);
-    print(event.startTime);
     if (!mounted) {
       return;
     }
 
     if (event.coordinates.isEmpty ||
-        _nameController.text.isEmpty) {
+        _nameController.text.isEmpty || event.location.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );

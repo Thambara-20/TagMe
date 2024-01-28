@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
+import 'package:tag_me/models/user.dart';
+
 
 Future<List<Event>> loadEventsFromCache() async {
   final prefs = await SharedPreferences.getInstance();
@@ -20,30 +22,41 @@ Future<void> saveEventsToCache(List<Event> events) async {
   await prefs.setString("events", json.encode(eventsJson));
 }
 
-void listenToEvents() async {
-  FirebaseFirestore.instance
-      .collection('events')
-      .snapshots()
-      .listen((snapshot) async {
-    await saveEventsToCache(snapshot.docs.map((document) {
-      Map<String, dynamic> data = document.data();
+ Future<void> storeLoggedInUser(AppUser user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('userUid', user.uid);
+    await prefs.setString('userEmail', user.email);
+    await prefs.setString('userDisplayName', user.displayName);
+    await prefs.setBool('isAdmin', user.isAdmin);
+  }
 
-      return Event(
-        id: document.id,
-        creator: data['creator'] ?? '',
-        name: data['name'] ?? '',
-        startTime: (data['startTime'] as Timestamp).toDate(),
-        endTime: (data['endTime'] as Timestamp).toDate(),
-        location: data['location'] ?? '',
-        geoPoint: List<double>.from(
-          (data['geoPoint'] as List<dynamic>?)?.cast<double>() ?? [],
-        ),
-        coordinates: Map<String, double>.from(data['coordinates'] ?? {}),
-        participants: List<String>.from(
-          (data['participants'] as List<dynamic>?)?.cast<String>() ?? [],
-        ),
-        isParticipating: data['isParticipating'] ?? false,
-      );
-    }).toList());
-  });
-}
+  Future<void> removeLoggedInUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    await prefs.remove('userUid');
+    await prefs.remove('userEmail');
+    await prefs.remove('userDisplayName');
+    await prefs.remove('isAdmin');
+  }
+
+  Future<bool> checkLoggedInUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false;
+  }
+
+  Future<AppUser> getLoggedInUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String uid = prefs.getString('userUid') ?? '';
+    final String userEmail = prefs.getString('userEmail') ?? '';
+    final String userDisplayName = prefs.getString('userDisplayName') ?? '';
+    final bool isAdmin = prefs.getBool('isAdmin') ?? false;
+
+    return AppUser(
+      uid: uid,
+      email: userEmail,
+      displayName: userDisplayName,
+      isAdmin: isAdmin,
+    );
+  }
+

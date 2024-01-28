@@ -1,14 +1,12 @@
 // ignore_for_file: file_names
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
-import 'package:tag_me/utilities/authService.dart';
+import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -25,26 +23,32 @@ class _EventsPageState extends State<EventsPage> {
   List<Event> events = [];
   List<Event> searchResult = [];
   bool isLoading = true;
-  bool isAddmin = false;
+  late AppUser user;
 
   @override
   initState() {
     super.initState();
     _listenToEvents();
-    _checkAdmin();
+    _getUserInfo();
+   
   }
-
-  Future<void> _checkAdmin() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    isAddmin = await FirebaseAuthService().isUserAdmin(user!.uid);
-  }
-
-  void _listenToEvents() {
-   loadEventsFromCache().then((loadedEvents) {
+void _listenToEvents() {
+  Future.delayed(Duration(seconds: 1), () {
+    loadEventsFromCache().then((loadedEvents) {
       setState(() {
         events = loadedEvents;
         searchResult = events;
         isLoading = false;
+      });
+    });
+  });
+}
+
+
+  void _getUserInfo() {
+    getLoggedInUserInfo().then((loggedInUser) {
+      setState(() {
+        user = loggedInUser;
       });
     });
   }
@@ -100,7 +104,7 @@ class _EventsPageState extends State<EventsPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          isAddmin ? _onCreateEvent(context) : null;
+          user.isAdmin ? _onCreateEvent(context) : null;
         },
         backgroundColor: kAddButtonColor,
         child: const Icon(Icons.add),
@@ -148,7 +152,7 @@ class _EventsPageState extends State<EventsPage> {
           ),
         ),
         onTap: () {
-          isAddmin ? _onEventTapped(context, event) : null;
+          user.isAdmin ? _onEventTapped(context, event) : null;
         },
       ),
     );

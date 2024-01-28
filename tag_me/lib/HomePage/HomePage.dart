@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
 import 'package:tag_me/utilities/eventFunctions.dart';
 
 class HomePage extends StatefulWidget {

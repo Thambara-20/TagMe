@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
 
 class NamePage extends StatelessWidget {
   final TextEditingController nameController;
   final VoidCallback onNext;
   final Event event;
 
-  NamePage({
+  const NamePage({super.key, 
     required this.nameController,
     required this.event,
     required this.onNext,

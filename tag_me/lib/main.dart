@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
@@ -17,7 +16,7 @@ import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:tag_me/utilities/Location.dart';
-import 'package:tag_me/utilities/cache.dart';
+import 'package:tag_me/utilities/eventFunctions.dart';
 import 'firebase_options.dart';
 
 // ...
