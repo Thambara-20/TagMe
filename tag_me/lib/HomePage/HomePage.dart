@@ -22,9 +22,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+         decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(
+              'assets/background_home.jpg'), // Replace with your image asset path
+          fit: BoxFit.fill,
+        ),
+      ),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        color: khomePageBackgroundColor,
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('events').snapshots(),
           builder: (context, snapshot) {
@@ -70,6 +76,7 @@ class _HomePageState extends State<HomePage> {
             }).toList();
 
             return ListView.builder(
+              
               itemCount: ongoingEvents.length,
               itemBuilder: (context, index) {
                 if (checkStartTime(ongoingEvents[index].startTime)) {

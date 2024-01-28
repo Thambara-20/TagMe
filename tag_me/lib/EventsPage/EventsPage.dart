@@ -59,7 +59,13 @@ class _EventsPageState extends State<EventsPage> {
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: Container(
-          color: khomePageBackgroundColor,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/background_image.jpg'), // Replace with your image asset path
+              fit: BoxFit.fill,
+            ),
+          ),
           child: Column(
             children: [
               Padding(
@@ -115,16 +121,30 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget _buildEventListItem(Event event) {
-    return Card(
-      margin: const EdgeInsets.all(10.0),
-      color: keventCardColor,
-      shape: RoundedRectangleBorder(
+ Widget _buildEventListItem(Event event) {
+  return Card(
+    margin: const EdgeInsets.all(10.0),
+    color: keventCardColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15.0),
+      side: const BorderSide(
+        color: keventCardBorderColor,
+        width: 0.5,
+      ),
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        color: keventCardColor,
         borderRadius: BorderRadius.circular(15.0),
-        side: const BorderSide(
-          color: keventCardBorderColor,
-          width: 0.5,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.3), // Adjust color and opacity as needed
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
+      
       ),
       child: ExpansionTile(
         title: Text(
@@ -169,10 +189,11 @@ class _EventsPageState extends State<EventsPage> {
                   children: [
                     if (user.isAdmin)
                       ElevatedButton(
-                          onPressed: () {
-                            _onEventTapped(context, event);
-                          },
-                          child: const Text('Update')),
+                        onPressed: () {
+                          _onEventTapped(context, event);
+                        },
+                        child: const Text('Update'),
+                      ),
                   ],
                 ),
               ],
@@ -180,8 +201,10 @@ class _EventsPageState extends State<EventsPage> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _onEventTapped(BuildContext context, Event event) async {
     await Navigator.push(

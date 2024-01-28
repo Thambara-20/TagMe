@@ -6,6 +6,8 @@ import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
 import 'package:tag_me/utilities/userServices.dart';
 
+import '../utilities/Location.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -20,18 +22,25 @@ class _ProfilePageState extends State<ProfilePage> {
       Prospect(memberId: "", name: "", role: "", email: "", uid: "");
   String _location = "";
 
-  @override 
+  @override
   void initState() {
     super.initState();
     _loadUserInfo();
   }
 
-  Future<void> _loadUserInfo() async {
-    Prospect loadedprospect = await getUserInfo();
+Future<void> _loadUserInfo() async {
+  Prospect loadedprospect = await getUserInfo();
+  String loadedLocation = await getArea();
+
+  // Check if the widget is still mounted before calling setState
+  if (mounted) {
     setState(() {
       prospect = loadedprospect;
+      _location = loadedLocation;
     });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

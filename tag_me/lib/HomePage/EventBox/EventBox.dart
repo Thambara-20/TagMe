@@ -19,6 +19,7 @@ class EventBox extends StatefulWidget {
 
 class _EventBoxState extends State<EventBox> {
   bool _userAttending = false;
+  bool _clicked = false;
 
   @override
   void initState() {
@@ -30,52 +31,79 @@ class _EventBoxState extends State<EventBox> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(10.0),
-      color: keventBoxColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25.0),
-        side: const BorderSide(
-          color: keventBoxBorderColor,
-          width: 0.5,
-        ),
-      ),
-      child: ListTile(
-        title: Center(
-          child: Text(
-            widget.event.name,
-            style: keventBoxLargeTextStyle,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow('Start Time:',
-                formatDateTime(widget.event.startTime), Icons.access_time),
-            _buildDetailRow('End Time:', formatDateTime(widget.event.endTime),
-                Icons.access_time),
-            _buildDetailRow('Participants:',
-                '${widget.event.participants.length}', Icons.people),
-            _buildDetailRow(
-                'Location:', widget.event.location, Icons.location_on),
-            _buildDetailRow(
-                'User Attending:', widget.event.isParticipating, Icons.person),
-            const SizedBox(height: 8.0),
-            ElevatedButton(
-              onPressed: _userAttending ? null : _verifyAttendance,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kbuttonColorBlue,
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              ),
-              child: Center(
-                child: Text(
-                  _userAttending ? 'Attendance Marked' : 'Mark Attendance Now',
-                  style: _userAttending
-                      ? keventBoxDisabledButtonStyle
-                      : keventBoxEnabledButtonStyle,
+      child: ExpansionPanelList(
+        elevation: 0,
+        expansionCallback: (int index, bool isExpanded) {
+          setState(() {
+            _clicked = !_clicked;
+          });
+        },
+        children: [
+          ExpansionPanel(
+            headerBuilder: (BuildContext context, bool isExpanded) {
+              return ListTile(
+                title: Center(
+                  child: Text(
+                    widget.event.name,
+                    style: keventBoxLargeTextStyle,
+                  ),
                 ),
+              );
+            },
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDetailRow(
+                    'Start Time:',
+                    formatDateTime(widget.event.startTime),
+                    Icons.access_time,
+                  ),
+                  _buildDetailRow(
+                    'End Time:',
+                    formatDateTime(widget.event.endTime),
+                    Icons.access_time,
+                  ),
+                  _buildDetailRow(
+                    'Participants:',
+                    '${widget.event.participants.length}',
+                    Icons.people,
+                  ),
+                  _buildDetailRow(
+                    'Location:',
+                    widget.event.location,
+                    Icons.location_on,
+                  ),
+                  _buildDetailRow(
+                    'User Attending:',
+                    widget.event.isParticipating,
+                    Icons.person,
+                  ),
+                  const SizedBox(height: 8.0),
+                  ElevatedButton(
+                    onPressed: _userAttending ? null : _verifyAttendance,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kbuttonColorBlue,
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _userAttending
+                            ? 'Attendance Marked'
+                            : 'Mark Attendance Now',
+                        style: _userAttending
+                            ? keventBoxDisabledButtonStyle
+                            : keventBoxEnabledButtonStyle,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+            isExpanded: _clicked,
+          ),
+        ],
       ),
     );
   }
