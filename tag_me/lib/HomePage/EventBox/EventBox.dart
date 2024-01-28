@@ -1,6 +1,10 @@
 // ignore_for_file: file_names
 
+import 'dart:ui';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tag_me/HomePage/ParticipantsPage/ParticipantsPage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/Location.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
@@ -19,91 +23,122 @@ class EventBox extends StatefulWidget {
 
 class _EventBoxState extends State<EventBox> {
   bool _userAttending = false;
-  bool _clicked = false;
+  bool isInGeoPointArea = false;
 
   @override
   void initState() {
     super.initState();
-    _userAttending = widget.event.isParticipating;
+    _userAttending = widget.event.participants.contains(FirebaseAuth.instance.currentUser?.uid);
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(10.0),
-      child: ExpansionPanelList(
-        elevation: 0,
-        expansionCallback: (int index, bool isExpanded) {
-          setState(() {
-            _clicked = !_clicked;
-          });
-        },
-        children: [
-          ExpansionPanel(
-            headerBuilder: (BuildContext context, bool isExpanded) {
-              return ListTile(
-                title: Center(
-                  child: Text(
-                    widget.event.name,
-                    style: keventBoxLargeTextStyle,
-                  ),
-                ),
-              );
-            },
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDetailRow(
-                    'Start Time:',
-                    formatDateTime(widget.event.startTime),
-                    Icons.access_time,
-                  ),
-                  _buildDetailRow(
-                    'End Time:',
-                    formatDateTime(widget.event.endTime),
-                    Icons.access_time,
-                  ),
-                  _buildDetailRow(
-                    'Participants:',
-                    '${widget.event.participants.length}',
-                    Icons.people,
-                  ),
-                  _buildDetailRow(
-                    'Location:',
-                    widget.event.location,
-                    Icons.location_on,
-                  ),
-                  _buildDetailRow(
-                    'User Attending:',
-                    widget.event.isParticipating,
-                    Icons.person,
-                  ),
-                  const SizedBox(height: 8.0),
-                  ElevatedButton(
-                    onPressed: _userAttending ? null : _verifyAttendance,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kbuttonColorBlue,
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _userAttending
-                            ? 'Attendance Marked'
-                            : 'Mark Attendance Now',
-                        style: _userAttending
-                            ? keventBoxDisabledButtonStyle
-                            : keventBoxEnabledButtonStyle,
-                      ),
-                    ),
-                  ),
-                ],
+      color: keventBoxColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+        side: const BorderSide(
+          color: keventCardBorderColor,
+          width: 1,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.all(10),
+          title: ListTile(
+            leading: const Icon(Icons.event),
+            title: Center(
+              child: Text(
+                'Project: ${widget.event.name}',
+                style: keventBoxLargeTextStyle,
               ),
             ),
-            isExpanded: _clicked,
           ),
-        ],
+          childrenPadding: const EdgeInsets.all(14.0),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow(
+              'Start Time:',
+              formatDateTime(widget.event.startTime),
+              Icons.access_time,
+            ),
+            _buildDetailRow(
+              'End Time:',
+              formatDateTime(widget.event.endTime),
+              Icons.access_time,
+            ),
+            _buildDetailRow(
+              'Participants:',
+              '${widget.event.participants.length}',
+              Icons.people,
+            ),
+            _buildDetailRow(
+              'Location:',
+              widget.event.location,
+              Icons.location_on,
+            ),
+            _buildDetailRow(
+              'User Attending:',
+              widget.event.isParticipating ? 'Yes' : 'No',
+              Icons.person,
+            ),
+            const SizedBox(height: 8.0),
+            ElevatedButton.icon(
+              onPressed: _userAttending ? null : _verifyAttendance,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kbuttonColorBlue,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              icon: const Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+              label: Center(
+                child: Text(
+                  _userAttending ? 'Attendance Marked' : 'Mark Attendance Now',
+                  style: _userAttending
+                      ? keventBoxDisabledButtonStyle
+                      : keventBoxEnabledButtonStyle,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kNavbarButtonBackgroundColor,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                minimumSize: const Size(double.infinity, 40),
+              ),
+              onFocusChange: (bool hasFocus) {
+                // Change the shadow when focused
+                ElevatedButton.styleFrom(
+                  elevation: hasFocus ? 4 : 2,
+                );
+              },
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ParticipantsPage(
+                        participants: widget.event.participants,
+                        project: widget.event.name),
+                  ),
+                );
+              },
+              child: const Text(
+                  'Participants', style: knormalTextWhiteStyle,), // Replace with your desired button text
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -124,10 +159,12 @@ class _EventBoxState extends State<EventBox> {
                     '$label ',
                     style: keventBoxNormalTextStyle,
                   ),
-                  Text(_userAttending ? 'Yes' : 'No',
-                      style: _userAttending
-                          ? kwarningTextGreenStyle
-                          : kwarningTextRedStyle),
+                  Text(
+                    _userAttending ? 'Yes' : 'No',
+                    style: _userAttending
+                        ? kwarningTextGreenStyle
+                        : kwarningTextRedStyle,
+                  ),
                 ],
               ),
             )
@@ -144,8 +181,7 @@ class _EventBoxState extends State<EventBox> {
   }
 
   void _verifyAttendance() {
-    Map<String, double> eventGeoPoint =
-        widget.event.coordinates; // event's latitude and longitude
+    Map<String, double> eventGeoPoint = widget.event.coordinates;
     showDialog(
       context: context,
       builder: (context) {
@@ -157,24 +193,17 @@ class _EventBoxState extends State<EventBox> {
           actions: [
             TextButton(
               onPressed: () async {
-                bool isInGeoPointArea =
-                    await checkInGeoPointArea(eventGeoPoint);
+                isInGeoPointArea = await checkInGeoPointArea(eventGeoPoint);
                 if (isInGeoPointArea) {
-                  setState(() {
-                    _userAttending = !_userAttending;
-                    addParticipant(widget.event.id);
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _userAttending = !_userAttending;
+                      addParticipant(widget.event.id);
+                    });
+                  }
                   _close();
                 } else {
-                  // ignore: use_build_context_synchronously
-                  if (!mounted) {
-                    return;
-                  }
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('You are not in the required area'),
-                    ),
-                  );
+                  _showSnackBar("You are not in the area");
                 }
               },
               child: const Text('Verify'),
@@ -188,6 +217,15 @@ class _EventBoxState extends State<EventBox> {
           ],
         );
       },
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 

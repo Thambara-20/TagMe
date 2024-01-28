@@ -65,7 +65,7 @@ Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
       eventGeoPoint['latitude']!,
       eventGeoPoint['longtitude']!,
     );
-    double thresholdDistance = 1000;
+    double thresholdDistance = 2000;
     return distanceInMeters <= thresholdDistance;
   } catch (e) {
     return false;

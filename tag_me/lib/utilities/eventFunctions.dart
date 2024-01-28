@@ -7,6 +7,37 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tag_me/models/event.dart';
 import 'package:tag_me/utilities/cache.dart';
 
+Stream<QuerySnapshot> getEventsStream() {
+  return FirebaseFirestore.instance.collection('events').snapshots();
+}
+
+List<Event> processEventData(QuerySnapshot snapshot) {
+  List<Event> ongoingEvents = snapshot.docs.map((DocumentSnapshot document) {
+    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+    return Event(
+      id: document.id,
+      creator: data['creator'] ?? '',
+      name: data['name'] ?? '',
+      startTime: (data['startTime'] as Timestamp).toDate(),
+      endTime: (data['endTime'] as Timestamp).toDate(),
+      location: data['location'] ?? '',
+      geoPoint: List<double>.from(
+        (data['geoPoint'] as List<dynamic>?)?.cast<double>() ?? [],
+      ),
+      coordinates: Map<String, double>.from(data['coordinates'] ?? {}),
+      participants: List<String>.from(
+        (data['participants'] as List<dynamic>?)?.cast<String>() ?? [],
+      ),
+      isParticipating: data['participants']
+              .contains(FirebaseAuth.instance.currentUser?.uid) ??
+          false,
+    );
+  }).toList();
+
+  return ongoingEvents;
+}
+
 Future<void> updateEvent(Event newEvent) async {
   try {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -20,18 +51,7 @@ Future<void> updateEvent(Event newEvent) async {
         'location': newEvent.location,
         'coordinates': newEvent.coordinates,
         'geoPoint': newEvent.geoPoint,
-        'participants': [
-          "user1",
-          "user2",
-          "user3",
-          "user4",
-          "user5",
-          "user6",
-          "user7",
-          "user8",
-          "user9",
-          "user10"
-        ],
+        'participants': newEvent.participants,
         'isParticipating': newEvent.isParticipating,
       });
     }
@@ -76,11 +96,13 @@ Future<void> addParticipant(String eventId) async {
 
     if (user != null) {
       await firestore.collection('events').doc(eventId).update({
-        'participants': FieldValue.arrayUnion([user.displayName ?? '']),
+        'participants': FieldValue.arrayUnion([user.uid]),
       });
     }
   } catch (e) {}
 }
+
+
 
 bool checkStartTime(DateTime startTime) {
   DateTime now = DateTime.now();

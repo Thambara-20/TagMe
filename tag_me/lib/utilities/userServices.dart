@@ -89,3 +89,28 @@ Future<void> updateProspectCollection(String uid, String name) async {
       .doc(uid)
       .set({'name': name, 'uid': uid});
 }
+
+Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
+  Map<String, dynamic> userInfo;
+
+  DocumentSnapshot memberSnapshot =
+      await FirebaseFirestore.instance.collection('members').doc(uid).get();
+
+  if (memberSnapshot.exists) {
+    userInfo = {
+      'uid': uid,
+      'memberId': memberSnapshot.id,
+      'name': memberSnapshot.get('name') ?? '',
+      'role': 'Member',
+    };
+  } else {
+    userInfo = {
+      'uid': uid,
+      'memberId': '',
+      'name': '',
+      'role': 'Prospect',
+    };
+  }
+
+  return userInfo;
+}

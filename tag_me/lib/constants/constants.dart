@@ -46,7 +46,7 @@ const kiconColorWhite = Colors.white;
 
 // -----------------------------------------------Home-page & EventBox--------------------------------------------------------------------------------
 
-const keventBoxColor = Color.fromARGB(255, 228, 228, 228);
+const keventBoxColor = Color.fromARGB(209, 228, 228, 228);
 const keventBoxBorderColor = Color.fromARGB(255, 4, 4, 4);
 const khomePageBackgroundColor = Color.fromARGB(255, 68, 68, 68);
 const keventBoxEnabledButtonStyle = TextStyle(

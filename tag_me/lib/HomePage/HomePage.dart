@@ -1,11 +1,8 @@
-// Import necessary packages
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert'; // Import for JSON decoding
 import 'package:flutter/material.dart';
-import 'package:tag_me/constants/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
 import 'package:tag_me/models/event.dart';
-import 'package:tag_me/utilities/eventFunctions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,75 +15,50 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Event> cachedEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadEventsFromCache();
+  }
+
+  Future<void> loadEventsFromCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    final eventsJson = prefs.getString("events");
+    if (eventsJson != null) {
+      final List<dynamic> decoded = json.decode(eventsJson);
+      cachedEvents = decoded.map((eventJson) => Event.fromJson(eventJson)).toList();
+    }
+
+    setState(() {}); // Trigger a rebuild after loading events from cache
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-         decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(
-              'assets/background_home.jpg'), // Replace with your image asset path
-          fit: BoxFit.fill,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background_home.jpg'),
+            fit: BoxFit.fill,
+          ),
         ),
-      ),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('events').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            }
-
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(
+        child: cachedEvents.isNotEmpty
+            ? ListView.builder(
+                itemCount: cachedEvents.length,
+                itemBuilder: (context, index) {
+                  return EventBox(event: cachedEvents[index]);
+                },
+              )
+            : const Center(
                 child: Text(
                   'No ongoing events available.',
                   style: TextStyle(color: Colors.white),
                 ),
-              );
-            }
-
-            // Process the data
-            List<Event> ongoingEvents =
-                snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data =
-                  document.data() as Map<String, dynamic>;
-
-              return Event(
-                id: document.id,
-                creator: data['creator'] ?? '',
-                name: data['name'] ?? '',
-                startTime: (data['startTime'] as Timestamp).toDate(),
-                endTime: (data['endTime'] as Timestamp).toDate(),
-                location: data['location'] ?? '',
-                geoPoint: List<double>.from(
-                  (data['geoPoint'] as List<dynamic>?)?.cast<double>() ?? [],
-                ),
-                coordinates:
-                    Map<String, double>.from(data['coordinates'] ?? {}),
-                participants: List<String>.from(
-                  (data['participants'] as List<dynamic>?)?.cast<String>() ??
-                      [],
-                ),
-                isParticipating: data['participants'].contains(
-                        FirebaseAuth.instance.currentUser?.displayName) ??
-                    false,
-              );
-            }).toList();
-
-            return ListView.builder(
-              
-              itemCount: ongoingEvents.length,
-              itemBuilder: (context, index) {
-                if (checkStartTime(ongoingEvents[index].startTime)) {
-                  return EventBox(event: ongoingEvents[index]);
-                }
-                return null;
-              },
-            );
-          },
-        ),
+              ),
       ),
     );
   }

@@ -121,90 +121,94 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
- Widget _buildEventListItem(Event event) {
-  return Card(
-    margin: const EdgeInsets.all(10.0),
-    color: keventCardColor,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15.0),
-      side: const BorderSide(
-        color: keventCardBorderColor,
-        width: 0.5,
-      ),
-    ),
-    child: Container(
-      decoration: BoxDecoration(
-        color: keventCardColor,
+  Widget _buildEventListItem(Event event) {
+    return Card(
+      margin: const EdgeInsets.all(10.0),
+      color: keventCardColor,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.3), // Adjust color and opacity as needed
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
-      
+        side: const BorderSide(
+          color: keventCardBorderColor,
+          width: 0.5,
+        ),
       ),
-      child: ExpansionTile(
-        title: Text(
-          'Project: ${event.name}',
-          style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(
-          'Starts At: ${formatDateTime(event.startTime)}',
-          style: const TextStyle(fontSize: 16.0),
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'End Time: ${formatDateTime(event.endTime)}',
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                ),
-                Center(
-                  child: Text(
-                    'Location: ${event.location}',
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                ),
-                const SizedBox(height: 2.0),
-                Center(
-                  child: CountdownTimer(
-                    endTime: event.startTime.millisecondsSinceEpoch,
-                    textStyle: const TextStyle(
-                      fontSize: 16.0,
-                      color: Color.fromARGB(255, 185, 12, 0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (user.isAdmin)
-                      ElevatedButton(
-                        onPressed: () {
-                          _onEventTapped(context, event);
-                        },
-                        child: const Text('Update'),
-                      ),
-                  ],
-                ),
-              ],
+      child: Container(
+        decoration: BoxDecoration(
+          color: keventCardColor,
+          borderRadius: BorderRadius.circular(15.0),
+          boxShadow: [
+            BoxShadow(
+              color: const Color.fromARGB(255, 0, 0, 0)
+                  .withOpacity(0.3), // Adjust color and opacity as needed
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
             ),
+          ],
+        ),
+        child: ExpansionTile(
+          title: Text(
+            'Project: ${event.name}',
+            style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
           ),
-        ],
+          subtitle: Text(
+            'Starts At: ${formatDateTime(event.startTime)}',
+            style: const TextStyle(fontSize: 16.0),
+          ),
+          children: [
+            Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          'End Time: ${formatDateTime(event.endTime)}',
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                      ),
+                      Center(
+                        child: Text(
+                          'Location: ${event.location}',
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                      ),
+                      const SizedBox(height: 2.0),
+                      Center(
+                        child: CountdownTimer(
+                          endTime: event.startTime.millisecondsSinceEpoch,
+                          textStyle: const TextStyle(
+                            fontSize: 16.0,
+                            color: Color.fromARGB(255, 185, 12, 0),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          user.isAdmin
+                              ? ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.black),
+                                  ),
+                                  onPressed: () {
+                                    _onEventTapped(context, event);
+                                  },
+                                  child: const Text('Update',
+                                      style: knormalTextWhiteStyle),
+                                )
+                              : const Text('You are not an admin'),
+                        ],
+                      ),
+                    ])),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   void _onEventTapped(BuildContext context, Event event) async {
     await Navigator.push(
