@@ -326,13 +326,11 @@ class _AddEventFormState extends State<AddEventForm> {
     id: '',
     creator: '',
     name: '',
-    startTime:DateTime.now() ,
+    startTime: DateTime.now(),
     endTime: DateTime.now(),
     location: '',
     geoPoint: [],
-    coordinates: {
-    "latitude": 6.927079,
-    "longtitude": 79.861},
+    coordinates: {"latitude": 6.927079, "longtitude": 79.861},
     participants: [],
     isParticipating: false,
   );
@@ -447,7 +445,8 @@ class _AddEventFormState extends State<AddEventForm> {
     }
 
     if (event.coordinates.isEmpty ||
-        _nameController.text.isEmpty || event.location.isEmpty) {
+        _nameController.text.isEmpty ||
+        event.location.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all required fields')),
       );
@@ -461,7 +460,7 @@ class _AddEventFormState extends State<AddEventForm> {
         Event newEvent = Event(
           id: event.id, // Include id in the constructor
           creator: user.uid,
-          name: event.name,
+          name: _nameController.text,
           startTime: event.startTime,
           endTime: event.endTime,
           location: event.location,
@@ -480,7 +479,7 @@ class _AddEventFormState extends State<AddEventForm> {
           const SnackBar(content: Text('Event saved successfully')),
         );
 
-        Navigator.pop(context, newEvent);
+        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {

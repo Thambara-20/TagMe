@@ -6,7 +6,8 @@ class NamePage extends StatelessWidget {
   final VoidCallback onNext;
   final Event event;
 
-  const NamePage({super.key, 
+  const NamePage({
+    super.key,
     required this.nameController,
     required this.event,
     required this.onNext,

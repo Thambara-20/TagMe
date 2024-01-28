@@ -1,8 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tag_me/utilities/userServices.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -19,38 +18,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _memberIdController = TextEditingController();
 
   String _selectedRole = 'prospect';
-
-  void _updateProfile() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        await user.updateDisplayName(_nameController.text);
-
-        if (_selectedRole == 'member') {
-          await FirebaseFirestore.instance
-              .collection('members')
-              .doc(_memberIdController.text)
-              .set({
-            'name': _nameController.text,
-            'memberId': _memberIdController.text,
-          });
-        } else {
-          await FirebaseFirestore.instance
-              .collection('prospects')
-              .doc(user.uid)
-              .set({
-            'name': _nameController.text,
-          });
-        }
-
-        // ignore: use_build_context_synchronously
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      // Handle errors, show a message, etc.
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +58,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _updateProfile,
+              onPressed: () async {
+                await updateProfile(_nameController.text, _selectedRole,
+                    _memberIdController.text);
+                
+              },
               child: const Text('Save'),
             ),
           ],

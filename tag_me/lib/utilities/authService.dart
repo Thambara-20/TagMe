@@ -41,7 +41,7 @@ class FirebaseAuthService {
 
       if (firebaseUser != null) {
         final bool isAdmin = await isUserAdmin(firebaseUser.uid);
-        final AppUser user = AppUser.fromFirebaseUser(firebaseUser, isAdmin);
+        final AppUser user = AppUserFactory().createUserFromFirebase(firebaseUser, isAdmin);
         return user;
       }
 
@@ -75,7 +75,7 @@ class FirebaseAuthService {
 
         if (firebaseUser != null) {
           final bool isAdmin = await isUserAdmin(firebaseUser.uid);
-          final AppUser user = AppUser.fromFirebaseUser(firebaseUser, isAdmin);
+          final AppUser user = AppUserFactory().createUserFromFirebase(firebaseUser, isAdmin);
           return user;
         }
       } else {
