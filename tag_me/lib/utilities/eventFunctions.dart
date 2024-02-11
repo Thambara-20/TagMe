@@ -7,10 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tag_me/models/event.dart';
 import 'package:tag_me/utilities/cache.dart';
 
-Stream<QuerySnapshot> getEventsStream() {
-  return FirebaseFirestore.instance.collection('events').snapshots();
-}
-
 List<Event> processEventData(QuerySnapshot snapshot) {
   List<Event> ongoingEvents = snapshot.docs.map((DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;

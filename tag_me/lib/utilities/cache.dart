@@ -14,6 +14,21 @@ Future<List<Event>> loadEventsFromCache() async {
   return [];
 }
 
+Future<List<Event>> loadOngoingEventsFromCache() async {
+  final prefs = await SharedPreferences.getInstance();
+  final eventsJson = prefs.getString("events");
+  if (eventsJson != null) {
+    final List<dynamic> decoded = json.decode(eventsJson);
+    final List<Event> events = decoded
+        .map((eventJson) => Event.fromJson(eventJson))
+        .where((event) => event.endTime.isAfter(DateTime.now()) && event.startTime.isBefore(DateTime.now()))
+        .toList();
+
+    return events;
+  }
+  return [];
+}
+
 Future<void> saveEventsToCache(List<Event> events) async {
   final prefs = await SharedPreferences.getInstance();
   final eventsJson = events.map((event) => event.toJson()).toList();

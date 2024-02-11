@@ -72,7 +72,7 @@ const keventBoxNormalTextStyle = TextStyle(
 );
 
 //------------------------------------------------EventPage--------------------------------------------------------------------------------
-const ksearchBarColor = Color.fromARGB(67, 255, 255, 255);
+const ksearchBarColor = Color.fromARGB(157, 255, 255, 255);
 const kAddButtonColor = Colors.blue;
 const keventCardColor = Color.fromARGB(154, 255, 255, 255);
 const keventCardBorderColor = Colors.black;

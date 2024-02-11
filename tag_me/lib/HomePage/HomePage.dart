@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPre
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/event.dart';
+import 'package:tag_me/utilities/cache.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -27,15 +28,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> loadEventsFromCache() async {
-    final prefs = await SharedPreferences.getInstance();
-    final eventsJson = prefs.getString("events");
-    if (eventsJson != null) {
-      final List<dynamic> decoded = json.decode(eventsJson);
-      cachedEvents =
-          decoded.map((eventJson) => Event.fromJson(eventJson)).toList();
-    }
-
-    setState(() {}); // Trigger a rebuild after loading events from cache
+    cachedEvents = await loadOngoingEventsFromCache();
+    setState(() {});
   }
 
   @override

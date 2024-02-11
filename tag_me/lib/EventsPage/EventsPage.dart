@@ -20,24 +20,27 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  final TextEditingController _searchController = TextEditingController();
   List<Event> events = [];
-  List<Event> searchResult = [];
+  List<Event> ongoingEvents = [];
+  List<Event> upcomingEvents = [];
+  List<Event> finishedEvents = [];
   bool isLoading = true;
   late AppUser user;
+  late String selectedCategory;
 
   @override
   initState() {
     super.initState();
     _listenToEvents();
     _getUserInfo();
+    selectedCategory = 'Ongoing'; // Set default category
   }
 
   void _listenToEvents() {
     loadEventsFromCache().then((loadedEvents) {
       setState(() {
         events = loadedEvents;
-        searchResult = events;
+        _categorizeEvents();
         isLoading = false;
       });
     });
@@ -49,6 +52,35 @@ class _EventsPageState extends State<EventsPage> {
         user = loggedInUser;
       });
     });
+  }
+
+  void _categorizeEvents() {
+    final now = DateTime.now();
+
+    ongoingEvents = events
+        .where((event) => event.startTime.isBefore(now) && event.endTime.isAfter(now))
+        .toList();
+
+    upcomingEvents = events
+        .where((event) => event.startTime.isAfter(now))
+        .toList();
+
+    finishedEvents = events
+        .where((event) => event.endTime.isBefore(now))
+        .toList();
+  }
+
+  List<Event> getSelectedCategoryEvents() {
+    switch (selectedCategory) {
+      case 'Ongoing':
+        return ongoingEvents;
+      case 'Upcoming':
+        return upcomingEvents;
+      case 'Finished':
+        return finishedEvents;
+      default:
+        return [];
+    }
   }
 
   @override
@@ -71,26 +103,13 @@ class _EventsPageState extends State<EventsPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      searchResult = events.where((event) {
-                        return event.name
-                            .toLowerCase()
-                            .contains(value.toLowerCase());
-                      }).toList();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search Events',
-                    filled: true,
-                    fillColor: ksearchBarColor,
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNavigationBarItem('Ongoing'),
+                    _buildNavigationBarItem('Upcoming'),
+                    _buildNavigationBarItem('Finished'),
+                  ],
                 ),
               ),
               Expanded(
@@ -102,9 +121,9 @@ class _EventsPageState extends State<EventsPage> {
                         ),
                       )
                     : ListView.builder(
-                        itemCount: searchResult.length,
+                        itemCount: getSelectedCategoryEvents().length,
                         itemBuilder: (context, index) {
-                          return _buildEventListItem(searchResult[index]);
+                          return _buildEventListItem(getSelectedCategoryEvents()[index]);
                         },
                       ),
               ),
@@ -122,7 +141,38 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
+  Widget _buildNavigationBarItem(String category) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedCategory = category;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color: selectedCategory == category ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Text(
+          category,
+          style: TextStyle(
+            color: selectedCategory == category ? Colors.black : Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildEventListItem(Event event) {
+    bool isEventOngoing = DateTime.now().isAfter(event.startTime) &&
+        DateTime.now().isBefore(event.endTime);
+    bool isEventUpcoming = DateTime.now().isBefore(event.startTime);
+
+    String eventStatus =
+        isEventOngoing ? 'Ongoing..' : (isEventUpcoming ? 'Upcoming' : '');
+
     return Card(
       margin: const EdgeInsets.all(10.0),
       color: keventCardColor,
@@ -139,8 +189,7 @@ class _EventsPageState extends State<EventsPage> {
           borderRadius: BorderRadius.circular(15.0),
           boxShadow: [
             BoxShadow(
-              color: const Color.fromARGB(255, 0, 0, 0)
-                  .withOpacity(0.3), // Adjust color and opacity as needed
+              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, 2),
@@ -148,9 +197,32 @@ class _EventsPageState extends State<EventsPage> {
           ],
         ),
         child: ExpansionTile(
-          title: Text(
-            'Project: ${event.name}',
-            style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Project: ${event.name}',
+                style: const TextStyle(
+                    fontSize: 20.0, fontWeight: FontWeight.bold),
+              ),
+              if (isEventOngoing || isEventUpcoming)
+                Row(
+                  children: [
+                    Icon(
+                      isEventOngoing ? Icons.access_time : Icons.pending_actions,
+                      color: isEventOngoing ? Colors.green : Colors.blue,
+                    ),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      eventStatus,
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: isEventOngoing ? Colors.green : Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
           ),
           subtitle: Text(
             'Starts At: ${formatDateTime(event.startTime)}',
@@ -158,53 +230,53 @@ class _EventsPageState extends State<EventsPage> {
           ),
           children: [
             Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'End Time: ${formatDateTime(event.endTime)}',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Location: ${event.location}',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                  const SizedBox(height: 2.0),
+                  Center(
+                    child: CountdownTimer(
+                      endTime: event.startTime.millisecondsSinceEpoch,
+                      textStyle: const TextStyle(
+                        fontSize: 16.0,
+                        color: Color.fromARGB(255, 162, 11, 0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Center(
-                        child: Text(
-                          'End Time: ${formatDateTime(event.endTime)}',
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                      Center(
-                        child: Text(
-                          'Location: ${event.location}',
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                      ),
-                      const SizedBox(height: 2.0),
-                      Center(
-                        child: CountdownTimer(
-                          endTime: event.startTime.millisecondsSinceEpoch,
-                          textStyle: const TextStyle(
-                            fontSize: 16.0,
-                            color: Color.fromARGB(255, 185, 12, 0),
+                      if (user.isAdmin)
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.black),
                           ),
+                          onPressed: () {
+                            _onEventTapped(context, event);
+                          },
+                          child: const Text('Update',
+                              style: knormalTextWhiteStyle),
                         ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          user.isAdmin
-                              ? ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            Colors.black),
-                                  ),
-                                  onPressed: () {
-                                    _onEventTapped(context, event);
-                                  },
-                                  child: const Text('Update',
-                                      style: knormalTextWhiteStyle),
-                                )
-                              : const Text('You are not an admin'),
-                        ],
-                      ),
-                    ])),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -238,8 +310,7 @@ class _EventsPageState extends State<EventsPage> {
     loadEventsFromCache().then((loadedEvents) {
       setState(() {
         events = loadedEvents;
-        searchResult = events;
-      });
+        });
     });
   }
 }

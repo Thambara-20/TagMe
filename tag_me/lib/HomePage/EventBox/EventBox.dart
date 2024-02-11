@@ -47,7 +47,7 @@ class _EventBoxState extends State<EventBox> {
           borderRadius: BorderRadius.circular(15.0),
         ),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.all(10),
+          tilePadding: const EdgeInsets.only(left: 14.0, right: 14.0),
           title: ListTile(
             leading: const Icon(Icons.event),
             title: Center(
