@@ -25,15 +25,15 @@ class _EventsPageState extends State<EventsPage> {
   List<Event> upcomingEvents = [];
   List<Event> finishedEvents = [];
   bool isLoading = true;
-  late AppUser user;
+  late bool isAdmin = false;
   late String selectedCategory;
 
   @override
   initState() {
     super.initState();
-    _listenToEvents();
+    selectedCategory = 'Ongoing';
     _getUserInfo();
-    selectedCategory = 'Ongoing'; // Set default category
+    _listenToEvents();
   }
 
   void _listenToEvents() {
@@ -49,7 +49,7 @@ class _EventsPageState extends State<EventsPage> {
   void _getUserInfo() {
     getLoggedInUserInfo().then((loggedInUser) {
       setState(() {
-        user = loggedInUser;
+        isAdmin = loggedInUser.isAdmin;
       });
     });
   }
@@ -58,16 +58,15 @@ class _EventsPageState extends State<EventsPage> {
     final now = DateTime.now();
 
     ongoingEvents = events
-        .where((event) => event.startTime.isBefore(now) && event.endTime.isAfter(now))
+        .where((event) =>
+            event.startTime.isBefore(now) && event.endTime.isAfter(now))
         .toList();
 
-    upcomingEvents = events
-        .where((event) => event.startTime.isAfter(now))
-        .toList();
+    upcomingEvents =
+        events.where((event) => event.startTime.isAfter(now)).toList();
 
-    finishedEvents = events
-        .where((event) => event.endTime.isBefore(now))
-        .toList();
+    finishedEvents =
+        events.where((event) => event.endTime.isBefore(now)).toList();
   }
 
   List<Event> getSelectedCategoryEvents() {
@@ -102,7 +101,8 @@ class _EventsPageState extends State<EventsPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(
+                    top: 24.0, bottom: 8.0, left: 16.0, right: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -123,7 +123,8 @@ class _EventsPageState extends State<EventsPage> {
                     : ListView.builder(
                         itemCount: getSelectedCategoryEvents().length,
                         itemBuilder: (context, index) {
-                          return _buildEventListItem(getSelectedCategoryEvents()[index]);
+                          return _buildEventListItem(
+                              getSelectedCategoryEvents()[index]);
                         },
                       ),
               ),
@@ -131,13 +132,15 @@ class _EventsPageState extends State<EventsPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          user.isAdmin ? _onCreateEvent(context) : null;
-        },
-        backgroundColor: kAddButtonColor,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton(
+              onPressed: () {
+                _onCreateEvent(context);
+              },
+              backgroundColor: kAddButtonColor,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
@@ -151,7 +154,8 @@ class _EventsPageState extends State<EventsPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         decoration: BoxDecoration(
-          color: selectedCategory == category ? Colors.white : Colors.transparent,
+          color:
+              selectedCategory == category ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10.0),
         ),
         child: Text(
@@ -209,7 +213,9 @@ class _EventsPageState extends State<EventsPage> {
                 Row(
                   children: [
                     Icon(
-                      isEventOngoing ? Icons.access_time : Icons.pending_actions,
+                      isEventOngoing
+                          ? Icons.access_time
+                          : Icons.pending_actions,
                       color: isEventOngoing ? Colors.green : Colors.blue,
                     ),
                     const SizedBox(width: 4.0),
@@ -260,7 +266,7 @@ class _EventsPageState extends State<EventsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (user.isAdmin)
+                      if (isAdmin)
                         ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor:
@@ -310,7 +316,8 @@ class _EventsPageState extends State<EventsPage> {
     loadEventsFromCache().then((loadedEvents) {
       setState(() {
         events = loadedEvents;
-        });
+      });
+      _listenToEvents();
     });
   }
 }

@@ -5,6 +5,7 @@ import 'package:tag_me/ProfilePage/History.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
 import 'package:tag_me/utilities/userServices.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../utilities/Location.dart';
 
@@ -91,7 +92,7 @@ Future<void> _loadUserInfo() async {
           ),
           _buildProfileItem(context, 'Email', prospect.email),
           _buildProfileItem(context, 'Location', _location),
-          _buildProfileItem(context, 'club', prospect.userClub),
+          _buildProfileItem(context, 'Club', prospect.userClub),
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.history,
@@ -159,12 +160,23 @@ Future<void> _loadUserInfo() async {
     );
   }
 
-  Widget _buildProfileItem(BuildContext context, String label, String value) {
+   Widget _buildProfileItem(BuildContext context, String label, String value) {
     return ListTile(
-      title: Text(
-        '$label: $value',
-        style: const TextStyle(fontSize: 14),
-      ),
+      title: value != ''
+          ? Text(
+              '$label: $value',
+              style: const TextStyle(fontSize: 14),
+            )
+          : Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: const Color.fromARGB(158, 245, 245, 245)!,
+              child: Container(
+                color: Colors.white,
+                width: double.infinity,
+                height: 20.0,
+                margin: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+              ),
+            ),
     );
   }
 }

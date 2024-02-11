@@ -50,20 +50,24 @@ Future<Prospect> getUserInfo() async {
     }
 
     User? user = FirebaseAuth.instance.currentUser;
+    print(user);
     if (user != null) {
       print(isProfileExist);
+      // document where doc contains user.uid
+
       DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
           .collection('members')
-          .doc(user.uid)
-          .get();
-
+          .where('uid', isEqualTo: user.uid)
+          .get()
+          .then((value) => value.docs.first);
       userInfo = Prospect(
           uid: user.uid,
           email: user.email ?? '',
           memberId: memberSnapshot.exists ? memberSnapshot.id : '',
-          userClub: memberSnapshot.get('userClub') ?? '',
+          userClub: memberSnapshot.exists ? memberSnapshot.get('userClub') : '',
           name: user.displayName ?? '',
           role: memberSnapshot.exists ? 'Member' : 'Prospect');
+      updateUserRole(userInfo);
     }
   } catch (e) {
     print('Error loading user info from Firebase: $e');
