@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -16,6 +16,7 @@ class HistoryPage extends StatelessWidget {
       Event(
         id: '1',
         creator: 'User 1',
+        club: "testClub",
         name: 'Event 1',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
@@ -31,6 +32,7 @@ class HistoryPage extends StatelessWidget {
       Event(
         id:'2',
         creator: 'User 2',
+        club: "testClub",
         name: 'Event 2',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
@@ -46,6 +48,7 @@ class HistoryPage extends StatelessWidget {
       Event(
         id:'3',
         creator: 'User 3',
+        club: "testClub",
         name: 'Event 3',
         startTime: DateTime.now(),
         endTime: DateTime.now(),

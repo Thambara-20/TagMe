@@ -1,9 +1,10 @@
 // ignore_for_file: file_names, prefer_if_null_operators, unnecessary_null_comparison
 
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
-Future<void> askForLocationPermission() async{
+Future<void> askForLocationPermission() async {
   LocationPermission permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
@@ -17,8 +18,6 @@ Future<void> askForLocationPermission() async{
     }
   }
 }
-
-
 
 Future<Position> determinePosition() async {
   bool serviceEnabled;
@@ -57,16 +56,16 @@ Future<Position> determinePosition() async {
   return await Geolocator.getCurrentPosition();
 }
 
-Future<bool> checkInGeoPointArea(Map<String,double> eventGeoPoint) async {
+Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
   try {
     Position userPosition = await determinePosition();
     double distanceInMeters = Geolocator.distanceBetween(
       userPosition.latitude,
       userPosition.longitude,
       eventGeoPoint['latitude']!,
-      eventGeoPoint['longtitude']!, 
+      eventGeoPoint['longtitude']!,
     );
-    double thresholdDistance = 1000;
+    double thresholdDistance = 2000;
     return distanceInMeters <= thresholdDistance;
   } catch (e) {
     return false;
@@ -88,4 +87,16 @@ Future<GeoPoint> getGeoPointFromLocation(
   return GeoPoint(latitude: latitude, longitude: longtitude);
 }
 
-placemarkFromAddress(String location) {}
+Future<String> getArea() async {
+  try {
+    List<Placemark> placemarks = [];
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemarks[0];
+    return '${place.locality}, ${place.country}';
+  } catch (e) {
+    return '';
+  }
+}

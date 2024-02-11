@@ -1,9 +1,9 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, file_names
 
 import 'package:flutter/material.dart';
 import 'package:tag_me/EventsPage/AddEventPage/DateTimePicker.dart';
 
-import '../../utilities/event.dart';
+import '../../models/event.dart';
 
 class DateTimePage extends StatelessWidget {
   Event event;

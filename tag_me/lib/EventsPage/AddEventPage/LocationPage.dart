@@ -1,16 +1,18 @@
+// ignore_for_file: library_private_types_in_public_api, file_names
+
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tag_me/utilities/Location.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
 
 class LocationPage extends StatefulWidget {
   final Event event;
   final VoidCallback onBack;
   final VoidCallback onNext;
 
-  LocationPage({Key? key, required this.event, required this.onBack, required this.onNext})
+  const LocationPage({Key? key, required this.event, required this.onBack, required this.onNext})
       : super(key: key);
 
   @override

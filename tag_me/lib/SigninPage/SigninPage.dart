@@ -1,10 +1,11 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/main.dart';
+import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
+import 'package:tag_me/utilities/cache.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -89,14 +90,14 @@ class _SignInPageState extends State<SignInPage> {
               ElevatedButton(
                 onPressed: () async {
                   // Call the sign in with email and password method
-                  User? user =
+                  AppUser? user =
                       await FirebaseAuthService().signInWithEmailAndPassword(
                     _emailController.text,
                     _passwordController.text,
                   );
 
                   if (user != null) {
-                    // Successfully signed in
+                    await storeLoggedInUser(user);
                     // ignore: use_build_context_synchronously
                     Navigator.pushNamed(context, MainPage.routeName);
                   } else {

@@ -1,13 +1,15 @@
 // ignore_for_file: file_names
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/constants/constants.dart';
-import 'package:tag_me/ProfilePage/History.dart';
+import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
+import 'package:tag_me/utilities/userServices.dart';
+import 'package:shimmer/shimmer.dart';
+
+import '../utilities/Location.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -19,10 +21,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _userName = '---'; // Updated dynamically from Firebase
-  String _userRole = '---'; // Updated dynamically from Firestore
-  String _userEmail = '---'; // Updated dynamically from Firebase
-  String _userLocation = '---'; // Updated dynamically from Geolocator
+  Prospect prospect =
+      Prospect(memberId: "", name: "", role: "", email: "", uid: "", userClub: "");
+  String _location = "";
 
   @override
   void initState() {
@@ -30,38 +31,19 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserInfo();
   }
 
-  Future<void> _loadUserInfo() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        _userName = user.displayName ?? '';
-        _userEmail = user.email ?? '';
+Future<void> _loadUserInfo() async {
+  Prospect loadedprospect = await getUserInfo();
+  String loadedLocation = await getArea();
 
-        DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
-            .collection('members')
-            .doc(user.uid)
-            .get();
-
-        if (memberSnapshot.exists) {
-          _userRole = 'Member';
-        } else {
-          _userRole = 'Prospect';
-        }
-        try {
-          List<Placemark> placemarks = [];
-          Position position = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high);
-          placemarks = await placemarkFromCoordinates(
-              position.latitude, position.longitude);
-          Placemark place = placemarks[0];
-          _userLocation = '${place.locality}, ${place.country}';
-        // ignore: empty_catches
-        } catch (e) {}
-      }
-      setState(() {});
-    // ignore: empty_catches
-    } catch (e) {}
+  // Check if the widget is still mounted before calling setState
+  if (mounted) {
+    setState(() {
+      prospect = loadedprospect;
+      _location = loadedLocation;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -104,24 +86,25 @@ class _ProfilePageState extends State<ProfilePage> {
             ]),
           ),
           ListTile(
-            title: Text(_userName, style: const TextStyle(fontSize: 20)),
+            title: Text(prospect.name, style: const TextStyle(fontSize: 20)),
           ),
           ListTile(
-            title: Text("Role: $_userRole", //member/prospect
+            title: Text("Role: ${prospect.role}", //member/prospect
                 style: const TextStyle(fontSize: 14, color: Colors.black)),
           ),
-          _buildProfileItem(context, 'Email', _userEmail),
-          _buildProfileItem(context, 'Location', _userLocation),
+          _buildProfileItem(context, 'Email', prospect.email),
+          _buildProfileItem(context, 'Location', _location),
+          _buildProfileItem(context, 'Club', prospect.userClub),
           const SizedBox(height: 16),
           ListTile(
-            leading: const Icon(Icons.history,
+            leading: const Icon(Icons.info,
                 color: Color.fromARGB(255, 149, 149, 149)),
-            title: const Text('History'),
+            title: const Text('About'),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const HistoryPage(),
+                  builder: (context) => const AboutPage(),
                 ),
               );
             },
@@ -179,12 +162,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileItem(BuildContext context, String label, String value) {
+   Widget _buildProfileItem(BuildContext context, String label, String value) {
     return ListTile(
-      title: Text(
-        '$label: $value',
-        style: const TextStyle(fontSize: 14),
-      ),
+      title: value != ''
+          ? Text(
+              '$label: $value',
+              style: const TextStyle(fontSize: 14),
+            )
+          : Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: const Color.fromARGB(158, 245, 245, 245),
+              child: Container(
+                color: Colors.white,
+                width: double.infinity,
+                height: 20.0,
+                margin: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+              ),
+            ),
     );
   }
 }

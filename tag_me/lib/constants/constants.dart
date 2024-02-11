@@ -46,9 +46,9 @@ const kiconColorWhite = Colors.white;
 
 // -----------------------------------------------Home-page & EventBox--------------------------------------------------------------------------------
 
-const keventBoxColor = Color.fromARGB(255, 228, 228, 228);
+const keventBoxColor = Color.fromARGB(209, 228, 228, 228);
 const keventBoxBorderColor = Color.fromARGB(255, 4, 4, 4);
-const khomePageBackgroundColor = Color.fromARGB(255, 68, 68, 68);
+const khomePageBackgroundColor = Color.fromARGB(255, 66, 66, 66);
 const keventBoxEnabledButtonStyle = TextStyle(
   fontSize: 16.0,
   fontWeight: FontWeight.w500,
@@ -71,19 +71,20 @@ const keventBoxNormalTextStyle = TextStyle(
   color: Color.fromARGB(255, 5, 5, 5),
 );
 
-//------------------------------------------------EventPage-------------------------------------------------------------------------------- 
-const ksearchBarColor = Colors.white;
+//------------------------------------------------EventPage--------------------------------------------------------------------------------
+const ksearchBarColor = Color.fromARGB(157, 255, 255, 255);
 const kAddButtonColor = Colors.blue;
-const keventCardColor = Colors.white;
+const keventCardColor = Color.fromARGB(154, 255, 255, 255);
 const keventCardBorderColor = Colors.black;
 
 //------------------------------------------------AppBar--------------------------------------------------------------------------------
 
 const knavbarBackgroundColor = Colors.black;
 
-//------------------------------------------------Navbar--------------------------------------------------------------------------------  
+//------------------------------------------------Navbar--------------------------------------------------------------------------------
 
 const kNavbarBackgroundColor = Colors.black;
+const kNavbarIconBackgroundColor = Color.fromARGB(255, 66, 66, 66);
 const kNavbarButtonBackgroundColor = Colors.black;
 const kNavbarButtonColor = Color.fromARGB(255, 255, 255, 255);
 const kNavbarSelectedIconColor = Colors.blue;

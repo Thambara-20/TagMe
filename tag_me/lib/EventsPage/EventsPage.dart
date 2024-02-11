@@ -1,14 +1,13 @@
 // ignore_for_file: file_names
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
 import 'package:tag_me/constants/constants.dart';
-import 'package:tag_me/utilities/authService.dart';
+import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
+import 'package:tag_me/utilities/dateConvert.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -21,135 +20,330 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  final TextEditingController _searchController = TextEditingController();
   List<Event> events = [];
-  List<Event> searchResult = [];
+  List<Event> ongoingEvents = [];
+  List<Event> upcomingEvents = [];
+  List<Event> finishedEvents = [];
   bool isLoading = true;
-  bool isAddmin = false;
+  late AppUser appUser;
+  late bool isAdmin = false;
+  late String selectedCategory;
+  late String selectedClub;
+  List<String> clubs = [
+    'Leo District 306A1',
+    'Leo District 306A2',
+    'Leo District 306B1',
+    'Leo District 306B2',
+    'Leo District 306C1',
+    'Leo District 306C2'
+  ];
+  late bool isCreater = false;
 
   @override
   initState() {
     super.initState();
+    selectedCategory = 'Ongoing';
+    appUser = AppUser(uid: '', email: '', isAdmin: false);
+    selectedClub = clubs[0]; // Set default club
+    _getUserInfo();
     _listenToEvents();
-    _checkAdmin();
-  }
-
-  Future<void> _checkAdmin() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    isAddmin = await FirebaseAuthService().isUserAdmin(user!.uid);
   }
 
   void _listenToEvents() {
-   loadEventsFromCache().then((loadedEvents) {
+    loadEventsFromCache().then((loadedEvents) {
       setState(() {
-        events = loadedEvents;
-        searchResult = events;
+        events = loadedEvents
+            .where((event) => event.club == selectedClub.split(' ')[2])
+            .toList();
+        _categorizeEvents();
         isLoading = false;
       });
     });
   }
 
+  void _getUserInfo() {
+    getLoggedInUserInfo().then((loggedInUser) {
+      setState(() {
+        isAdmin = loggedInUser.isAdmin;
+        appUser = loggedInUser;
+      });
+    });
+  }
+
+  void _categorizeEvents() {
+    final now = DateTime.now();
+    ongoingEvents = events
+        .where((event) =>
+            event.startTime.isBefore(now) && event.endTime.isAfter(now))
+        .toList();
+
+    upcomingEvents =
+        events.where((event) => event.startTime.isAfter(now)).toList();
+
+    finishedEvents =
+        events.where((event) => event.endTime.isBefore(now)).toList();
+  }
+
+  List<Event> getSelectedCategoryEvents() {
+    switch (selectedCategory) {
+      case 'Ongoing':
+        return ongoingEvents;
+      case 'Upcoming':
+        return upcomingEvents;
+      case 'Finished':
+        return finishedEvents;
+      default:
+        return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: khomePageBackgroundColor,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {
-                    searchResult = events.where((event) {
-                      return event.name
-                          .toLowerCase()
-                          .contains(value.toLowerCase());
-                    }).toList();
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search Events',
-                  filled: true,
-                  fillColor: ksearchBarColor,
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 0, 0, 0),
+                khomePageBackgroundColor,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Text('Select the district: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 147, 147, 147),
+                        )),
+                    _buildClubDropdown(),
+                  ],
                 ),
               ),
-            ),
-            Expanded(
-              child: isLoading
-                  ? const Center(
-                      child: Text(
-                        'No events available.',
-                        style: TextStyle(color: Colors.white),
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNavigationBarItem('Ongoing'),
+                    _buildNavigationBarItem('Upcoming'),
+                    _buildNavigationBarItem('Finished'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: isLoading
+                    ? const Center(
+                        child: Text(
+                          'No events available.',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: getSelectedCategoryEvents().length,
+                        itemBuilder: (context, index) {
+                          return _buildEventListItem(
+                              getSelectedCategoryEvents()[index]);
+                        },
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: searchResult.length,
-                      itemBuilder: (context, index) {
-                        return _buildEventListItem(searchResult[index]);
-                      },
-                    ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          isAddmin ? _onCreateEvent(context) : null;
-        },
-        backgroundColor: kAddButtonColor,
-        child: const Icon(Icons.add),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton(
+              onPressed: () {
+                _onCreateEvent(context);
+              },
+              backgroundColor: kAddButtonColor,
+              child: const Icon(Icons.add),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildClubDropdown() {
+    return DropdownButton<String>(
+      value: selectedClub,
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedClub = newValue!;
+        });
+        _refresh();
+      },
+      items: clubs.map((String club) {
+        return DropdownMenuItem<String>(
+          value: club,
+          child: Text(
+            club,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 147, 147, 147),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildNavigationBarItem(String category) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedCategory = category;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color:
+              selectedCategory == category ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Text(
+          category,
+          style: TextStyle(
+            color: selectedCategory == category ? Colors.black : Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildEventListItem(Event event) {
+
+    bool isCreater = event.creator == appUser.uid;
+    bool isEventOngoing = DateTime.now().isAfter(event.startTime) &&
+        DateTime.now().isBefore(event.endTime);
+    bool isEventUpcoming = DateTime.now().isBefore(event.startTime);
+
+    String eventStatus =
+        isEventOngoing ? 'Ongoing..' : (isEventUpcoming ? 'Upcoming' : '');
+
     return Card(
       margin: const EdgeInsets.all(10.0),
       color: keventCardColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25.0),
+        borderRadius: BorderRadius.circular(15.0),
         side: const BorderSide(
           color: keventCardBorderColor,
           width: 0.5,
         ),
       ),
-      child: ListTile(
-        title: Center(
-          child: Column(
+      child: Container(
+        decoration: BoxDecoration(
+          color: keventCardColor,
+          borderRadius: BorderRadius.circular(15.0),
+          boxShadow: [
+            BoxShadow(
+              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ExpansionTile(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                event.name,
-                style: const TextStyle(fontSize: 18.0),
+                'Project: ${event.name}',
+                style: const TextStyle(
+                    fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
-              Text(
-                'Start Time: ${_formatDateTime(event.startTime)}',
-                style: const TextStyle(fontSize: 15.0),
-              ),
-              Text(
-                'End Time: ${_formatDateTime(event.endTime)}',
-                style: const TextStyle(fontSize: 15.0),
-              ),
-              Text(
-                'Location: ${event.location}',
-                style: const TextStyle(fontSize: 15.0),
-              ),
-              CountdownTimer(
-                endTime: event.startTime.millisecondsSinceEpoch,
-                textStyle: const TextStyle(
-                    fontSize: 15.0, color: Color.fromARGB(255, 185, 12, 0)),
-              ),
+              if (isEventOngoing || isEventUpcoming)
+                Row(
+                  children: [
+                    Icon(
+                      isEventOngoing
+                          ? Icons.access_time
+                          : Icons.pending_actions,
+                      color: isEventOngoing
+                          ? const Color.fromARGB(255, 37, 37, 37)
+                          : const Color.fromARGB(255, 0, 0, 0),
+                    ),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      eventStatus,
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: isEventOngoing
+                            ? const Color.fromARGB(255, 37, 37, 37)
+                            : const Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
+          subtitle: Text(
+            'Starts At: ${formatDateTime(event.startTime)}',
+            style: const TextStyle(fontSize: 16.0),
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'End Time: ${formatDateTime(event.endTime)}',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Location: ${event.location}',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                  const SizedBox(height: 2.0),
+                  Center(
+                    child: CountdownTimer(
+                      endTime: event.startTime.millisecondsSinceEpoch,
+                      textStyle: const TextStyle(
+                        fontSize: 16.0,
+                        color: Color.fromARGB(255, 162, 11, 0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isAdmin && isCreater)
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.black),
+                          ),
+                          onPressed: () {
+                            _onEventTapped(context, event);
+                          },
+                          child: const Text('Update',
+                              style: knormalTextWhiteStyle),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        onTap: () {
-          isAddmin ? _onEventTapped(context, event) : null;
-        },
       ),
     );
   }
@@ -175,13 +369,14 @@ class _EventsPageState extends State<EventsPage> {
     saveEventsToCache(events);
   }
 
-  String _formatDateTime(DateTime dateTime) {
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
-  }
+  Future<void> _refresh() async {
+    await Future.delayed(const Duration(seconds: 1));
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+    loadEventsFromCache().then((loadedEvents) {
+      setState(() {
+        events = loadedEvents;
+      });
+      _listenToEvents();
+    });
   }
 }

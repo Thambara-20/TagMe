@@ -1,10 +1,12 @@
 // ignore_for_file: file_names
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tag_me/HomePage/ParticipantsPage/ParticipantsPage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/Location.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
-import 'package:tag_me/utilities/event.dart';
+import 'package:tag_me/models/event.dart';
 import 'package:tag_me/utilities/eventFunctions.dart';
 
 class EventBox extends StatefulWidget {
@@ -19,11 +21,13 @@ class EventBox extends StatefulWidget {
 
 class _EventBoxState extends State<EventBox> {
   bool _userAttending = false;
+  bool isInGeoPointArea = false;
 
   @override
   void initState() {
     super.initState();
-    _userAttending = widget.event.isParticipating;
+    _userAttending = widget.event.participants
+        .contains(FirebaseAuth.instance.currentUser?.uid);
   }
 
   @override
@@ -32,40 +36,79 @@ class _EventBoxState extends State<EventBox> {
       margin: const EdgeInsets.all(10.0),
       color: keventBoxColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(25.0),
+        borderRadius: BorderRadius.circular(15.0),
         side: const BorderSide(
-          color: keventBoxBorderColor,
-          width: 0.5,
+          color: keventCardBorderColor,
+          width: 1,
         ),
       ),
-      child: ListTile(
-        title: Center(
-          child: Text(
-            widget.event.name,
-            style: keventBoxLargeTextStyle,
-          ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.only(left: 14.0, right: 14.0),
+          title: ListTile(
+            leading: const Icon(Icons.event),
+            title: Center(
+              child: Text(
+                'Project: ${widget.event.name}',
+                style: keventBoxLargeTextStyle,
+              ),
+            ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Club: Leo District ${widget.event.club}',
+                style: keventBoxNormalTextStyle,
+              )
+            ],
+          ),
+          childrenPadding: const EdgeInsets.all(14.0),
+          expandedCrossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow('Start Time:',
-                formatDateTime(widget.event.startTime), Icons.access_time),
-            _buildDetailRow('End Time:', formatDateTime(widget.event.endTime),
-                Icons.access_time),
-            _buildDetailRow('Participants:',
-                '${widget.event.participants.length}', Icons.people),
             _buildDetailRow(
-                'Location:', widget.event.location, Icons.location_on),
+              'Start Time:',
+              formatDateTime(widget.event.startTime),
+              Icons.access_time,
+            ),
             _buildDetailRow(
-                'User Attending:', widget.event.isParticipating, Icons.person),
+              'End Time:',
+              formatDateTime(widget.event.endTime),
+              Icons.access_time,
+            ),
+            _buildDetailRow(
+              'Participants:',
+              '${widget.event.participants.length}',
+              Icons.people,
+            ),
+            _buildDetailRow(
+              'Location:',
+              widget.event.location,
+              Icons.location_on,
+            ),
+            _buildDetailRow(
+              'User Attending:',
+              widget.event.isParticipating ? 'Yes' : 'No',
+              Icons.person,
+            ),
             const SizedBox(height: 8.0),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: _userAttending ? null : _verifyAttendance,
               style: ElevatedButton.styleFrom(
                 backgroundColor: kbuttonColorBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
               ),
-              child: Center(
+              icon: const Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+              label: Center(
                 child: Text(
                   _userAttending ? 'Attendance Marked' : 'Mark Attendance Now',
                   style: _userAttending
@@ -73,6 +116,36 @@ class _EventBoxState extends State<EventBox> {
                       : keventBoxEnabledButtonStyle,
                 ),
               ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kNavbarButtonBackgroundColor,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                minimumSize: const Size(double.infinity, 40),
+              ),
+              onFocusChange: (bool hasFocus) {
+                // Change the shadow when focused
+                ElevatedButton.styleFrom(
+                  elevation: hasFocus ? 4 : 2,
+                );
+              },
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ParticipantsPage(
+                        participants: widget.event.participants,
+                        project: widget.event.name),
+                  ),
+                );
+              },
+              child: const Text(
+                'Participants',
+                style: knormalTextWhiteStyle,
+              ), // Replace with your desired button text
             ),
           ],
         ),
@@ -96,10 +169,12 @@ class _EventBoxState extends State<EventBox> {
                     '$label ',
                     style: keventBoxNormalTextStyle,
                   ),
-                  Text(_userAttending ? 'Yes' : 'No',
-                      style: _userAttending
-                          ? kwarningTextGreenStyle
-                          : kwarningTextRedStyle),
+                  Text(
+                    _userAttending ? 'Yes' : 'No',
+                    style: _userAttending
+                        ? kwarningTextGreenStyle
+                        : kwarningTextRedStyle,
+                  ),
                 ],
               ),
             )
@@ -116,8 +191,7 @@ class _EventBoxState extends State<EventBox> {
   }
 
   void _verifyAttendance() {
-    Map<String, double> eventGeoPoint =
-        widget.event.coordinates; // event's latitude and longitude
+    Map<String, double> eventGeoPoint = widget.event.coordinates;
     showDialog(
       context: context,
       builder: (context) {
@@ -129,24 +203,17 @@ class _EventBoxState extends State<EventBox> {
           actions: [
             TextButton(
               onPressed: () async {
-                bool isInGeoPointArea =
-                    await checkInGeoPointArea(eventGeoPoint);
+                isInGeoPointArea = await checkInGeoPointArea(eventGeoPoint);
                 if (isInGeoPointArea) {
-                  setState(() {
-                    _userAttending = !_userAttending;
-                    addParticipant(widget.event.id);
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _userAttending = !_userAttending;
+                      addParticipant(widget.event.id);
+                    });
+                  }
                   _close();
                 } else {
-                  // ignore: use_build_context_synchronously
-                  if (!mounted) {
-                    return;
-                  }
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('You are not in the required area'),
-                    ),
-                  );
+                  _showSnackBar("You are not in the area");
                 }
               },
               child: const Text('Verify'),
@@ -160,6 +227,15 @@ class _EventBoxState extends State<EventBox> {
           ],
         );
       },
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 

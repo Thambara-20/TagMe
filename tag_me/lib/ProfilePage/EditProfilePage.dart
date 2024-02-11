@@ -1,8 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tag_me/utilities/userServices.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -19,38 +18,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _memberIdController = TextEditingController();
 
   String _selectedRole = 'prospect';
-
-  void _updateProfile() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        await user.updateDisplayName(_nameController.text);
-
-        if (_selectedRole == 'member') {
-          await FirebaseFirestore.instance
-              .collection('members')
-              .doc(_memberIdController.text)
-              .set({
-            'name': _nameController.text,
-            'memberId': _memberIdController.text,
-          });
-        } else {
-          await FirebaseFirestore.instance
-              .collection('prospects')
-              .doc(user.uid)
-              .set({
-            'name': _nameController.text,
-          });
-        }
-
-        // ignore: use_build_context_synchronously
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      // Handle errors, show a message, etc.
-    }
-  }
+  String _selectedClub = 'Leo District 306A1';
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +36,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
               decoration: const InputDecoration(labelText: 'Name'),
             ),
             const SizedBox(height: 16.0),
+            DropdownButton<String>(
+              value: _selectedClub,
+              onChanged: (value) {
+                setState(() {
+                  _selectedClub = value!;
+                });
+              },
+              items: [
+                'Leo District 306A1',
+                'Leo District 306A2',
+                'Leo District 306B1',
+                'Leo District 306B2',
+                'Leo District 306C1',
+                'Leo District 306C2'
+              ].map((club) {
+                return DropdownMenuItem<String>(
+                  value: club,
+                  child: Text(club),
+                );
+              }).toList(),
+            ),
             DropdownButton<String>(
               value: _selectedRole,
               onChanged: (value) {
@@ -91,7 +80,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: _updateProfile,
+              onPressed: () async {
+                await updateProfile(_nameController.text, _selectedRole,
+                    _memberIdController.text , _selectedClub);
+                // ignore: use_build_context_synchronously
+                Navigator.pop(context);
+              },
               child: const Text('Save'),
             ),
           ],
