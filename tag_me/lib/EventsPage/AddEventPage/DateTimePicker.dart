@@ -57,8 +57,8 @@ class _DateTimePickerState extends State<DateTimePicker> {
       }
     }
   }
+  // ignore: empty_catches
   catch(e){
-    print(e);
   }
   }
 

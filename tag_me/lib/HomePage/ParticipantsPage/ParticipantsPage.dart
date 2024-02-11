@@ -1,4 +1,3 @@
-
 // ignore_for_file: file_names, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
@@ -9,7 +8,8 @@ class ParticipantsPage extends StatefulWidget {
   final List<String> participants;
   final String project;
 
-  const ParticipantsPage({Key? key, required this.participants, required this.project})
+  const ParticipantsPage(
+      {Key? key, required this.participants, required this.project})
       : super(key: key);
 
   @override
@@ -22,7 +22,7 @@ class _ParticipantsPageState extends State<ParticipantsPage> {
   @override
   void initState() {
     super.initState();
-    participantsInfo = []; 
+    participantsInfo = [];
     _loadParticipantsInfo();
   }
 
@@ -52,16 +52,18 @@ class _ParticipantsPageState extends State<ParticipantsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              
               padding: const EdgeInsets.all(10.0),
-              child: Text('Project: ${widget.project}', style: knormalTextBlueStyle),
+              child: Text('Project: ${widget.project}',
+                  style: knormalTextBlueStyle),
             ),
             PaginatedDataTable(
               rowsPerPage: 10,
+              columnSpacing: 10,
               columns: const [
                 DataColumn(label: Text('uid')),
                 DataColumn(label: Text('name')),
                 DataColumn(label: Text('role')),
+                DataColumn(label: Text('club'))
               ],
               source: _ParticipantDataSource(participantsInfo),
             ),
@@ -71,12 +73,13 @@ class _ParticipantsPageState extends State<ParticipantsPage> {
     );
   }
 }
+
 class _ParticipantDataSource extends DataTableSource {
   final List<Map<String, dynamic>> participantsInfo;
 
   _ParticipantDataSource(this.participantsInfo);
 
-  String truncateUid(String uid) {
+  String truncate(String uid) {
     const maxLength = 5;
 
     if (uid.length <= maxLength) {
@@ -95,9 +98,10 @@ class _ParticipantDataSource extends DataTableSource {
     Map<String, dynamic> participant = participantsInfo[index];
 
     return DataRow(cells: [
-      DataCell(Text(truncateUid(participant['uid']))),
-      DataCell(Text(participant['name'])),
+      DataCell(Text(truncate(participant['uid']))),
+      DataCell(Text(truncate(participant['name']))),
       DataCell(Text(participant['role'])),
+      DataCell(Text(participant['userClub'])),
     ]);
   }
 

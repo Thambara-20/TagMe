@@ -34,14 +34,15 @@ Future<void> updateProfile(
       );
 
       await updateUserRole(prospect);
+      
     }
-  } catch (e) {
-    print('Error updating profile: $e');
-  }
+    // ignore: empty_catches
+  } catch (e) {}
 }
 
 Future<Prospect> getUserInfo() async {
   late Prospect userInfo;
+  User? user = FirebaseAuth.instance.currentUser;
 
   try {
     final isProfileExist = await isProfileUpdated();
@@ -49,12 +50,7 @@ Future<Prospect> getUserInfo() async {
       return getLoggedUserRoleData();
     }
 
-    User? user = FirebaseAuth.instance.currentUser;
-    print(user);
     if (user != null) {
-      print(isProfileExist);
-      // document where doc contains user.uid
-
       DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
           .collection('members')
           .where('uid', isEqualTo: user.uid)
@@ -70,15 +66,28 @@ Future<Prospect> getUserInfo() async {
       updateUserRole(userInfo);
     }
   } catch (e) {
-    print('Error loading user info from Firebase: $e');
-    userInfo = Prospect(
-      uid: '',
-      email: '',
-      memberId: '',
-      userClub: '',
-      name: '',
-      role: '',
-    );
+    try {
+      DocumentSnapshot prospectSnapshot = await FirebaseFirestore.instance
+          .collection('prospects')
+          .doc(user!.uid)
+          .get();
+      userInfo = Prospect(
+          uid: user.uid,
+          email: user.email ?? '',
+          memberId: '',
+          userClub:
+              prospectSnapshot.exists ? prospectSnapshot.get('userClub') : '',
+          name: user.displayName ?? '',
+          role: prospectSnapshot.exists ? 'Prospect' : '');
+    } catch (e) {
+      userInfo = Prospect(
+          uid: user!.uid,
+          email: user.email ?? '',
+          memberId: '',
+          userClub: '',
+          name: user.displayName ?? '',
+          role: '');
+    }
   }
 
   return userInfo;
@@ -100,27 +109,74 @@ Future<void> updateProspectCollection(
 
 Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
   Map<String, dynamic> userInfo;
+  try {
+    DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
+        .collection('members')
+        .where('uid', isEqualTo: uid)
+        .get()
+        .then((value) => value.docs.first);
 
-  DocumentSnapshot memberSnapshot =
-      await FirebaseFirestore.instance.collection('members').doc(uid).get();
+    if (memberSnapshot.exists) {
+      userInfo = {
+        'uid': uid,
+        'memberId': memberSnapshot.id,
+        'name': memberSnapshot.get('name') ?? '',
+        'userClub': memberSnapshot.get('userClub') ?? '',
+        'role': 'Member',
+      };
+    } else {
+      userInfo = {
+        'uid': uid,
+        'memberId': '',
+        'userClub': '',
+        'name': '',
+        'role': 'Prospect',
+      };
+    }
+  } catch (e) {
+    try {
+      DocumentSnapshot prospectSnapshot = await FirebaseFirestore.instance
+          .collection('prospects')
+          .doc(uid)
+          .get();
 
-  if (memberSnapshot.exists) {
-    userInfo = {
-      'uid': uid,
-      'memberId': memberSnapshot.id,
-      'name': memberSnapshot.get('name') ?? '',
-      'userClub': memberSnapshot.get('userClub') ?? '',
-      'role': 'Member',
-    };
-  } else {
-    userInfo = {
-      'uid': uid,
-      'memberId': '',
-      'userClub': '',
-      'name': '',
-      'role': 'Prospect',
-    };
+      if (prospectSnapshot.exists) {
+        userInfo = {
+          'uid': uid,
+          'memberId': '',
+          'userClub': prospectSnapshot.get('userClub') ?? '',
+          'name': prospectSnapshot.get('name') ?? '',
+          'role': 'Prospect',
+        };
+      } else {
+        userInfo = {
+          'uid': uid,
+          'memberId': '',
+          'userClub': '',
+          'name': '',
+          'role': 'Prospect',
+        };
+      }
+    } catch (e) {
+      userInfo = {
+        'uid': uid,
+        'memberId': '',
+        'userClub': '',
+        'name': '',
+        'role': 'Prospect',
+      };
+    }
   }
 
   return userInfo;
+}
+
+Future<String> findAdminClub(String uid) async {
+  try {
+    final adminDoc =
+        await FirebaseFirestore.instance.collection('admins').doc(uid).get();
+    return adminDoc.get('club');
+  } catch (e) {
+    return '';
+  }
 }

@@ -1,7 +1,6 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:tag_me/constants/line.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
@@ -16,6 +15,11 @@ class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('About Tag Me'),
+
+      
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -27,7 +31,6 @@ class _AboutPageState extends State<AboutPage> {
                 'assets/logo.jpg', // Replace with the path to your app's logo
                 height: 100,
               ),
-              AnimatedStraightLine(width: 300, height: 10),
               const SizedBox(height: 16),
               const Center(
                 child: Text(

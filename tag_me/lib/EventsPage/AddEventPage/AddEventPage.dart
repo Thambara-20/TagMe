@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tag_me/utilities/comfirmationDialog.dart';
 import 'package:tag_me/utilities/eventFunctions.dart';
+import 'package:tag_me/utilities/userServices.dart';
 import '../../models/event.dart';
 import 'NamePage.dart';
 import 'LocationPage.dart';
@@ -26,11 +27,12 @@ class _AddEventFormState extends State<AddEventForm> {
   final PageController _pageController = PageController(initialPage: 0);
 
   final TextEditingController _nameController = TextEditingController();
-
+  late String club;
   var event = Event(
     id: '',
     creator: '',
     name: '',
+    club: '',
     startTime: DateTime.now(),
     endTime: DateTime.now(),
     location: '',
@@ -43,16 +45,26 @@ class _AddEventFormState extends State<AddEventForm> {
   @override
   void initState() {
     super.initState();
+    getClub();
+
 
     if (widget.selectedEvent != null) {
       event.id = widget.selectedEvent!.id;
       _nameController.text = widget.selectedEvent!.name;
       event.startTime = widget.selectedEvent!.startTime;
+      event.club = widget.selectedEvent!.club;
       event.endTime = widget.selectedEvent!.endTime;
       event.participants = widget.selectedEvent!.participants;
       event.location = widget.selectedEvent!.location;
       event.geoPoint = widget.selectedEvent!.geoPoint;
       event.coordinates = widget.selectedEvent!.coordinates;
+    }
+  }
+
+  void getClub() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      event.club = await findAdminClub(user.uid);
     }
   }
 
@@ -163,9 +175,10 @@ class _AddEventFormState extends State<AddEventForm> {
 
       if (user != null) {
         Event newEvent = Event(
-          id: event.id, // Include id in the constructor
+          id: event.id, 
           creator: user.uid,
           name: _nameController.text,
+          club: event.club,
           startTime: event.startTime,
           endTime: event.endTime,
           location: event.location,

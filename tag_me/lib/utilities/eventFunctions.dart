@@ -15,6 +15,7 @@ List<Event> processEventData(QuerySnapshot snapshot) {
       id: document.id,
       creator: data['creator'] ?? '',
       name: data['name'] ?? '',
+      club: data['club'] ?? '',
       startTime: (data['startTime'] as Timestamp).toDate(),
       endTime: (data['endTime'] as Timestamp).toDate(),
       location: data['location'] ?? '',
@@ -42,6 +43,7 @@ Future<void> updateEvent(Event newEvent) async {
       await firestore.collection('events').doc(newEvent.id).update({
         'creator': newEvent.creator,
         'name': newEvent.name,
+        'club': newEvent.club,
         'startTime': newEvent.startTime,
         'endTime': newEvent.endTime,
         'location': newEvent.location,
@@ -72,6 +74,7 @@ Future<void> addEvent(Event newEvent) async {
         await firestore.collection('events').add({
       'creator': newEvent.creator,
       'name': newEvent.name,
+      'club': newEvent.club,
       'startTime': newEvent.startTime,
       'endTime': newEvent.endTime,
       'location': newEvent.location,
@@ -121,6 +124,7 @@ void listenToEvents() async {
           id: document.id,
           creator: data['creator'] ?? '',
           name: data['name'] ?? '',
+          club: data['club'] ?? '',
           startTime: (data['startTime'] as Timestamp).toDate(),
           endTime: (data['endTime'] as Timestamp).toDate(),
           location: data['location'] ?? '',

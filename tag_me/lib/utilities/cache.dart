@@ -14,16 +14,18 @@ Future<List<Event>> loadEventsFromCache() async {
   return [];
 }
 
-Future<List<Event>> loadOngoingEventsFromCache() async {
+Future<List<Event>> loadOngoingEventsFromCache(String userClub) async {
   final prefs = await SharedPreferences.getInstance();
   final eventsJson = prefs.getString("events");
   if (eventsJson != null) {
     final List<dynamic> decoded = json.decode(eventsJson);
     final List<Event> events = decoded
         .map((eventJson) => Event.fromJson(eventJson))
-        .where((event) => event.endTime.isAfter(DateTime.now()) && event.startTime.isBefore(DateTime.now()))
+        .where((event) =>
+            event.endTime.isAfter(DateTime.now()) &&
+            event.startTime.isBefore(DateTime.now()) &&
+            event.club == userClub.split(" ")[2])
         .toList();
-
     return events;
   }
   return [];

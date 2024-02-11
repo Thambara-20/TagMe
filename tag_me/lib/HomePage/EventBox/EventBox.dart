@@ -1,6 +1,5 @@
 // ignore_for_file: file_names
 
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tag_me/HomePage/ParticipantsPage/ParticipantsPage.dart';
@@ -27,7 +26,8 @@ class _EventBoxState extends State<EventBox> {
   @override
   void initState() {
     super.initState();
-    _userAttending = widget.event.participants.contains(FirebaseAuth.instance.currentUser?.uid);
+    _userAttending = widget.event.participants
+        .contains(FirebaseAuth.instance.currentUser?.uid);
   }
 
   @override
@@ -56,6 +56,15 @@ class _EventBoxState extends State<EventBox> {
                 style: keventBoxLargeTextStyle,
               ),
             ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Club: Leo District ${widget.event.club}',
+                style: keventBoxNormalTextStyle,
+              )
+            ],
           ),
           childrenPadding: const EdgeInsets.all(14.0),
           expandedCrossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +143,9 @@ class _EventBoxState extends State<EventBox> {
                 );
               },
               child: const Text(
-                  'Participants', style: knormalTextWhiteStyle,), // Replace with your desired button text
+                'Participants',
+                style: knormalTextWhiteStyle,
+              ), // Replace with your desired button text
             ),
           ],
         ),

@@ -83,6 +83,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               onPressed: () async {
                 await updateProfile(_nameController.text, _selectedRole,
                     _memberIdController.text , _selectedClub);
+                // ignore: use_build_context_synchronously
+                Navigator.pop(context);
               },
               child: const Text('Save'),
             ),

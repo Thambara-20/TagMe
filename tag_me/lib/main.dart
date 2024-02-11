@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
 import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/ProfilePage/History.dart';
@@ -105,7 +104,6 @@ class _MainPageState extends State<MainPage> {
         children: const [
           HomePage(),
           EventsPage(),
-          AboutPage(),
         ],
       ),
       bottomNavigationBar: CurvedNavigationBar(
@@ -138,6 +136,5 @@ class _MainPageState extends State<MainPage> {
   final List<Map<String, dynamic>> _pages = [
     {'title': 'Home', 'icon': Icons.home},
     {'title': 'Events', 'icon': Icons.event},
-    {'title': 'About', 'icon': Icons.description},
   ];
 }

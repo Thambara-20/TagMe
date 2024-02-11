@@ -25,13 +25,26 @@ class _EventsPageState extends State<EventsPage> {
   List<Event> upcomingEvents = [];
   List<Event> finishedEvents = [];
   bool isLoading = true;
+  late AppUser appUser;
   late bool isAdmin = false;
   late String selectedCategory;
+  late String selectedClub;
+  List<String> clubs = [
+    'Leo District 306A1',
+    'Leo District 306A2',
+    'Leo District 306B1',
+    'Leo District 306B2',
+    'Leo District 306C1',
+    'Leo District 306C2'
+  ];
+  late bool isCreater = false;
 
   @override
   initState() {
     super.initState();
     selectedCategory = 'Ongoing';
+    appUser = AppUser(uid: '', email: '', isAdmin: false);
+    selectedClub = clubs[0]; // Set default club
     _getUserInfo();
     _listenToEvents();
   }
@@ -39,7 +52,9 @@ class _EventsPageState extends State<EventsPage> {
   void _listenToEvents() {
     loadEventsFromCache().then((loadedEvents) {
       setState(() {
-        events = loadedEvents;
+        events = loadedEvents
+            .where((event) => event.club == selectedClub.split(' ')[2])
+            .toList();
         _categorizeEvents();
         isLoading = false;
       });
@@ -50,13 +65,13 @@ class _EventsPageState extends State<EventsPage> {
     getLoggedInUserInfo().then((loggedInUser) {
       setState(() {
         isAdmin = loggedInUser.isAdmin;
+        appUser = loggedInUser;
       });
     });
   }
 
   void _categorizeEvents() {
     final now = DateTime.now();
-
     ongoingEvents = events
         .where((event) =>
             event.startTime.isBefore(now) && event.endTime.isAfter(now))
@@ -99,10 +114,25 @@ class _EventsPageState extends State<EventsPage> {
             ),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Text('Select the district: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 147, 147, 147),
+                        )),
+                    _buildClubDropdown(),
+                  ],
+                ),
+              ),
+              Padding(
                 padding: const EdgeInsets.only(
-                    top: 24.0, bottom: 8.0, left: 16.0, right: 16.0),
+                    top: 8.0, bottom: 8.0, left: 16.0, right: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -144,6 +174,29 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
+  Widget _buildClubDropdown() {
+    return DropdownButton<String>(
+      value: selectedClub,
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedClub = newValue!;
+        });
+        _refresh();
+      },
+      items: clubs.map((String club) {
+        return DropdownMenuItem<String>(
+          value: club,
+          child: Text(
+            club,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 147, 147, 147),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildNavigationBarItem(String category) {
     return GestureDetector(
       onTap: () {
@@ -170,6 +223,8 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   Widget _buildEventListItem(Event event) {
+
+    bool isCreater = event.creator == appUser.uid;
     bool isEventOngoing = DateTime.now().isAfter(event.startTime) &&
         DateTime.now().isBefore(event.endTime);
     bool isEventUpcoming = DateTime.now().isBefore(event.startTime);
@@ -216,14 +271,18 @@ class _EventsPageState extends State<EventsPage> {
                       isEventOngoing
                           ? Icons.access_time
                           : Icons.pending_actions,
-                      color: isEventOngoing ? Colors.green : Colors.blue,
+                      color: isEventOngoing
+                          ? const Color.fromARGB(255, 37, 37, 37)
+                          : const Color.fromARGB(255, 0, 0, 0),
                     ),
                     const SizedBox(width: 4.0),
                     Text(
                       eventStatus,
                       style: TextStyle(
                         fontSize: 12.0,
-                        color: isEventOngoing ? Colors.green : Colors.blue,
+                        color: isEventOngoing
+                            ? const Color.fromARGB(255, 37, 37, 37)
+                            : const Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
                   ],
@@ -266,7 +325,7 @@ class _EventsPageState extends State<EventsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (isAdmin)
+                      if (isAdmin && isCreater)
                         ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor:

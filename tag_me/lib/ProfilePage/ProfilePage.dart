@@ -1,7 +1,9 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
+import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/constants/constants.dart';
-import 'package:tag_me/ProfilePage/History.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
 import 'package:tag_me/utilities/userServices.dart';
@@ -95,14 +97,14 @@ Future<void> _loadUserInfo() async {
           _buildProfileItem(context, 'Club', prospect.userClub),
           const SizedBox(height: 16),
           ListTile(
-            leading: const Icon(Icons.history,
+            leading: const Icon(Icons.info,
                 color: Color.fromARGB(255, 149, 149, 149)),
-            title: const Text('History'),
+            title: const Text('About'),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const HistoryPage(),
+                  builder: (context) => const AboutPage(),
                 ),
               );
             },
@@ -169,7 +171,7 @@ Future<void> _loadUserInfo() async {
             )
           : Shimmer.fromColors(
               baseColor: Colors.grey[300]!,
-              highlightColor: const Color.fromARGB(158, 245, 245, 245)!,
+              highlightColor: const Color.fromARGB(158, 245, 245, 245),
               child: Container(
                 color: Colors.white,
                 width: double.infinity,
