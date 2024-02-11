@@ -109,7 +109,7 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: khomePageBackgroundColor,
+        backgroundColor: kNavbarIconBackgroundColor,
         color: kNavbarBackgroundColor,
         buttonBackgroundColor: kNavbarButtonBackgroundColor,
         animationDuration: const Duration(milliseconds: 600),

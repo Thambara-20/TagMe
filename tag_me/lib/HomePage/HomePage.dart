@@ -1,7 +1,10 @@
+// ignore_for_file: file_names
+
 import 'dart:convert'; // Import for JSON decoding
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
+import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/event.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,7 +31,8 @@ class _HomePageState extends State<HomePage> {
     final eventsJson = prefs.getString("events");
     if (eventsJson != null) {
       final List<dynamic> decoded = json.decode(eventsJson);
-      cachedEvents = decoded.map((eventJson) => Event.fromJson(eventJson)).toList();
+      cachedEvents =
+          decoded.map((eventJson) => Event.fromJson(eventJson)).toList();
     }
 
     setState(() {}); // Trigger a rebuild after loading events from cache
@@ -39,11 +43,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background_home.jpg'),
-            fit: BoxFit.fill,
-          ),
-        ),
+            gradient: LinearGradient(colors: [
+          Color.fromARGB(255, 0, 0, 0),
+          khomePageBackgroundColor
+        ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: cachedEvents.isNotEmpty

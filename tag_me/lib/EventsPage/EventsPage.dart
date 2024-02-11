@@ -34,13 +34,11 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void _listenToEvents() {
-    Future.delayed(const Duration(seconds: 1), () {
-      loadEventsFromCache().then((loadedEvents) {
-        setState(() {
-          events = loadedEvents;
-          searchResult = events;
-          isLoading = false;
-        });
+    loadEventsFromCache().then((loadedEvents) {
+      setState(() {
+        events = loadedEvents;
+        searchResult = events;
+        isLoading = false;
       });
     });
   }
@@ -60,10 +58,13 @@ class _EventsPageState extends State<EventsPage> {
         onRefresh: _refresh,
         child: Container(
           decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                  'assets/background_image.jpg'), // Replace with your image asset path
-              fit: BoxFit.fill,
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 0, 0, 0),
+                khomePageBackgroundColor,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
           child: Column(

@@ -85,12 +85,14 @@ class _HomePageState extends State<WelcomePage> {
                           AppUser? user = await authService.signInWithGoogle();
                           if (user != null) {
                             await storeLoggedInUser(user);
+                            // ignore: use_build_context_synchronously
                             Navigator.pushNamed(context, MainPage.routeName);
                           }
                         }
                       } catch (e) {
+                        // ignore: use_build_context_synchronously
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to logged in')),
+                          const SnackBar(content: Text('Failed to logged in')),
                         );
                       }
                     },

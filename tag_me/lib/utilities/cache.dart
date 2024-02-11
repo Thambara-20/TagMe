@@ -20,8 +20,6 @@ Future<void> saveEventsToCache(List<Event> events) async {
   await prefs.setString("events", json.encode(eventsJson));
 }
 
-
-
 Future<bool> checkLoggedInUser() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getBool('isLoggedIn') ?? false;
@@ -39,6 +37,7 @@ Future<AppUser> getLoggedInUserInfo() async {
     isAdmin: isAdmin,
   );
 }
+
 Future<void> storeLoggedInUser(AppUser user) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', true);
@@ -57,8 +56,8 @@ Future<void> removeLoggedInUser() async {
   await prefs.remove('memberId');
   await prefs.remove('name');
   await prefs.remove('isProfileUpdated');
+  await prefs.remove('userClub');
 }
-
 
 Future<void> updateUserRole(Prospect prospect) async {
   final prefs = await SharedPreferences.getInstance();
@@ -68,6 +67,7 @@ Future<void> updateUserRole(Prospect prospect) async {
   await prefs.setString('userRole', prospect.role);
   await prefs.setString("memberId", prospect.memberId);
   await prefs.setString('userEmail', prospect.email);
+  await prefs.setString('userClub', prospect.userClub);
 }
 
 Future<Prospect> getLoggedUserRoleData() async {
@@ -77,12 +77,14 @@ Future<Prospect> getLoggedUserRoleData() async {
   final String memberId = prefs.getString('memberId') ?? '';
   final String name = prefs.getString('name') ?? '';
   final String email = prefs.getString('userEmail') ?? '';
+  final String userClub = prefs.getString('userClub') ?? '';
 
   return Prospect(
     email: email,
     uid: uid,
     name: name,
     role: userRole,
+    userClub: userClub,
     memberId: memberId,
   );
 }

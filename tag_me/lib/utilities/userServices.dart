@@ -1,19 +1,21 @@
+// ignore_for_file: file_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
 
 Future<void> updateProfile(
-    String name, String selectedRole, String memberId) async {
+    String name, String selectedRole, String memberId, String userClub) async {
   try {
     AppUser loggedInUser = await getLoggedInUserInfo();
 
     if (loggedInUser.uid.isNotEmpty) {
       if (selectedRole == 'member') {
-        await updateMemberCollection(loggedInUser.uid, name, memberId);
+        await updateMemberCollection(
+            loggedInUser.uid, name, memberId, userClub);
       } else {
-        await updateProspectCollection(loggedInUser.uid, name);
+        await updateProspectCollection(loggedInUser.uid, name, userClub);
       }
 
       User? fireUser = FirebaseAuth.instance.currentUser;
@@ -27,6 +29,7 @@ Future<void> updateProfile(
         email: loggedInUser.email,
         memberId: memberId,
         name: name,
+        userClub: userClub,
         role: selectedRole,
       );
 
@@ -42,12 +45,13 @@ Future<Prospect> getUserInfo() async {
 
   try {
     final isProfileExist = await isProfileUpdated();
-    User? user = FirebaseAuth.instance.currentUser;
     if (isProfileExist) {
       return getLoggedUserRoleData();
     }
 
+    User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
+      print(isProfileExist);
       DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
           .collection('members')
           .doc(user.uid)
@@ -57,6 +61,7 @@ Future<Prospect> getUserInfo() async {
           uid: user.uid,
           email: user.email ?? '',
           memberId: memberSnapshot.exists ? memberSnapshot.id : '',
+          userClub: memberSnapshot.get('userClub') ?? '',
           name: user.displayName ?? '',
           role: memberSnapshot.exists ? 'Member' : 'Prospect');
     }
@@ -66,6 +71,7 @@ Future<Prospect> getUserInfo() async {
       uid: '',
       email: '',
       memberId: '',
+      userClub: '',
       name: '',
       role: '',
     );
@@ -75,19 +81,17 @@ Future<Prospect> getUserInfo() async {
 }
 
 Future<void> updateMemberCollection(
-    String uid, String name, String memberId) async {
-  await FirebaseFirestore.instance.collection('members').doc(memberId).set({
-    'uid': uid,
-    'name': name,
-    'memberId': memberId,
-  });
+    String uid, String name, String memberId, String userClub) async {
+  await FirebaseFirestore.instance.collection('members').doc(memberId).set(
+      {'uid': uid, 'name': name, 'memberId': memberId, 'userClub': userClub});
 }
 
-Future<void> updateProspectCollection(String uid, String name) async {
+Future<void> updateProspectCollection(
+    String uid, String name, String userClub) async {
   await FirebaseFirestore.instance
       .collection('prospects')
       .doc(uid)
-      .set({'name': name, 'uid': uid});
+      .set({'name': name, 'uid': uid, 'userClub': userClub});
 }
 
 Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
@@ -101,12 +105,14 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
       'uid': uid,
       'memberId': memberSnapshot.id,
       'name': memberSnapshot.get('name') ?? '',
+      'userClub': memberSnapshot.get('userClub') ?? '',
       'role': 'Member',
     };
   } else {
     userInfo = {
       'uid': uid,
       'memberId': '',
+      'userClub': '',
       'name': '',
       'role': 'Prospect',
     };

@@ -19,7 +19,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   Prospect prospect =
-      Prospect(memberId: "", name: "", role: "", email: "", uid: "");
+      Prospect(memberId: "", name: "", role: "", email: "", uid: "", userClub: "");
   String _location = "";
 
   @override
@@ -91,6 +91,7 @@ Future<void> _loadUserInfo() async {
           ),
           _buildProfileItem(context, 'Email', prospect.email),
           _buildProfileItem(context, 'Location', _location),
+          _buildProfileItem(context, 'club', prospect.userClub),
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.history,

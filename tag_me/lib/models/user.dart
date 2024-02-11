@@ -16,16 +16,18 @@ class Prospect extends AppUser {
   final String memberId;
   final String name;
   final String role;
+  final String userClub;
 
   Prospect({
     required this.memberId,
     required this.name,
     required this.role,
+    required this.userClub,
     required String email,
     required String uid,
   }) : super(
           uid: uid,
-          email: email, 
+          email: email,
           isAdmin: false,
         );
 }
@@ -40,7 +42,7 @@ class AppUserFactory implements UserFactory {
   AppUser createUserFromFirebase(User firebaseUser, bool isAdmin) {
     return AppUser(
       uid: firebaseUser.uid,
-      email: firebaseUser.email ?? '', // Use the null-aware operator to handle null email
+      email: firebaseUser.email ?? '',
       isAdmin: isAdmin,
     );
   }
@@ -50,5 +52,3 @@ class AppUserFactory implements UserFactory {
     throw Exception("AppUserFactory cannot create prospects");
   }
 }
-
-

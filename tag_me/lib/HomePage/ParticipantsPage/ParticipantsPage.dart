@@ -1,3 +1,6 @@
+
+// ignore_for_file: file_names, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/userServices.dart';
@@ -79,7 +82,7 @@ class _ParticipantDataSource extends DataTableSource {
     if (uid.length <= maxLength) {
       return uid;
     } else {
-      return uid.substring(0, maxLength) + '...';
+      return '${uid.substring(0, maxLength)}...';
     }
   }
 

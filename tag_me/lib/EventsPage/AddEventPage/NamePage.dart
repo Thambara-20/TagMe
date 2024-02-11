@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/models/event.dart';
 
@@ -27,7 +29,7 @@ class NamePage extends StatelessWidget {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: InputDecoration(labelText: 'Event Name'),
+                      decoration: const InputDecoration(labelText: 'Event Name'),
                     ),
                   ],
                 ),

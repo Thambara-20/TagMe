@@ -18,6 +18,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _memberIdController = TextEditingController();
 
   String _selectedRole = 'prospect';
+  String _selectedClub = 'Leo District 306A1';
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
               decoration: const InputDecoration(labelText: 'Name'),
             ),
             const SizedBox(height: 16.0),
+            DropdownButton<String>(
+              value: _selectedClub,
+              onChanged: (value) {
+                setState(() {
+                  _selectedClub = value!;
+                });
+              },
+              items: [
+                'Leo District 306A1',
+                'Leo District 306A2',
+                'Leo District 306B1',
+                'Leo District 306B2',
+                'Leo District 306C1',
+                'Leo District 306C2'
+              ].map((club) {
+                return DropdownMenuItem<String>(
+                  value: club,
+                  child: Text(club),
+                );
+              }).toList(),
+            ),
             DropdownButton<String>(
               value: _selectedRole,
               onChanged: (value) {
@@ -60,8 +82,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ElevatedButton(
               onPressed: () async {
                 await updateProfile(_nameController.text, _selectedRole,
-                    _memberIdController.text);
-                
+                    _memberIdController.text , _selectedClub);
               },
               child: const Text('Save'),
             ),
