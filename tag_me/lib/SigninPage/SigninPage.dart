@@ -47,9 +47,10 @@ class _SignInPageState extends State<SignInPage> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background.jpg'),
-            fit: BoxFit.cover,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [kWelcomePageBackgroundColorI, kWelcomePageBackgroundColorII],
           ),
         ),
         child: Center(

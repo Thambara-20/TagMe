@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateTimePicker extends StatefulWidget {
+  final String text;
   final DateTime initialDateTime;
   final Function(DateTime) onDateTimeChanged;
 
   const DateTimePicker({
     Key? key,
+    required this.text,
     required this.initialDateTime,
     required this.onDateTimeChanged,
   }) : super(key: key);
@@ -28,38 +30,37 @@ class _DateTimePickerState extends State<DateTimePicker> {
   }
 
   Future<void> _selectDateTime(BuildContext context) async {
-    try{
-    final selectedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDateTime,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
-    );
-
-    if (selectedDate != null) {
-      // ignore: use_build_context_synchronously
-      final selectedTime = await showTimePicker(
+    try {
+      final selectedDate = await showDatePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+        initialDate: _selectedDateTime,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2101),
       );
 
-      if (selectedTime != null) {
-        setState(() {
-          _selectedDateTime = DateTime(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day,
-            selectedTime.hour,
-            selectedTime.minute,
-          );
-        });
-        widget.onDateTimeChanged(_selectedDateTime);
+      if (selectedDate != null) {
+        // ignore: use_build_context_synchronously
+        final selectedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+        );
+
+        if (selectedTime != null) {
+          setState(() {
+            _selectedDateTime = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              selectedTime.hour,
+              selectedTime.minute,
+            );
+          });
+          widget.onDateTimeChanged(_selectedDateTime);
+        }
       }
     }
-  }
-  // ignore: empty_catches
-  catch(e){
-  }
+    // ignore: empty_catches
+    catch (e) {}
   }
 
   @override
@@ -67,7 +68,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
     return Row(
       children: [
         Text(
-          'Start Time: ${DateFormat('yyyy-MM-dd HH:mm').format(_selectedDateTime)}',
+          '${widget.text}: ${DateFormat('yyyy-MM-dd HH:mm').format(_selectedDateTime)}',
         ),
         IconButton(
           icon: const Icon(Icons.event),

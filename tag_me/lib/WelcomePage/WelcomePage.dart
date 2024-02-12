@@ -38,11 +38,11 @@ class _HomePageState extends State<WelcomePage> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
+            
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [kWelcomePageBackgroundColorI, kWelcomePageBackgroundColorII],),),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

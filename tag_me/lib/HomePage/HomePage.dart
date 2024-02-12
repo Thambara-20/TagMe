@@ -21,11 +21,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Event> cachedEvents = [];
+  late String selectedClub;
+  List<String> clubs = [
+    'Leo District 306A1',
+    'Leo District 306A2',
+    'Leo District 306B1',
+    'Leo District 306B2',
+    'Leo District 306C1',
+    'Leo District 306C2'
+  ];
 
   @override
   void initState() {
     super.initState();
+    loadUser();
     loadEventsFromCache();
+    selectedClub = clubs[0];
+  }
+
+  Future<void> loadUser() async {
+    Prospect prospect = await getUserInfo();
+    
+    setState(() {
+      selectedClub = prospect.userClub;
+    });
   }
 
   Future<void> loadEventsFromCache() async {
@@ -33,7 +52,7 @@ class _HomePageState extends State<HomePage> {
     if (prospect.userClub == '' || prospect.userClub.isEmpty) {
       _showEditProfileNotification(context);
     } else {
-      cachedEvents = await loadOngoingEventsFromCache(prospect.userClub);
+      cachedEvents = await loadOngoingEventsFromCache(selectedClub);
       setState(() {});
     }
   }
@@ -80,21 +99,63 @@ class _HomePageState extends State<HomePage> {
           ),
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          child: cachedEvents.isNotEmpty
-              ? ListView.builder(
-                  itemCount: cachedEvents.length,
-                  itemBuilder: (context, index) {
-                    return EventBox(event: cachedEvents[index]);
-                  },
-                )
-              : const Center(
-                  child: Text(
-                    'No ongoing events available.',
-                    style: TextStyle(color: Colors.white),
-                  ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Text('select your district: ',
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 147, 147, 147),
+                            fontSize: 16)),
+                    _buildClubDropdown(),
+                  ],
                 ),
+              ),
+              Expanded(
+                child: cachedEvents.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: cachedEvents.length,
+                        itemBuilder: (context, index) {
+                          return EventBox(event: cachedEvents[index]);
+                        },
+                      )
+                    : const Center(
+                        child: Text(
+                          'No ongoing events available.',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildClubDropdown() {
+    return DropdownButton<String>(
+      value: selectedClub,
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedClub = newValue!;
+        });
+        _refresh();
+      },
+      items: clubs.map((String club) {
+        return DropdownMenuItem<String>(
+          value: club,
+          child: Text(
+            club,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 147, 147, 147),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
