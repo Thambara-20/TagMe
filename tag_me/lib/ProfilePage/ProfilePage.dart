@@ -6,10 +6,12 @@ import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
+import 'package:tag_me/utilities/eventServices.dart';
 import 'package:tag_me/utilities/userServices.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../utilities/Location.dart';
+import '../utilities/locationService.dart';
+import '../utilities/comfirmationDialog.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -21,8 +23,15 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Prospect prospect =
-      Prospect(memberId: "", name: "", role: "", email: "", uid: "", userClub: "");
+  Prospect prospect = Prospect(
+      memberId: "",
+      name: "",
+      role: "",
+      email: "",
+      uid: "",
+      userClub: "",
+      district: "",
+      designation: "");
   String _location = "";
 
   @override
@@ -31,19 +40,17 @@ class _ProfilePageState extends State<ProfilePage> {
     _loadUserInfo();
   }
 
-Future<void> _loadUserInfo() async {
-  Prospect loadedprospect = await getUserInfo();
-  String loadedLocation = await getArea();
+  Future<void> _loadUserInfo() async {
+    Prospect loadedprospect = await getUserInfo();
+    String loadedLocation = await getArea();
 
-  // Check if the widget is still mounted before calling setState
-  if (mounted) {
-    setState(() {
-      prospect = loadedprospect;
-      _location = loadedLocation;
-    });
+    if (mounted) {
+      setState(() {
+        prospect = loadedprospect;
+        _location = loadedLocation;
+      });
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -89,12 +96,14 @@ Future<void> _loadUserInfo() async {
             title: Text(prospect.name, style: const TextStyle(fontSize: 20)),
           ),
           ListTile(
-            title: Text("Role: ${prospect.role}", //member/prospect
+            title: Text("Prospect/Member: ${prospect.role}", //member/prospect
                 style: const TextStyle(fontSize: 14, color: Colors.black)),
           ),
           _buildProfileItem(context, 'Email', prospect.email),
           _buildProfileItem(context, 'Location', _location),
+          _buildProfileItem(context, 'District', prospect.district),
           _buildProfileItem(context, 'Club', prospect.userClub),
+          _buildProfileItem(context, 'Designation', prospect.designation),
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.info,
@@ -133,12 +142,22 @@ Future<void> _loadUserInfo() async {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () async {
-                  FirebaseAuthService authService = FirebaseAuthService();
-                  await authService.signOut();
-                  // ignore: use_build_context_synchronously
-                  Navigator.pushNamed(context, '/WelcomePage');
-
-                  // Add functionality for logout
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return ConfirmationDialog(
+                        onConfirm: () async {
+                          FirebaseAuthService authService =
+                              FirebaseAuthService();
+                          authService.signOut().then((value) {
+                            Navigator.pushNamed(context, '/WelcomePage');
+                          });
+                        },
+                        confirmationMessage:
+                            'Are you sure you want to logout ?',
+                      );
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(200, 40),
@@ -162,18 +181,18 @@ Future<void> _loadUserInfo() async {
     );
   }
 
-   Widget _buildProfileItem(BuildContext context, String label, String value) {
+  Widget _buildProfileItem(BuildContext context, String label, String value) {
     return ListTile(
-      title: value != ''
+      title: value != '' || label == 'Designation'
           ? Text(
               '$label: $value',
               style: const TextStyle(fontSize: 14),
             )
           : Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: const Color.fromARGB(158, 245, 245, 245),
+              baseColor: const Color.fromARGB(91, 0, 15, 55),
+              highlightColor: const Color.fromARGB(64, 245, 245, 245),
               child: Container(
-                color: Colors.white,
+                color: const Color.fromARGB(255, 0, 0, 0),
                 width: double.infinity,
                 height: 20.0,
                 margin: const EdgeInsets.only(top: 4.0, bottom: 4.0),

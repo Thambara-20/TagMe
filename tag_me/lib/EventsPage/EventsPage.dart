@@ -28,15 +28,8 @@ class _EventsPageState extends State<EventsPage> {
   late AppUser appUser;
   late bool isAdmin = false;
   late String selectedCategory;
-  late String selectedClub;
-  List<String> clubs = [
-    'Leo District 306A1',
-    'Leo District 306A2',
-    'Leo District 306B1',
-    'Leo District 306B2',
-    'Leo District 306C1',
-    'Leo District 306C2'
-  ];
+  late String selectedDistrict;
+  List<String> districts =  [];
   late bool isCreater = false;
 
   @override
@@ -44,16 +37,26 @@ class _EventsPageState extends State<EventsPage> {
     super.initState();
     selectedCategory = 'Ongoing';
     appUser = AppUser(uid: '', email: '', isAdmin: false);
-    selectedClub = clubs[0]; // Set default club
+    selectedDistrict = ''; 
+    _loadData();
     _getUserInfo();
     _listenToEvents();
+  }
+
+  void _loadData() {
+    loadDistrictsFromCache().then((loadedDistricts) {
+      setState(() {
+        districts = loadedDistricts;
+        selectedDistrict = districts[0];
+      });
+    });
   }
 
   void _listenToEvents() {
     loadEventsFromCache().then((loadedEvents) {
       setState(() {
         events = loadedEvents
-            .where((event) => event.club == selectedClub.split(' ')[2])
+            .where((event) => event.district == selectedDistrict)
             .toList();
         _categorizeEvents();
         isLoading = false;
@@ -126,7 +129,7 @@ class _EventsPageState extends State<EventsPage> {
                           fontSize: 16,
                           color: Color.fromARGB(255, 147, 147, 147),
                         )),
-                    _buildClubDropdown(),
+                    _buildDistrictDropdown(),
                   ],
                 ),
               ),
@@ -174,20 +177,20 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget _buildClubDropdown() {
+  Widget _buildDistrictDropdown() {
     return DropdownButton<String>(
-      value: selectedClub,
+      value: selectedDistrict,
       onChanged: (String? newValue) {
         setState(() {
-          selectedClub = newValue!;
+          selectedDistrict = newValue!;
         });
         _refresh();
       },
-      items: clubs.map((String club) {
+      items: districts.map((String district) {
         return DropdownMenuItem<String>(
-          value: club,
+          value: district,
           child: Text(
-            club,
+            district,
             style: const TextStyle(
               color: Color.fromARGB(255, 147, 147, 147),
             ),

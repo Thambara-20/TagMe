@@ -2,8 +2,11 @@
 
 // ignore_for_file: file_names, empty_catches
 
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/models/event.dart';
 import 'package:tag_me/utilities/cache.dart';
 
@@ -15,7 +18,7 @@ List<Event> processEventData(QuerySnapshot snapshot) {
       id: document.id,
       creator: data['creator'] ?? '',
       name: data['name'] ?? '',
-      club: data['club'] ?? '',
+      district: data['district'] ?? '',
       startTime: (data['startTime'] as Timestamp).toDate(),
       endTime: (data['endTime'] as Timestamp).toDate(),
       location: data['location'] ?? '',
@@ -43,7 +46,7 @@ Future<void> updateEvent(Event newEvent) async {
       await firestore.collection('events').doc(newEvent.id).update({
         'creator': newEvent.creator,
         'name': newEvent.name,
-        'club': newEvent.club,
+        'district': newEvent.district,
         'startTime': newEvent.startTime,
         'endTime': newEvent.endTime,
         'location': newEvent.location,
@@ -74,7 +77,7 @@ Future<void> addEvent(Event newEvent) async {
         await firestore.collection('events').add({
       'creator': newEvent.creator,
       'name': newEvent.name,
-      'club': newEvent.club,
+      'district': newEvent.district,
       'startTime': newEvent.startTime,
       'endTime': newEvent.endTime,
       'location': newEvent.location,
@@ -101,8 +104,6 @@ Future<void> addParticipant(String eventId) async {
   } catch (e) {}
 }
 
-
-
 bool checkStartTime(DateTime startTime) {
   DateTime now = DateTime.now();
   if (startTime.isBefore(now)) {
@@ -124,7 +125,7 @@ void listenToEvents() async {
           id: document.id,
           creator: data['creator'] ?? '',
           name: data['name'] ?? '',
-          club: data['club'] ?? '',
+          district: data['district'] ?? '',
           startTime: (data['startTime'] as Timestamp).toDate(),
           endTime: (data['endTime'] as Timestamp).toDate(),
           location: data['location'] ?? '',
@@ -140,4 +141,21 @@ void listenToEvents() async {
       }).toList());
     });
   } catch (e) {}
+}
+
+// get event location range in meters
+
+Future<void> getEventLocationRange() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    DocumentSnapshot data = await FirebaseFirestore.instance
+        .collection('settings')
+        .doc('location_range')
+        .get();
+    if (data.exists) {
+      await prefs.setDouble('location_range', data['range'].toDouble());
+    }
+  } catch (e) {
+    print("Error fetching location range: $e");
+  }
 }

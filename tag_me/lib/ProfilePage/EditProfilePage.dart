@@ -1,6 +1,8 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:tag_me/utilities/cache.dart';
+import 'package:tag_me/utilities/clubServices.dart';
 import 'package:tag_me/utilities/userServices.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -17,8 +19,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _memberIdController = TextEditingController();
 
-  String _selectedRole = 'prospect';
-  String _selectedClub = 'Leo District 306A1';
+  // final TextEditingController _clubController = TextEditingController();
+
+  late String _selectedRole = 'Prospect';
+  late String _selectedDesignation;
+  late String _selectedDistrict;
+  late String _selectedClub;
+  List<String> districts = [];
+  List<String> clubs = [];
+  List<String> designations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDistrict = '';
+    _selectedClub = '';
+    _selectedDesignation = '';
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    districts = await loadDistrictsFromCache();
+    clubs = await loadClubsFromDistrict(districts[0]);
+    designations = await loadDesignations();
+
+    setState(() {
+      _selectedDistrict = districts[0];
+      _selectedClub = clubs[0];
+      _selectedDesignation = designations[0];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,55 +66,120 @@ class _EditProfilePageState extends State<EditProfilePage> {
               decoration: const InputDecoration(labelText: 'Name'),
             ),
             const SizedBox(height: 16.0),
-            DropdownButton<String>(
-              value: _selectedClub,
-              onChanged: (value) {
+            PopupMenuButton<String>(
+              child: ListTile(
+                title: Text(_selectedDistrict),
+                trailing: const Icon(Icons.arrow_drop_down),
+              ),
+              itemBuilder: (BuildContext context) {
+                return districts.map((district) {
+                  return PopupMenuItem<String>(
+                    value: district,
+                    child: Text(district),
+                  );
+                }).toList();
+              },
+              onSelected: (value) {
                 setState(() {
-                  _selectedClub = value!;
+                  _selectedDistrict = value;
                 });
               },
-              items: [
-                'Leo District 306A1',
-                'Leo District 306A2',
-                'Leo District 306B1',
-                'Leo District 306B2',
-                'Leo District 306C1',
-                'Leo District 306C2'
-              ].map((club) {
-                return DropdownMenuItem<String>(
-                  value: club,
-                  child: Text(club),
-                );
-              }).toList(),
             ),
-            DropdownButton<String>(
-              value: _selectedRole,
-              onChanged: (value) {
+            FutureBuilder(
+              future: loadClubsFromDistrict(_selectedDistrict),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox();
+                } else if (snapshot.hasError) {
+                  return Text('Error loading clubs: ${snapshot.error}');
+                } else {
+                  clubs = snapshot.data as List<String>;
+                  if (clubs.isNotEmpty && !clubs.contains(_selectedClub)) {
+                    _selectedClub = clubs[0];
+                  }
+                  return PopupMenuButton<String>(
+                    child: ListTile(
+                      title: Text(_selectedClub),
+                      trailing: const Icon(Icons.arrow_drop_down),
+                    ),
+                    itemBuilder: (BuildContext context) {
+                      return clubs.map((club) {
+                        return PopupMenuItem<String>(
+                          value: club,
+                          child: Text(club),
+                        );
+                      }).toList();
+                    },
+                    onSelected: (value) {
+                      setState(() {
+                        _selectedClub = value;
+                      });
+                    },
+                  );
+                }
+              },
+            ),
+            PopupMenuButton<String>(
+              child: ListTile(
+                title: Text(_selectedRole),
+                trailing: const Icon(Icons.arrow_drop_down),
+              ),
+              itemBuilder: (BuildContext context) {
+                return ["Prospect", "Member"].map((role) {
+                  return PopupMenuItem<String>(
+                    value: role,
+                    child: Text(role),
+                  );
+                }).toList();
+              },
+              onSelected: (value) {
                 setState(() {
-                  _selectedRole = value!;
+                  _selectedRole = value;
                 });
               },
-              items: ['prospect', 'member'].map((role) {
-                return DropdownMenuItem<String>(
-                  value: role,
-                  child: Text(role),
-                );
-              }).toList(),
             ),
-            if (_selectedRole == 'member') ...[
-              const SizedBox(height: 16.0),
+            if (_selectedRole == 'Member') ...[
               TextFormField(
                 controller: _memberIdController,
                 decoration: const InputDecoration(labelText: 'Member ID'),
+              ),
+              const SizedBox(height: 16.0),
+              PopupMenuButton<String>(
+                child: ListTile(
+                  title: Text(_selectedDesignation),
+                  trailing: const Icon(Icons.arrow_drop_down),
+                ),
+                itemBuilder: (BuildContext context) {
+                  return designations.map((designation) {
+                    return PopupMenuItem<String>(
+                      value: designation,
+                      child: Text(designation),
+                    );
+                  }).toList();
+                },
+                onSelected: (value) {
+                  setState(() {
+                    _selectedDesignation = value;
+                  });
+                },
               ),
             ],
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
-                await updateProfile(_nameController.text, _selectedRole,
-                    _memberIdController.text , _selectedClub);
-                // ignore: use_build_context_synchronously
-                Navigator.pop(context);
+                updateProfile(
+                        _nameController.text,
+                        _selectedRole,
+                        _memberIdController.text,
+                        _selectedClub,
+                        _selectedDesignation,
+                        _selectedDistrict)
+                    .then((value) => Navigator.pop(context))
+                    .catchError((error) {
+                  Navigator.pop(context);
+                  // ignore: avoid_print
+                  print(error);
+                });
               },
               child: const Text('Save'),
             ),

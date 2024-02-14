@@ -14,8 +14,8 @@ import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:tag_me/utilities/Location.dart';
-import 'package:tag_me/utilities/eventFunctions.dart';
+import 'package:tag_me/utilities/locationService.dart';
+import 'package:tag_me/utilities/eventServices.dart';
 import 'firebase_options.dart';
 
 // ...
@@ -24,6 +24,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   await askForLocationPermission();
+  await getEventLocationRange();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

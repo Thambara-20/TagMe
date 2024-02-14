@@ -2,6 +2,32 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/models/event.dart';
 import 'package:tag_me/models/user.dart';
+import 'package:tag_me/utilities/clubServices.dart';
+
+Future<List<String>> loadDistrictsFromCache() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final districtsJson = prefs.getString("districts");
+
+    if (districtsJson != null) {
+      final List<dynamic> decoded = json.decode(districtsJson);
+      return decoded.map((district) => district.toString()).toList();
+    }
+
+    final List<String> districts = await findDistricts();
+    saveDistrictsToCache(districts);
+    return districts;
+  } catch (e) {
+    return [];
+  }
+}
+
+//save districts to cache
+Future<void> saveDistrictsToCache(List<String> districts) async {
+  final prefs = await SharedPreferences.getInstance();
+  final districtsJson = districts.map((district) => district).toList();
+  await prefs.setString("districts", json.encode(districtsJson));
+}
 
 Future<List<Event>> loadEventsFromCache() async {
   final prefs = await SharedPreferences.getInstance();
@@ -14,21 +40,29 @@ Future<List<Event>> loadEventsFromCache() async {
   return [];
 }
 
-Future<List<Event>> loadOngoingEventsFromCache(String userClub) async {
-  final prefs = await SharedPreferences.getInstance();
-  final eventsJson = prefs.getString("events");
-  if (eventsJson != null) {
-    final List<dynamic> decoded = json.decode(eventsJson);
-    final List<Event> events = decoded
-        .map((eventJson) => Event.fromJson(eventJson))
-        .where((event) =>
-            event.endTime.isAfter(DateTime.now()) &&
-            event.startTime.isBefore(DateTime.now()) &&
-            event.club == userClub.split(" ")[2])
-        .toList();
-    return events;
+Future<List<Event>> loadOngoingEventsFromCache(String district) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final eventsJson = prefs.getString("events");
+
+    if (eventsJson != null) {
+      final List<dynamic> decoded = json.decode(eventsJson);
+
+      final List<Event> events = decoded
+          .map((eventJson) => Event.fromJson(eventJson))
+          .where((event) =>
+              event.endTime.isAfter(DateTime.now()) &&
+              event.startTime.isBefore(DateTime.now()) &&
+              event.district == district)
+          .toList();
+
+      return events;
+    }
+
+    return [];
+  } catch (e) {
+    return [];
   }
-  return [];
 }
 
 Future<void> saveEventsToCache(List<Event> events) async {
@@ -74,6 +108,8 @@ Future<void> removeLoggedInUser() async {
   await prefs.remove('name');
   await prefs.remove('isProfileUpdated');
   await prefs.remove('userClub');
+  await prefs.remove('designation');
+  await prefs.remove('district');
 }
 
 Future<void> updateUserRole(Prospect prospect) async {
@@ -85,6 +121,8 @@ Future<void> updateUserRole(Prospect prospect) async {
   await prefs.setString("memberId", prospect.memberId);
   await prefs.setString('userEmail', prospect.email);
   await prefs.setString('userClub', prospect.userClub);
+  await prefs.setString('designation', prospect.designation);
+  await prefs.setString('district', prospect.district);
 }
 
 Future<Prospect> getLoggedUserRoleData() async {
@@ -95,6 +133,8 @@ Future<Prospect> getLoggedUserRoleData() async {
   final String name = prefs.getString('name') ?? '';
   final String email = prefs.getString('userEmail') ?? '';
   final String userClub = prefs.getString('userClub') ?? '';
+  final String designation = prefs.getString('designation') ?? '';
+  final String district = prefs.getString('district') ?? '';
 
   return Prospect(
     email: email,
@@ -103,6 +143,8 @@ Future<Prospect> getLoggedUserRoleData() async {
     role: userRole,
     userClub: userClub,
     memberId: memberId,
+    designation: designation,
+    district: district,
   );
 }
 

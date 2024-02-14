@@ -7,7 +7,6 @@ import 'package:tag_me/models/event.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/utilities/userServices.dart';
-// ... (existing imports)
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -21,38 +20,36 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Event> cachedEvents = [];
-  late String selectedClub;
-  List<String> clubs = [
-    'Leo District 306A1',
-    'Leo District 306A2',
-    'Leo District 306B1',
-    'Leo District 306B2',
-    'Leo District 306C1',
-    'Leo District 306C2'
-  ];
+  late String selectedDistrict;
+  List<String> districts = [];
 
   @override
   void initState() {
     super.initState();
-    loadUser();
-    loadEventsFromCache();
-    selectedClub = clubs[0];
+    selectedDistrict = '';
+    loadData();
   }
 
   Future<void> loadUser() async {
     Prospect prospect = await getUserInfo();
-    
     setState(() {
-      selectedClub = prospect.userClub;
+      selectedDistrict =
+          prospect.district != '' ? prospect.district : districts[0];
     });
+  }
+
+  Future<void> loadData() async {
+    districts = await loadDistrictsFromCache();
+    await loadUser();
+    await loadEventsFromCache();
   }
 
   Future<void> loadEventsFromCache() async {
     Prospect prospect = await getUserInfo();
-    if (prospect.userClub == '' || prospect.userClub.isEmpty) {
+    if (prospect.district == '' || prospect.district.isEmpty) {
       _showEditProfileNotification(context);
     } else {
-      cachedEvents = await loadOngoingEventsFromCache(selectedClub);
+      cachedEvents = await loadOngoingEventsFromCache(selectedDistrict);
       setState(() {});
     }
   }
@@ -84,72 +81,83 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 0, 0, 0),
-                khomePageBackgroundColor,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const Text('select your district: ',
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 147, 147, 147),
-                            fontSize: 16)),
-                    _buildClubDropdown(),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: cachedEvents.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: cachedEvents.length,
-                        itemBuilder: (context, index) {
-                          return EventBox(event: cachedEvents[index]);
-                        },
-                      )
-                    : const Center(
-                        child: Text(
-                          'No ongoing events available.',
-                          style: TextStyle(color: Colors.white),
+      body: FutureBuilder(
+          future: loadDistrictsFromCache(),
+          builder: (context, snapshot) {
+            if (selectedDistrict.isEmpty) {
+              return Container(
+                color: Colors.black,
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            } else {
+              return RefreshIndicator(
+                onRefresh: _refresh,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 0, 0, 0),
+                        khomePageBackgroundColor,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            const Text('Select your district: ',
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 147, 147, 147),
+                                    fontSize: 16)),
+                            _buildDistrictDropdown(),
+                          ],
                         ),
                       ),
-              ),
-            ],
-          ),
-        ),
-      ),
+                      Expanded(
+                        child: cachedEvents.isNotEmpty
+                            ? ListView.builder(
+                                itemCount: cachedEvents.length,
+                                itemBuilder: (context, index) {
+                                  return EventBox(event: cachedEvents[index]);
+                                },
+                              )
+                            : const Center(
+                                child: Text(
+                                  'No ongoing events available.',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }),
     );
   }
 
-  Widget _buildClubDropdown() {
+  Widget _buildDistrictDropdown() {
     return DropdownButton<String>(
-      value: selectedClub,
+      value: selectedDistrict,
       onChanged: (String? newValue) {
         setState(() {
-          selectedClub = newValue!;
+          selectedDistrict = newValue!;
         });
         _refresh();
       },
-      items: clubs.map((String club) {
+      items: districts.map((String district) {
         return DropdownMenuItem<String>(
-          value: club,
+          value: district,
           child: Text(
-            club,
+            district,
             style: const TextStyle(
               color: Color.fromARGB(255, 147, 147, 147),
             ),

@@ -3,6 +3,8 @@
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tag_me/utilities/eventServices.dart';
 
 Future<void> askForLocationPermission() async {
   LocationPermission permission = await Geolocator.checkPermission();
@@ -58,6 +60,11 @@ Future<Position> determinePosition() async {
 
 Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
   try {
+    await getEventLocationRange();
+    final prefs = await SharedPreferences.getInstance();
+    late double locationRange;
+    locationRange = prefs.getDouble("location_range") ?? 500.0;
+    // print(locationRange);
     Position userPosition = await determinePosition();
     double distanceInMeters = Geolocator.distanceBetween(
       userPosition.latitude,
@@ -65,9 +72,11 @@ Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
       eventGeoPoint['latitude']!,
       eventGeoPoint['longtitude']!,
     );
-    double thresholdDistance = 2000;
+    double thresholdDistance = locationRange;
+    print('location range: $locationRange');
     return distanceInMeters <= thresholdDistance;
   } catch (e) {
+    print("Error checking in geo point area: $e");
     return false;
   }
 }

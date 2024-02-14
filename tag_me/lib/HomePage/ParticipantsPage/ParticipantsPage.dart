@@ -60,10 +60,12 @@ class _ParticipantsPageState extends State<ParticipantsPage> {
               rowsPerPage: 10,
               columnSpacing: 10,
               columns: const [
-                DataColumn(label: Text('uid')),
-                DataColumn(label: Text('name')),
-                DataColumn(label: Text('role')),
-                DataColumn(label: Text('club'))
+                DataColumn(label: Text('Id')),
+                DataColumn(label: Text('Name')),
+                DataColumn(label: Text('Role')),
+                DataColumn(label: Text('Designation')),
+                DataColumn(label: Text('District')),
+                DataColumn(label: Text('Club'))
               ],
               source: _ParticipantDataSource(participantsInfo),
             ),
@@ -98,9 +100,13 @@ class _ParticipantDataSource extends DataTableSource {
     Map<String, dynamic> participant = participantsInfo[index];
 
     return DataRow(cells: [
-      DataCell(Text(truncate(participant['uid']))),
+      DataCell(Text(index.toString())),
       DataCell(Text(truncate(participant['name']))),
       DataCell(Text(participant['role'])),
+      DataCell(Text(participant['designation'] == ''
+          ? 'N/A'
+          : participant['designation'])),
+      DataCell(Text(participant['district'])),
       DataCell(Text(participant['userClub'])),
     ]);
   }

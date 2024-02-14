@@ -4,10 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tag_me/HomePage/ParticipantsPage/ParticipantsPage.dart';
 import 'package:tag_me/constants/constants.dart';
-import 'package:tag_me/utilities/Location.dart';
+import 'package:tag_me/utilities/locationService.dart';
 import 'package:tag_me/utilities/dateConvert.dart';
 import 'package:tag_me/models/event.dart';
-import 'package:tag_me/utilities/eventFunctions.dart';
+import 'package:tag_me/utilities/eventServices.dart';
 
 class EventBox extends StatefulWidget {
   final Event event;
@@ -61,7 +61,7 @@ class _EventBoxState extends State<EventBox> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Club: Leo District ${widget.event.club}',
+                'District: Leo District ${widget.event.district}',
                 style: keventBoxNormalTextStyle,
               )
             ],

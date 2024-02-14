@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:tag_me/utilities/Location.dart';
+import 'package:tag_me/utilities/locationService.dart';
 import 'package:tag_me/models/event.dart';
 
 class LocationPage extends StatefulWidget {

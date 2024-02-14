@@ -16,7 +16,7 @@ class HistoryPage extends StatelessWidget {
       Event(
         id: '1',
         creator: 'User 1',
-        club: "testClub",
+        district: "testClub",
         name: 'Event 1',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
@@ -32,7 +32,7 @@ class HistoryPage extends StatelessWidget {
       Event(
         id:'2',
         creator: 'User 2',
-        club: "testClub",
+        district: "testClub",
         name: 'Event 2',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
@@ -48,7 +48,7 @@ class HistoryPage extends StatelessWidget {
       Event(
         id:'3',
         creator: 'User 3',
-        club: "testClub",
+        district: "testClub",
         name: 'Event 3',
         startTime: DateTime.now(),
         endTime: DateTime.now(),

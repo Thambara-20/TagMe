@@ -14,13 +14,17 @@ class AppUser {
 
 class Prospect extends AppUser {
   final String memberId;
+  final String designation;
   final String name;
   final String role;
+  final String district;
   final String userClub;
 
   Prospect({
     required this.memberId,
+    required this.designation,
     required this.name,
+    required this.district,
     required this.role,
     required this.userClub,
     required String email,
