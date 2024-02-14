@@ -29,18 +29,18 @@ class DateTimePage extends StatelessWidget {
                 child: Column(
                   children: [
                     DateTimePicker(
+                      text:"Start Time",
                       initialDateTime: event.startTime,
                       onDateTimeChanged: (newDateTime) {
                         event.startTime = newDateTime;
-                        // Handle the change
                       },
                     ),
                     const SizedBox(height: 20),
                     DateTimePicker(
+                      text:"End Time",
                       initialDateTime: event.endTime,
                       onDateTimeChanged: (newDateTime) {
                         event.endTime = newDateTime;
-                        // Handle the change
                       },
                     ),
                   ],

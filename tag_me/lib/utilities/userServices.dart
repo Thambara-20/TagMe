@@ -5,17 +5,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
 
-Future<void> updateProfile(
-    String name, String selectedRole, String memberId, String userClub) async {
+Future<void> updateProfile(String name, String selectedRole, String memberId,
+    String userClub, String designation, String district) async {
   try {
     AppUser loggedInUser = await getLoggedInUserInfo();
 
     if (loggedInUser.uid.isNotEmpty) {
-      if (selectedRole == 'member') {
+      if (selectedRole == 'Member') {
         await updateMemberCollection(
-            loggedInUser.uid, name, memberId, userClub);
+            loggedInUser.uid, name, memberId, userClub, designation, district);
       } else {
-        await updateProspectCollection(loggedInUser.uid, name, userClub);
+        await updateProspectCollection(
+            loggedInUser.uid, name, userClub, district);
       }
 
       User? fireUser = FirebaseAuth.instance.currentUser;
@@ -31,10 +32,11 @@ Future<void> updateProfile(
         name: name,
         userClub: userClub,
         role: selectedRole,
+        designation: designation,
+        district: district,
       );
 
       await updateUserRole(prospect);
-      
     }
     // ignore: empty_catches
   } catch (e) {}
@@ -62,7 +64,12 @@ Future<Prospect> getUserInfo() async {
           memberId: memberSnapshot.exists ? memberSnapshot.id : '',
           userClub: memberSnapshot.exists ? memberSnapshot.get('userClub') : '',
           name: user.displayName ?? '',
-          role: memberSnapshot.exists ? 'Member' : 'Prospect');
+          role: memberSnapshot.exists ? 'Member' : 'Prospect',
+          designation:
+              memberSnapshot.exists ? memberSnapshot.get('designation') : '',
+          district:
+              memberSnapshot.exists ? memberSnapshot.get('district') : '');
+
       updateUserRole(userInfo);
     }
   } catch (e) {
@@ -78,7 +85,10 @@ Future<Prospect> getUserInfo() async {
           userClub:
               prospectSnapshot.exists ? prospectSnapshot.get('userClub') : '',
           name: user.displayName ?? '',
-          role: prospectSnapshot.exists ? 'Prospect' : '');
+          role: prospectSnapshot.exists ? 'Prospect' : '',
+          designation: '',
+          district:
+              prospectSnapshot.exists ? prospectSnapshot.get('district') : '');
     } catch (e) {
       userInfo = Prospect(
           uid: user!.uid,
@@ -86,25 +96,42 @@ Future<Prospect> getUserInfo() async {
           memberId: '',
           userClub: '',
           name: user.displayName ?? '',
-          role: '');
+          role: '',
+          designation: '',
+          district: '');
     }
   }
 
   return userInfo;
 }
 
-Future<void> updateMemberCollection(
-    String uid, String name, String memberId, String userClub) async {
-  await FirebaseFirestore.instance.collection('members').doc(memberId).set(
-      {'uid': uid, 'name': name, 'memberId': memberId, 'userClub': userClub});
+Future<void> updateMemberCollection(String uid, String name, String memberId,
+    String userClub, String designation, String district) async {
+  await FirebaseFirestore.instance.collection('members').doc(memberId).set({
+    'uid': uid,
+    'name': name,
+    'memberId': memberId,
+    'userClub': userClub,
+    'designation': designation,
+    'district': district
+  });
 }
 
 Future<void> updateProspectCollection(
-    String uid, String name, String userClub) async {
-  await FirebaseFirestore.instance
-      .collection('prospects')
-      .doc(uid)
-      .set({'name': name, 'uid': uid, 'userClub': userClub});
+    String uid, String name, String userClub, String district) async {
+  final membersCollection = FirebaseFirestore.instance.collection('members');
+  final prospectsCollection =
+      FirebaseFirestore.instance.collection('prospects');
+
+  final memberQuery =
+      await membersCollection.where('uid', isEqualTo: uid).get();
+
+  if (memberQuery.docs.isNotEmpty) {
+    await membersCollection.doc(memberQuery.docs.first.id).delete();
+  }
+
+  await prospectsCollection.doc(uid).set(
+      {'name': name, 'uid': uid, 'userClub': userClub, 'district': district});
 }
 
 Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
@@ -123,6 +150,8 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
         'name': memberSnapshot.get('name') ?? '',
         'userClub': memberSnapshot.get('userClub') ?? '',
         'role': 'Member',
+        'designation': memberSnapshot.get('designation') ?? '',
+        'district': memberSnapshot.get('district') ?? '',
       };
     } else {
       userInfo = {
@@ -131,6 +160,8 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
         'userClub': '',
         'name': '',
         'role': 'Prospect',
+        'designation': '',
+        'district': '',
       };
     }
   } catch (e) {
@@ -147,6 +178,8 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
           'userClub': prospectSnapshot.get('userClub') ?? '',
           'name': prospectSnapshot.get('name') ?? '',
           'role': 'Prospect',
+          'designation': '',
+          'district': prospectSnapshot.get('district') ?? '',
         };
       } else {
         userInfo = {
@@ -155,6 +188,8 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
           'userClub': '',
           'name': '',
           'role': 'Prospect',
+          'designation': '',
+          'district': '',
         };
       }
     } catch (e) {
@@ -164,18 +199,19 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
         'userClub': '',
         'name': '',
         'role': 'Prospect',
+        'designation': '',
+        'district': '',
       };
     }
   }
-
   return userInfo;
 }
 
-Future<String> findAdminClub(String uid) async {
+Future<String> findAdminDistrict(String uid) async {
   try {
     final adminDoc =
         await FirebaseFirestore.instance.collection('admins').doc(uid).get();
-    return adminDoc.get('club');
+    return adminDoc.get('district');
   } catch (e) {
     return '';
   }

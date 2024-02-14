@@ -3,7 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tag_me/utilities/comfirmationDialog.dart';
-import 'package:tag_me/utilities/eventFunctions.dart';
+import 'package:tag_me/utilities/eventServices.dart';
 import 'package:tag_me/utilities/userServices.dart';
 import '../../models/event.dart';
 import 'NamePage.dart';
@@ -27,12 +27,12 @@ class _AddEventFormState extends State<AddEventForm> {
   final PageController _pageController = PageController(initialPage: 0);
 
   final TextEditingController _nameController = TextEditingController();
-  late String club;
+  late String district;
   var event = Event(
     id: '',
     creator: '',
     name: '',
-    club: '',
+    district: '',
     startTime: DateTime.now(),
     endTime: DateTime.now(),
     location: '',
@@ -52,7 +52,7 @@ class _AddEventFormState extends State<AddEventForm> {
       event.id = widget.selectedEvent!.id;
       _nameController.text = widget.selectedEvent!.name;
       event.startTime = widget.selectedEvent!.startTime;
-      event.club = widget.selectedEvent!.club;
+      event.district = widget.selectedEvent!.district;
       event.endTime = widget.selectedEvent!.endTime;
       event.participants = widget.selectedEvent!.participants;
       event.location = widget.selectedEvent!.location;
@@ -64,7 +64,7 @@ class _AddEventFormState extends State<AddEventForm> {
   void getClub() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      event.club = await findAdminClub(user.uid);
+      event.district = await findAdminDistrict(user.uid);
     }
   }
 
@@ -178,7 +178,7 @@ class _AddEventFormState extends State<AddEventForm> {
           id: event.id, 
           creator: user.uid,
           name: _nameController.text,
-          club: event.club,
+          district: event.district,
           startTime: event.startTime,
           endTime: event.endTime,
           location: event.location,

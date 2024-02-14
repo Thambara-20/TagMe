@@ -94,3 +94,7 @@ const kNavbarSelectedIconColor = Colors.blue;
 const kLogoutButtonColor = Color.fromARGB(255, 0, 0, 0);
 const kProfilePageBackgroundColor = Color.fromARGB(255, 0, 43, 103);
 const kProfileEditButtonColor = Color.fromARGB(151, 0, 0, 0);
+
+//------------------------------------------------WelcomePage--------------------------------------------------------------------------------
+const kWelcomePageBackgroundColorI = Color.fromARGB(255, 0, 0, 0);
+const kWelcomePageBackgroundColorII = Color.fromARGB(255, 0, 8, 20);

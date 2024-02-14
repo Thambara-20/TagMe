@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
 import 'package:tag_me/ProfilePage/EditProfilePage.dart';
-import 'package:tag_me/ProfilePage/History.dart';
 import 'package:tag_me/ProfilePage/ProfilePage.dart';
 import 'package:tag_me/SigninPage/SigninPage.dart';
 import 'package:tag_me/WelcomePage/WelcomePage.dart';
@@ -14,8 +13,8 @@ import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:tag_me/utilities/Location.dart';
-import 'package:tag_me/utilities/eventFunctions.dart';
+import 'package:tag_me/utilities/locationService.dart';
+import 'package:tag_me/utilities/eventServices.dart';
 import 'firebase_options.dart';
 
 // ...
@@ -24,6 +23,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   await askForLocationPermission();
+  await getEventLocationRange();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
         SignUpPage.routeName: (context) => const SignUpPage(),
         SignInPage.routeName: (context) => const SignInPage(),
         MainPage.routeName: (context) => const MainPage(),
-        HistoryPage.routeName: (context) => const HistoryPage(),
         EditProfilePage.routeName: (context) => const EditProfilePage(),
       },
     );

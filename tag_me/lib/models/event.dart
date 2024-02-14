@@ -2,7 +2,7 @@ class Event {
   String id;
   final String creator;
   final String name;
-  late String club;
+  late String district;
   late DateTime startTime;
   late DateTime endTime;
   late String location;
@@ -15,7 +15,7 @@ class Event {
     required this.id,
     required this.creator,
     required this.name,
-    required this.club,
+    required this.district,
     required this.startTime,
     required this.endTime,
     required this.location,
@@ -30,7 +30,7 @@ class Event {
       "id": id,
       'creator': creator,
       'name': name,
-      'club': club,
+      'district': district,
       'startTime': startTime.toIso8601String(),
       'endTime': endTime.toIso8601String(),
       'location': location,
@@ -46,7 +46,7 @@ class Event {
       id: json['id'],
       creator: json['creator'],
       name: json['name'],
-      club: json['club'],
+      district: json['district'],
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       location: json['location'],

@@ -7,7 +7,6 @@ import 'package:tag_me/models/event.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/utilities/userServices.dart';
-// ... (existing imports)
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -21,19 +20,36 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Event> cachedEvents = [];
+  late String selectedDistrict;
+  List<String> districts = [];
 
   @override
   void initState() {
     super.initState();
-    loadEventsFromCache();
+    selectedDistrict = '';
+    loadData();
+  }
+
+  Future<void> loadUser() async {
+    Prospect prospect = await getUserInfo();
+    setState(() {
+      selectedDistrict =
+          prospect.district != '' ? prospect.district : districts[0];
+    });
+  }
+
+  Future<void> loadData() async {
+    districts = await loadDistrictsFromCache();
+    await loadUser();
+    await loadEventsFromCache();
   }
 
   Future<void> loadEventsFromCache() async {
     Prospect prospect = await getUserInfo();
-    if (prospect.userClub == '' || prospect.userClub.isEmpty) {
+    if (prospect.district == '' || prospect.district.isEmpty) {
       _showEditProfileNotification(context);
     } else {
-      cachedEvents = await loadOngoingEventsFromCache(prospect.userClub);
+      cachedEvents = await loadOngoingEventsFromCache(selectedDistrict);
       setState(() {});
     }
   }
@@ -65,36 +81,89 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 0, 0, 0),
-                khomePageBackgroundColor,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: cachedEvents.isNotEmpty
-              ? ListView.builder(
-                  itemCount: cachedEvents.length,
-                  itemBuilder: (context, index) {
-                    return EventBox(event: cachedEvents[index]);
-                  },
-                )
-              : const Center(
-                  child: Text(
-                    'No ongoing events available.',
-                    style: TextStyle(color: Colors.white),
+      body: FutureBuilder(
+          future: loadDistrictsFromCache(),
+          builder: (context, snapshot) {
+            if (selectedDistrict.isEmpty) {
+              return Container(
+                color: Colors.black,
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            } else {
+              return RefreshIndicator(
+                onRefresh: _refresh,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(255, 0, 0, 0),
+                        khomePageBackgroundColor,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            const Text('Select your district: ',
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 147, 147, 147),
+                                    fontSize: 16)),
+                            _buildDistrictDropdown(),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: cachedEvents.isNotEmpty
+                            ? ListView.builder(
+                                itemCount: cachedEvents.length,
+                                itemBuilder: (context, index) {
+                                  return EventBox(event: cachedEvents[index]);
+                                },
+                              )
+                            : const Center(
+                                child: Text(
+                                  'No ongoing events available.',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
                 ),
-        ),
-      ),
+              );
+            }
+          }),
+    );
+  }
+
+  Widget _buildDistrictDropdown() {
+    return DropdownButton<String>(
+      value: selectedDistrict,
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedDistrict = newValue!;
+        });
+        _refresh();
+      },
+      items: districts.map((String district) {
+        return DropdownMenuItem<String>(
+          value: district,
+          child: Text(
+            district,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 147, 147, 147),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
