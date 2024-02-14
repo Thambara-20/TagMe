@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logger/logger.dart';
 
 Future<List<String>> loadClubsFromDistrict(String districtId) async {
   try {
@@ -15,13 +16,14 @@ Future<List<String>> loadClubsFromDistrict(String districtId) async {
           (districtSnapshot.data() as Map<String, dynamic>)['clubs']
               .cast<String>();
 
-      print(clubs); // Debugging: print the clubs list
+
+      final logger = Logger();
+      logger.d(clubs); 
       return clubs;
     } else {
       return [];
     }
   } catch (e) {
-    print("Error retrieving clubs in district: $e");
     return [];
   }
 }
@@ -36,7 +38,7 @@ Future<List<String>> findDistricts() async {
 
     return districtList;
   } catch (e) {
-    print("Error fetching district documents: $e");
+    Logger().e("Error fetching district documents: $e");
     return [];
   }
 }
@@ -55,7 +57,7 @@ Future<List<String>> loadDesignations() async {
       return [];
     }
   } catch (e) {
-    print("Error fetching designation documents: $e");
+    Logger().e("Error fetching designations: $e");
     return [];
   }
 }

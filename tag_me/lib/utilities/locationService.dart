@@ -3,6 +3,7 @@
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/utilities/eventServices.dart';
 
@@ -73,10 +74,9 @@ Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
       eventGeoPoint['longtitude']!,
     );
     double thresholdDistance = locationRange;
-    print('location range: $locationRange');
     return distanceInMeters <= thresholdDistance;
   } catch (e) {
-    print("Error checking in geo point area: $e");
+    Logger().e("Error checking in geo point area: $e");
     return false;
   }
 }

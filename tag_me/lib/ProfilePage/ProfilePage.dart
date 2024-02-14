@@ -6,7 +6,6 @@ import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
-import 'package:tag_me/utilities/eventServices.dart';
 import 'package:tag_me/utilities/userServices.dart';
 import 'package:shimmer/shimmer.dart';
 

@@ -2,10 +2,9 @@
 
 // ignore_for_file: file_names, empty_catches
 
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/models/event.dart';
 import 'package:tag_me/utilities/cache.dart';
@@ -156,6 +155,6 @@ Future<void> getEventLocationRange() async {
       await prefs.setDouble('location_range', data['range'].toDouble());
     }
   } catch (e) {
-    print("Error fetching location range: $e");
+    Logger().e("Error fetching location range: $e");
   }
 }

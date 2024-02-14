@@ -14,11 +14,9 @@ Future<void> updateProfile(String name, String selectedRole, String memberId,
       if (selectedRole == 'Member') {
         await updateMemberCollection(
             loggedInUser.uid, name, memberId, userClub, designation, district);
-        print("member path");
       } else {
         await updateProspectCollection(
             loggedInUser.uid, name, userClub, district);
-        print("prospect path");
       }
 
       User? fireUser = FirebaseAuth.instance.currentUser;
@@ -168,26 +166,22 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
     }
   } catch (e) {
     try {
-      print("on fetching prospect data $uid");
       DocumentSnapshot prospectSnapshot = await FirebaseFirestore.instance
           .collection('prospects')
           .doc(uid)
           .get();
 
       if (prospectSnapshot.exists) {
-        print("on fetching prospect data success $uid");
         userInfo = {
           'uid': uid,
           'memberId': '',
           'userClub': prospectSnapshot.get('userClub') ?? '',
           'name': prospectSnapshot.get('name') ?? '',
           'role': 'Prospect',
-          'designation':'',
+          'designation': '',
           'district': prospectSnapshot.get('district') ?? '',
         };
       } else {
-        print("on fetching prospect data fail $uid");
-
         userInfo = {
           'uid': uid,
           'memberId': '',
@@ -199,7 +193,6 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
         };
       }
     } catch (e) {
-      print("on fetching prospect data fail $uid");
       userInfo = {
         'uid': uid,
         'memberId': '',
@@ -211,7 +204,6 @@ Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {
       };
     }
   }
-  print("on fetching data $userInfo");
   return userInfo;
 }
 
