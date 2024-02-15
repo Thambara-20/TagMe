@@ -98,15 +98,18 @@ class _EventBoxState extends State<EventBox> {
             ElevatedButton.icon(
               onPressed: _userAttending ? null : _verifyAttendance,
               style: ElevatedButton.styleFrom(
+                disabledBackgroundColor: keventBoxButtonDisabledColor,
                 backgroundColor: kbuttonColorBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              icon: const Icon(
+              icon: Icon(
                 Icons.check,
-                color: Colors.white,
+                color: _userAttending
+                    ? keventBoxCheckIconColorII
+                    : keventBoxCheckIconColorI,
               ),
               label: Center(
                 child: Text(
@@ -165,15 +168,21 @@ class _EventBoxState extends State<EventBox> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '$label ',
-                    style: keventBoxNormalTextStyle,
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      label,
+                      style: keventBoxNormalTextStyle,
+                    ),
                   ),
-                  Text(
-                    _userAttending ? 'Yes' : 'No',
-                    style: _userAttending
-                        ? kwarningTextGreenStyle
-                        : kwarningTextRedStyle,
+                  Expanded(
+                    flex: 4,
+                    child: Text(
+                      _userAttending ? 'Yes' : 'No',
+                      style: _userAttending
+                          ? kwarningTextGreenStyle
+                          : kwarningTextRedStyle,
+                    ),
                   ),
                 ],
               ),

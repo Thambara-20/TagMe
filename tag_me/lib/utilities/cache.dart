@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/models/event.dart';
 import 'package:tag_me/models/user.dart';
@@ -22,7 +23,6 @@ Future<List<String>> loadDistrictsFromCache() async {
   }
 }
 
-//save districts to cache
 Future<void> saveDistrictsToCache(List<String> districts) async {
   final prefs = await SharedPreferences.getInstance();
   final districtsJson = districts.map((district) => district).toList();
@@ -58,35 +58,51 @@ Future<List<Event>> loadOngoingEventsFromCache(String district) async {
 
       return events;
     }
-
     return [];
   } catch (e) {
     return [];
   }
 }
 
+
 Future<void> saveEventsToCache(List<Event> events) async {
-  final prefs = await SharedPreferences.getInstance();
-  final eventsJson = events.map((event) => event.toJson()).toList();
-  await prefs.setString("events", json.encode(eventsJson));
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final eventsJson = events.map((event) => event.toJson()).toList();
+    await prefs.setString("events", json.encode(eventsJson));
+  } catch (e) {
+    Logger().e('Error saving events to cache: $e');
+    throw Exception('Error saving events to cache: $e');
+  }
 }
 
 Future<bool> checkLoggedInUser() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('isLoggedIn') ?? false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    Logger().log(Level.info, "Check User logged in: ${prefs.getBool('isLoggedIn')}");
+    return prefs.getBool('isLoggedIn') ?? false;
+  } catch (e) {
+    Logger().e('Error checking logged-in user): $e');
+    throw Exception('Error checking logged-in user: $e');
+  }
 }
 
 Future<AppUser> getLoggedInUserInfo() async {
-  final prefs = await SharedPreferences.getInstance();
-  final String uid = prefs.getString('userUid') ?? '';
-  final String userEmail = prefs.getString('userEmail') ?? '';
-  final bool isAdmin = prefs.getBool('isAdmin') ?? false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final String uid = prefs.getString('userUid') ?? '';
+    final String userEmail = prefs.getString('userEmail') ?? '';
+    final bool isAdmin = prefs.getBool('isAdmin') ?? false;
 
-  return AppUser(
-    uid: uid,
-    email: userEmail,
-    isAdmin: isAdmin,
-  );
+    return AppUser(
+      uid: uid,
+      email: userEmail,
+      isAdmin: isAdmin,
+    );
+  } catch (e) {
+    Logger().e('Error getting logged-in user info: $e');
+    throw Exception('Error getting logged-in user info: $e');
+  }
 }
 
 Future<void> storeLoggedInUser(AppUser user) async {

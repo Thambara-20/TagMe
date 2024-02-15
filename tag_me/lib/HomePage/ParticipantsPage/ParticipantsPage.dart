@@ -59,14 +59,13 @@ class _ParticipantsPageState extends State<ParticipantsPage> {
             PaginatedDataTable(
               rowsPerPage: 10,
               columnSpacing: 10,
-              
               columns: const [
                 DataColumn(label: Text('No')),
                 DataColumn(label: Text('Name')),
                 DataColumn(label: Text('Role')),
                 DataColumn(label: Text('Designation')),
                 DataColumn(label: Text('Leo District')),
-                DataColumn(label: Text('Club'))
+                DataColumn(label: Text('Leo Club'))
               ],
               source: _ParticipantDataSource(participantsInfo),
             ),

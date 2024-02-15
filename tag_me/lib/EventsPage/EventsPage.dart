@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
+import 'package:logger/logger.dart';
 import 'package:tag_me/EventsPage/AddEventPage/AddEventPage.dart';
+import 'package:tag_me/components/Dropdown/DropDown.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
@@ -29,7 +31,7 @@ class _EventsPageState extends State<EventsPage> {
   late bool isAdmin = false;
   late String selectedCategory;
   late String selectedDistrict;
-  List<String> districts =  [];
+  List<String> districts = [];
   late bool isCreater = false;
 
   @override
@@ -37,7 +39,7 @@ class _EventsPageState extends State<EventsPage> {
     super.initState();
     selectedCategory = 'Ongoing';
     appUser = AppUser(uid: '', email: '', isAdmin: false);
-    selectedDistrict = ''; 
+    selectedDistrict = '';
     _loadData();
     _getUserInfo();
     _listenToEvents();
@@ -54,14 +56,20 @@ class _EventsPageState extends State<EventsPage> {
 
   void _listenToEvents() {
     loadEventsFromCache().then((loadedEvents) {
-      setState(() {
-        events = loadedEvents
-            .where((event) => event.district == selectedDistrict)
-            .toList();
-        _categorizeEvents();
-        isLoading = false;
-      });
-    });
+      if (mounted) {
+        setState(() {
+          events = loadedEvents
+              .where((event) => event.district == selectedDistrict)
+              .toList();
+          _categorizeEvents();
+          isLoading = false;
+        });
+      }
+    }).catchError(
+      (error) {
+        Logger().e('Error loading events: $error');
+      },
+    );
   }
 
   void _getUserInfo() {
@@ -109,8 +117,8 @@ class _EventsPageState extends State<EventsPage> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 0, 0, 0),
-                khomePageBackgroundColor,
+                keventPageBackgroundColorI,
+                keventPageBackgroundColorII,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -120,16 +128,34 @@ class _EventsPageState extends State<EventsPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.0,
+                    right: MediaQuery.of(context).size.width * 0.05,
+                    bottom: MediaQuery.of(context).size.height * 0.01),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Select the district: ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color.fromARGB(255, 147, 147, 147),
-                        )),
-                    _buildDistrictDropdown(),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
+                        child: const Text('Select the district: ',
+                            textAlign: TextAlign.right,
+                            style: knormalTextGreyStyle),
+                      ),
+                    ),
+                    DistrictDropdown(
+                      selectedDistrict: selectedDistrict,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            selectedDistrict = newValue;
+                          });
+                          _refresh();
+                        }
+                      },
+                      districts: districts,
+                    ),
                   ],
                 ),
               ),
@@ -148,10 +174,8 @@ class _EventsPageState extends State<EventsPage> {
               Expanded(
                 child: isLoading
                     ? const Center(
-                        child: Text(
-                          'No events available.',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        child: Text('No events available.',
+                            style: keventPageSmallTextStyle),
                       )
                     : ListView.builder(
                         itemCount: getSelectedCategoryEvents().length,
@@ -177,48 +201,32 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget _buildDistrictDropdown() {
-    return DropdownButton<String>(
-      value: selectedDistrict,
-      onChanged: (String? newValue) {
-        setState(() {
-          selectedDistrict = newValue!;
-        });
-        _refresh();
-      },
-      items: districts.map((String district) {
-        return DropdownMenuItem<String>(
-          value: district,
-          child: Text(
-            district,
-            style: const TextStyle(
-              color: Color.fromARGB(255, 147, 147, 147),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
   Widget _buildNavigationBarItem(String category) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedCategory = category;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        decoration: BoxDecoration(
-          color:
-              selectedCategory == category ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Text(
-          category,
-          style: TextStyle(
-            color: selectedCategory == category ? Colors.black : Colors.white,
-            fontWeight: FontWeight.bold,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            selectedCategory = category;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          decoration: BoxDecoration(
+            color: selectedCategory == category
+                ? keventPageNavbarColorII
+                : keventPageNavbarColorIII,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Text(
+            category,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.width * 0.035,
+              color: selectedCategory == category
+                  ? keventPageNavbarColorI
+                  : keventPageNavbarColorII,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -226,7 +234,6 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   Widget _buildEventListItem(Event event) {
-
     bool isCreater = event.creator == appUser.uid;
     bool isEventOngoing = DateTime.now().isAfter(event.startTime) &&
         DateTime.now().isBefore(event.endTime);
@@ -251,7 +258,7 @@ class _EventsPageState extends State<EventsPage> {
           borderRadius: BorderRadius.circular(15.0),
           boxShadow: [
             BoxShadow(
-              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
+              color: keventPageBackgroundColorI.withOpacity(0.3),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, 2),
@@ -262,10 +269,12 @@ class _EventsPageState extends State<EventsPage> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Project: ${event.name}',
-                style: const TextStyle(
-                    fontSize: 20.0, fontWeight: FontWeight.bold),
+              Flexible(
+                child: Text(
+                  'Project: ${event.name}',
+                  style: const TextStyle(
+                      fontSize: 20.0, fontWeight: FontWeight.bold),
+                ),
               ),
               if (isEventOngoing || isEventUpcoming)
                 Row(
@@ -275,8 +284,8 @@ class _EventsPageState extends State<EventsPage> {
                           ? Icons.access_time
                           : Icons.pending_actions,
                       color: isEventOngoing
-                          ? const Color.fromARGB(255, 37, 37, 37)
-                          : const Color.fromARGB(255, 0, 0, 0),
+                          ? keventOngoingButtonColor
+                          : keventUpcomingButtonColor,
                     ),
                     const SizedBox(width: 4.0),
                     Text(
@@ -284,8 +293,8 @@ class _EventsPageState extends State<EventsPage> {
                       style: TextStyle(
                         fontSize: 12.0,
                         color: isEventOngoing
-                            ? const Color.fromARGB(255, 37, 37, 37)
-                            : const Color.fromARGB(255, 0, 0, 0),
+                            ? keventOngoingButtonColor
+                            : keventUpcomingButtonColor,
                       ),
                     ),
                   ],
@@ -317,12 +326,8 @@ class _EventsPageState extends State<EventsPage> {
                   const SizedBox(height: 2.0),
                   Center(
                     child: CountdownTimer(
-                      endTime: event.startTime.millisecondsSinceEpoch,
-                      textStyle: const TextStyle(
-                        fontSize: 16.0,
-                        color: Color.fromARGB(255, 162, 11, 0),
-                      ),
-                    ),
+                        endTime: event.startTime.millisecondsSinceEpoch,
+                        textStyle: kcountDownTextStyle),
                   ),
                   const SizedBox(height: 16.0),
                   Row(
@@ -331,8 +336,8 @@ class _EventsPageState extends State<EventsPage> {
                       if (isAdmin && isCreater)
                         ElevatedButton(
                           style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.black),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                keventCardUpdateButtonColor),
                           ),
                           onPressed: () {
                             _onEventTapped(context, event);

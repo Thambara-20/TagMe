@@ -11,7 +11,7 @@ import 'package:tag_me/utilities/userServices.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../utilities/locationService.dart';
-import '../utilities/comfirmationDialog.dart';
+import '../components/Comfirmation/comfirmationDialog.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -62,8 +62,8 @@ class _ProfilePageState extends State<ProfilePage> {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  kProfilePageBackgroundColor,
-                  Color.fromARGB(255, 0, 0, 0),
+                  kProfilePageBackgroundColorI,
+                  kProfilePageBackgroundColorII,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -73,7 +73,8 @@ class _ProfilePageState extends State<ProfilePage> {
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
+                  icon:
+                      const Icon(Icons.close, color: kProfileCloseButtonColor),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -82,11 +83,11 @@ class _ProfilePageState extends State<ProfilePage> {
               const Center(
                 child: CircleAvatar(
                   radius: 40,
-                  backgroundColor: Colors.white,
+                  backgroundColor: kAvatarBackgroundColor,
                   child: Icon(
                     Icons.person,
                     size: 40,
-                    color: kProfilePageBackgroundColor,
+                    color: kProfilePageBackgroundColorII,
                   ),
                 ),
               ),
@@ -95,19 +96,16 @@ class _ProfilePageState extends State<ProfilePage> {
           ListTile(
             title: Text(prospect.name, style: const TextStyle(fontSize: 20)),
           ),
-          ListTile(
-            title: Text("Prospect/Member: ${prospect.role}", //member/prospect
-                style: const TextStyle(fontSize: 14, color: Colors.black)),
-          ),
+          _buildProfileItem(context, 'Prospect/Member', prospect.role),
           _buildProfileItem(context, 'Email', prospect.email),
           _buildProfileItem(context, 'Location', _location),
           _buildProfileItem(context, 'Leo District', prospect.district),
-          _buildProfileItem(context, 'Club', prospect.userClub),
+          _buildProfileItem(context, 'Leo Club', prospect.userClub),
           _buildProfileItem(context, 'Designation', prospect.designation),
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.info,
-                color: Color.fromARGB(255, 149, 149, 149)),
+                color: kEditProfileButtonBackgroundColor),
             title: const Text('About'),
             onTap: () {
               Navigator.push(
@@ -128,7 +126,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(200, 40),
-                  backgroundColor: kProfileEditButtonColor,
+                  backgroundColor: kEditProfileButtonBackgroundColor,
+                  elevation: 5,
+                  shadowColor: kProfilePageBackgroundColorII,
                   padding: const EdgeInsets.symmetric(
                     vertical: 16,
                     horizontal: 20,
@@ -136,7 +136,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: const Text(
                   'Edit Profile',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style:
+                      TextStyle(fontSize: 16, color: kProfileNormalTextColor),
                 ),
               ),
               const SizedBox(height: 16),
@@ -167,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   minimumSize: const Size(200, 40),
                   backgroundColor: kLogoutButtonColor,
                   elevation: 5,
-                  shadowColor: Colors.black,
+                  shadowColor: kProfilePageBackgroundColorII,
                   padding: const EdgeInsets.symmetric(
                     vertical: 16,
                     horizontal: 20,
@@ -175,9 +176,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: const Text(
                   'Logout',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style:
+                      TextStyle(fontSize: 16, color: kProfileNormalTextColor),
                 ),
-              )
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ],
@@ -193,12 +196,11 @@ class _ProfilePageState extends State<ProfilePage> {
               style: const TextStyle(fontSize: 14),
             )
           : Shimmer.fromColors(
-              baseColor: const Color.fromARGB(91, 0, 15, 55),
-              highlightColor: const Color.fromARGB(64, 245, 245, 245),
+              baseColor: const Color.fromARGB(47, 144, 144, 144),
+              highlightColor: const Color.fromARGB(58, 245, 245, 245),
               child: Container(
-                color: const Color.fromARGB(255, 0, 0, 0),
-                width: double.infinity,
-                height: 20.0,
+                color: const Color.fromARGB(204, 0, 36, 99),
+                height: 25.0,
                 margin: const EdgeInsets.only(top: 4.0, bottom: 4.0),
               ),
             ),
