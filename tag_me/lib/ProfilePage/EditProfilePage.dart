@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/utilities/clubServices.dart';
 import 'package:tag_me/utilities/userServices.dart';
@@ -28,6 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   List<String> districts = [];
   List<String> clubs = [];
   List<String> designations = [];
+  late Prospect prospect;
 
   @override
   void initState() {
@@ -42,11 +44,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     districts = await loadDistrictsFromCache();
     clubs = await loadClubsFromDistrict(districts[0]);
     designations = await loadDesignations();
+    prospect = await getUserInfo();
 
     setState(() {
-      _selectedDistrict = districts[0];
-      _selectedClub = clubs[0];
-      _selectedDesignation = designations[0];
+      _nameController.text = prospect.name;
+      _selectedRole = prospect.role;
+      _memberIdController.text = prospect.memberId;
+      _selectedDesignation = prospect.designation;
+      _selectedDistrict = prospect.district;
+      _selectedClub = prospect.userClub;
+      _selectedDistrict = prospect.district;
     });
   }
 
@@ -68,6 +75,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             const SizedBox(height: 16.0),
             PopupMenuButton<String>(
               child: ListTile(
+                leading:
+                    const Text('Leo District:', style: TextStyle(fontSize: 16)),
                 title: Text(_selectedDistrict),
                 trailing: const Icon(Icons.arrow_drop_down),
               ),
@@ -99,6 +108,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                   return PopupMenuButton<String>(
                     child: ListTile(
+                      leading:
+                          const Text('Club:', style: TextStyle(fontSize: 16)),
                       title: Text(_selectedClub),
                       trailing: const Icon(Icons.arrow_drop_down),
                     ),
@@ -121,6 +132,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             PopupMenuButton<String>(
               child: ListTile(
+                leading: const Text('Member/Prospect:',
+                    style: TextStyle(fontSize: 16)),
                 title: Text(_selectedRole),
                 trailing: const Icon(Icons.arrow_drop_down),
               ),
@@ -146,6 +159,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
               const SizedBox(height: 16.0),
               PopupMenuButton<String>(
                 child: ListTile(
+                  leading: const Text('Designation:',
+                      style: TextStyle(fontSize: 16)),
                   title: Text(_selectedDesignation),
                   trailing: const Icon(Icons.arrow_drop_down),
                 ),
@@ -167,19 +182,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
-                updateProfile(
-                        _nameController.text,
-                        _selectedRole,
-                        _memberIdController.text,
-                        _selectedClub,
-                        _selectedDesignation,
-                        _selectedDistrict)
-                    .then((value) => Navigator.pop(context))
-                    .catchError((error) {
-                  Navigator.pop(context);
-                  // ignore: avoid_print
-                  print(error);
-                });
+                if (_nameController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Name cannot be empty'),
+                    ),
+                  );
+                  return;
+                } else {
+                  updateProfile(
+                          _nameController.text,
+                          _selectedRole,
+                          _memberIdController.text,
+                          _selectedClub,
+                          _selectedDesignation,
+                          _selectedDistrict)
+                      .then((value) => Navigator.pop(context))
+                      .catchError((error) {
+                    Navigator.pop(context);
+                    // ignore: avoid_print
+                    print(error);
+                  });
+                }
               },
               child: const Text('Save'),
             ),

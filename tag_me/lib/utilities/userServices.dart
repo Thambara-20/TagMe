@@ -32,7 +32,7 @@ Future<void> updateProfile(String name, String selectedRole, String memberId,
         name: name,
         userClub: userClub,
         role: selectedRole,
-        designation: designation,
+        designation: selectedRole == 'Member' ? designation : '',
         district: district,
       );
 

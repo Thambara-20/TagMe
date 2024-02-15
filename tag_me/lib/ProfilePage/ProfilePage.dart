@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:tag_me/AboutPage/AboutPage.dart';
 import 'package:tag_me/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/constants/constants.dart';
@@ -100,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           _buildProfileItem(context, 'Email', prospect.email),
           _buildProfileItem(context, 'Location', _location),
-          _buildProfileItem(context, 'District', prospect.district),
+          _buildProfileItem(context, 'Leo District', prospect.district),
           _buildProfileItem(context, 'Club', prospect.userClub),
           _buildProfileItem(context, 'Designation', prospect.designation),
           const SizedBox(height: 16),
@@ -148,9 +149,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         onConfirm: () async {
                           FirebaseAuthService authService =
                               FirebaseAuthService();
-                          authService.signOut().then((value) {
+                          try {
+                            await authService.signOut();
+                            // ignore: use_build_context_synchronously
                             Navigator.pushNamed(context, '/WelcomePage');
-                          });
+                          } catch (e) {
+                            Logger().e(e);
+                          }
                         },
                         confirmationMessage:
                             'Are you sure you want to logout ?',
@@ -172,7 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   'Logout',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
-              ),
+              )
             ],
           ),
         ],
