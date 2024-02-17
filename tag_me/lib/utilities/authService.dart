@@ -24,7 +24,6 @@ class FirebaseAuthService {
           await _googleSignIn.signIn();
 
       if (googleSignInAccount == null) {
-        // User canceled the sign-in process
         return null;
       }
 

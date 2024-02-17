@@ -42,7 +42,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        backgroundColor: Colors.black,
+        backgroundColor: khomePageBackgroundColorI,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: kiconColorWhite),
           onPressed: () {
@@ -54,7 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Container(
           height: screenHeight,
           decoration: const BoxDecoration(
-            color: Colors.black,
+            color: khomePageBackgroundColorI,
           ),
           child: Center(
             child: Column(
@@ -162,7 +162,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         style: knormalTextWhiteStyle),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, SignInPage.routeName);
+                        Navigator.pushReplacementNamed(
+                            context, SignInPage.routeName);
                       },
                       child: const Text('Sign In', style: knormalTextBlueStyle),
                     ),

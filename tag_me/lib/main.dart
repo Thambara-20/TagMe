@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tag_me/EventsPage/EventsPage.dart';
 import 'package:tag_me/ProfilePage/EditProfilePage.dart';
@@ -13,39 +14,50 @@ import 'package:tag_me/SignupPage/SignupPage.dart';
 import 'package:tag_me/HomePage/HomePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:tag_me/utilities/cache.dart';
 import 'package:tag_me/utilities/locationService.dart';
 import 'package:tag_me/utilities/eventServices.dart';
 import 'firebase_options.dart';
 
-// ...
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  await askForLocationPermission();
-  await getEventLocationRange();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  firestore.settings = const Settings(
-    persistenceEnabled: true,
-    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-  );
 
-  listenToEvents();
-  runApp(MyApp(prefs: prefs));
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = await checkLoggedInUser() || false;
+
+    await askForLocationPermission();
+    await getEventLocationRange();
+
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    firestore.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
+
+    listenToEvents();
+    runApp(MyApp(prefs: prefs, isLoggedIn: isLoggedIn));
+  } catch (e) {
+    Logger().e("Error initializing app: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
-  const MyApp({Key? key, required this.prefs}) : super(key: key);
+  final bool isLoggedIn;
+
+  const MyApp({Key? key, required this.prefs, required this.isLoggedIn})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: WelcomePage.routeName,
+      initialRoute: isLoggedIn ? MainPage.routeName : WelcomePage.routeName,
       routes: {
         WelcomePage.routeName: (context) => const WelcomePage(),
         HomePage.routeName: (context) => const HomePage(),

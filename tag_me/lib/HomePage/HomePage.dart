@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:tag_me/HomePage/EventBox/EventBox.dart';
+import 'package:tag_me/components/Dropdown/DropDown.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/event.dart';
 import 'package:tag_me/models/user.dart';
@@ -32,10 +33,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadUser() async {
     Prospect prospect = await getUserInfo();
-    setState(() {
-      selectedDistrict =
-          prospect.district != '' ? prospect.district : districts[0];
-    });
+    if (mounted) {
+      setState(() {
+        selectedDistrict =
+            prospect.district != '' ? prospect.district : districts[0];
+      });
+    }
   }
 
   Future<void> loadData() async {
@@ -50,7 +53,9 @@ class _HomePageState extends State<HomePage> {
       _showEditProfileNotification(context);
     } else {
       cachedEvents = await loadOngoingEventsFromCache(selectedDistrict);
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -86,7 +91,7 @@ class _HomePageState extends State<HomePage> {
           builder: (context, snapshot) {
             if (selectedDistrict.isEmpty) {
               return Container(
-                color: Colors.black,
+                color: khomePageBackgroundColorI,
                 child: const Center(child: CircularProgressIndicator()),
               );
             } else {
@@ -96,8 +101,8 @@ class _HomePageState extends State<HomePage> {
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color.fromARGB(255, 0, 0, 0),
-                        khomePageBackgroundColor,
+                        khomePageBackgroundColorI,
+                        khomePageBackgroundColorII,
                       ],
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -108,15 +113,35 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.0,
+                            right: MediaQuery.of(context).size.width * 0.05,
+                            bottom: MediaQuery.of(context).size.height * 0.01),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            const Text('Select your district: ',
-                                style: TextStyle(
-                                    color: Color.fromARGB(255, 147, 147, 147),
-                                    fontSize: 16)),
-                            _buildDistrictDropdown(),
+                            const Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Select your district: ',
+                                  textAlign: TextAlign.right,
+                                  style: knormalTextGreyStyle,
+                                ),
+                              ),
+                            ),
+                            DistrictDropdown(
+                              selectedDistrict: selectedDistrict,
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedDistrict = newValue;
+                                  });
+                                  _refresh();
+                                }
+                              },
+                              districts: districts,
+                            ),
                           ],
                         ),
                       ),
@@ -128,10 +153,12 @@ class _HomePageState extends State<HomePage> {
                                   return EventBox(event: cachedEvents[index]);
                                 },
                               )
-                            : const Center(
+                            : Container(
+                                alignment: Alignment.center,
                                 child: Text(
-                                  'No ongoing events available.',
-                                  style: TextStyle(color: Colors.white),
+                                  'Leo District $selectedDistrict currently has no ongoing events.',
+                                  textAlign: TextAlign.center,
+                                  style: khomePageSmallTextStyle,
                                 ),
                               ),
                       ),
@@ -141,29 +168,6 @@ class _HomePageState extends State<HomePage> {
               );
             }
           }),
-    );
-  }
-
-  Widget _buildDistrictDropdown() {
-    return DropdownButton<String>(
-      value: selectedDistrict,
-      onChanged: (String? newValue) {
-        setState(() {
-          selectedDistrict = newValue!;
-        });
-        _refresh();
-      },
-      items: districts.map((String district) {
-        return DropdownMenuItem<String>(
-          value: district,
-          child: Text(
-            district,
-            style: const TextStyle(
-              color: Color.fromARGB(255, 147, 147, 147),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }

@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:logger/logger.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/cache.dart';
 
@@ -28,11 +29,11 @@ Future<void> updateProfile(String name, String selectedRole, String memberId,
       Prospect prospect = Prospect(
         uid: loggedInUser.uid,
         email: loggedInUser.email,
-        memberId: memberId,
+        memberId: selectedRole == 'Member' ? memberId : '',
         name: name,
         userClub: userClub,
         role: selectedRole,
-        designation: designation,
+        designation: selectedRole == 'Member' ? designation : '',
         district: district,
       );
 
@@ -45,7 +46,6 @@ Future<void> updateProfile(String name, String selectedRole, String memberId,
 Future<Prospect> getUserInfo() async {
   late Prospect userInfo;
   User? user = FirebaseAuth.instance.currentUser;
-
   try {
     final isProfileExist = await isProfileUpdated();
     if (isProfileExist) {
@@ -119,19 +119,24 @@ Future<void> updateMemberCollection(String uid, String name, String memberId,
 
 Future<void> updateProspectCollection(
     String uid, String name, String userClub, String district) async {
-  final membersCollection = FirebaseFirestore.instance.collection('members');
-  final prospectsCollection =
-      FirebaseFirestore.instance.collection('prospects');
+  try {
+    final membersCollection = FirebaseFirestore.instance.collection('members');
+    final prospectsCollection =
+        FirebaseFirestore.instance.collection('prospects');
 
-  final memberQuery =
-      await membersCollection.where('uid', isEqualTo: uid).get();
+    final memberQuery =
+        await membersCollection.where('uid', isEqualTo: uid).get();
 
-  if (memberQuery.docs.isNotEmpty) {
-    await membersCollection.doc(memberQuery.docs.first.id).delete();
+    if (memberQuery.docs.isNotEmpty) {
+      await membersCollection.doc(memberQuery.docs.first.id).delete();
+    }
+
+    await prospectsCollection.doc(uid).set(
+        {'name': name, 'uid': uid, 'userClub': userClub, 'district': district});
+  } catch (e) {
+    Logger().e('Error updating prospect collection: $e');
+    throw Exception('Error updating prospect collection: $e');
   }
-
-  await prospectsCollection.doc(uid).set(
-      {'name': name, 'uid': uid, 'userClub': userClub, 'district': district});
 }
 
 Future<Map<String, dynamic>> getParticipantsInfo(String uid) async {

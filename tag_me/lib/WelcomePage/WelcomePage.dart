@@ -29,6 +29,12 @@ class _HomePageState extends State<WelcomePage> {
 
   Future<void> checkLoginStatus() async {
     isLoggedIn = await checkLoggedInUser();
+    //if islogged in navigate to HomePage
+
+    if (isLoggedIn) {
+      // ignore: use_build_context_synchronously
+      Navigator.pushNamed(context, MainPage.routeName);
+    }
   }
 
   @override
@@ -38,11 +44,15 @@ class _HomePageState extends State<WelcomePage> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-            
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [kWelcomePageBackgroundColorI, kWelcomePageBackgroundColorII],),),
+            colors: [
+              kWelcomePageBackgroundColorI,
+              kWelcomePageBackgroundColorII
+            ],
+          ),
+        ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

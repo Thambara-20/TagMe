@@ -1,5 +1,4 @@
 // event_functions.dart
-
 // ignore_for_file: file_names, empty_catches
 
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -12,51 +12,39 @@ Future<void> askForLocationPermission() async {
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
       return Future.error('Location permissions are denied');
     }
   }
 }
 
 Future<Position> determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
+  try {
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  // Test if location services are enabled.
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the
-    // App to enable the location services.
-    return Future.error('Location services are disabled.');
-  }
-
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled.');
     }
-  }
 
-  if (permission == LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately.
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-  }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permissions are denied');
+      }
+    }
 
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  } catch (e) {
+    Logger().e("Error determining position: $e");
+    rethrow;
+  }
 }
 
 Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
@@ -65,7 +53,6 @@ Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
     final prefs = await SharedPreferences.getInstance();
     late double locationRange;
     locationRange = prefs.getDouble("location_range") ?? 500.0;
-    // print(locationRange);
     Position userPosition = await determinePosition();
     double distanceInMeters = Geolocator.distanceBetween(
       userPosition.latitude,
@@ -82,11 +69,15 @@ Future<bool> checkInGeoPointArea(Map<String, double> eventGeoPoint) async {
 }
 
 Future<GeoPoint> getGeoPoint() async {
-  Position position = await determinePosition();
-  return GeoPoint(
-    latitude: position.latitude,
-    longitude: position.longitude,
-  );
+  try {
+    Position position = await determinePosition();
+    return GeoPoint(
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
+  } catch (e) {
+    throw Exception('Error getting GeoPoint: $e');
+  }
 }
 
 Future<GeoPoint> getGeoPointFromLocation(
