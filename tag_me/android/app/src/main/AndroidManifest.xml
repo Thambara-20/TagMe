@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
-        android:label="tag_me"
+        android:label="Tag Me"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
