@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:tag_me/components/Comfirmation/comfirmationDialog.dart';
 import 'package:tag_me/utilities/eventServices.dart';
 import 'package:tag_me/utilities/userServices.dart';
-import '../../models/event.dart';
+import '../../../models/event.dart';
 import 'NamePage.dart';
 import 'LocationPage.dart';
 import 'DateTimePage.dart';

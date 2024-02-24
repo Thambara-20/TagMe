@@ -12,7 +12,11 @@ class LocationPage extends StatefulWidget {
   final VoidCallback onBack;
   final VoidCallback onNext;
 
-  const LocationPage({Key? key, required this.event, required this.onBack, required this.onNext})
+  const LocationPage(
+      {Key? key,
+      required this.event,
+      required this.onBack,
+      required this.onNext})
       : super(key: key);
 
   @override
@@ -20,7 +24,6 @@ class LocationPage extends StatefulWidget {
 }
 
 class _LocationPageState extends State<LocationPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +38,7 @@ class _LocationPageState extends State<LocationPage> {
                     ElevatedButton(
                       onPressed: () async {
                         var p = await showSimplePickerLocation(
+                          // ignore: use_build_context_synchronously
                           context: context,
                           isDismissible: true,
                           title: "Select the location",
@@ -42,8 +46,8 @@ class _LocationPageState extends State<LocationPage> {
                           zoomOption: const ZoomOption(
                             initZoom: 8,
                           ),
-                          initPosition:
-                              await getGeoPointFromLocation(widget.event.coordinates),
+                          initPosition: await getGeoPointFromLocation(
+                              widget.event.coordinates),
                           radius: 10,
                         );
 

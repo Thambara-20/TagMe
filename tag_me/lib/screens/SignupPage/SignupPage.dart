@@ -2,7 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tag_me/SigninPage/SigninPage.dart';
+import 'package:tag_me/screens/SigninPage/SigninPage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/utilities/authService.dart';
 

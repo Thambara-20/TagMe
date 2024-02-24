@@ -2,16 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:tag_me/AboutPage/AboutPage.dart';
-import 'package:tag_me/ProfilePage/EditProfilePage.dart';
+import 'package:tag_me/screens/AboutPage/AboutPage.dart';
+import 'package:tag_me/screens/ProfilePage/EditProfilePage.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';
 import 'package:tag_me/utilities/userServices.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../utilities/locationService.dart';
-import '../components/Comfirmation/comfirmationDialog.dart';
+import '../../utilities/locationService.dart';
+import '../../components/Comfirmation/comfirmationDialog.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);

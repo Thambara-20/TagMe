@@ -89,7 +89,8 @@ const keventBoxNormalTextStyle = TextStyle(
 
 //------------------------------------------------EventPage--------------------------------------------------------------------------------
 const kAddButtonColor = Colors.blue;
-const keventCardColor = Color.fromARGB(154, 255, 255, 255);
+const keventCardColor = Color.fromARGB(121, 255, 255, 255);
+const keventCardColorII = Color.fromARGB(255, 171, 171, 171);
 const keventCardBorderColor = Colors.black;
 const keventPageBackgroundColorI = Color.fromARGB(255, 0, 0, 0);
 const keventPageBackgroundColorII = Color.fromARGB(255, 66, 66, 66);
@@ -100,12 +101,12 @@ const keventCardUpdateButtonColor = Colors.black;
 const keventOngoingButtonColor = Color.fromARGB(255, 61, 61, 61);
 const keventUpcomingButtonColor = Color.fromARGB(255, 0, 0, 0);
 const kcountDownTextStyle = TextStyle(
-  fontSize: 20.0,
-  fontWeight: FontWeight.bold,
-  color: Color.fromARGB(255, 132, 0, 0),
+  fontSize: 16.0,
+  fontWeight: FontWeight.w500,
+  color: Color.fromARGB(255, 0, 49, 112),
 );
 const keventPageSmallTextStyle = TextStyle(
-  fontSize: 14.0,
+  fontSize: 10.0,
   fontWeight: FontWeight.w500,
   color: Color.fromARGB(255, 255, 255, 255),
 );
