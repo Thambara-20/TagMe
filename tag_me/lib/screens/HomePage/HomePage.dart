@@ -1,7 +1,7 @@
 // ignore_for_file: file_names, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:tag_me/HomePage/EventBox/EventBox.dart';
+import 'package:tag_me/screens/HomePage/EventBox/EventBox.dart';
 import 'package:tag_me/components/Dropdown/DropDown.dart';
 import 'package:tag_me/constants/constants.dart';
 import 'package:tag_me/models/event.dart';

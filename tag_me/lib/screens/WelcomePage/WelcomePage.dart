@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tag_me/SignupPage/SignupPage.dart';
-import 'package:tag_me/SigninPage/SigninPage.dart';
+import 'package:tag_me/screens/SignupPage/SignupPage.dart';
+import 'package:tag_me/screens/SigninPage/SigninPage.dart';
 import 'package:tag_me/main.dart';
 import 'package:tag_me/models/user.dart';
 import 'package:tag_me/utilities/authService.dart';

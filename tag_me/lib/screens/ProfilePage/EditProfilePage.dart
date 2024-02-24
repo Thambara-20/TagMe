@@ -155,7 +155,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               if (_selectedRole == 'Member') ...[
                 TextFormField(
                   controller: _memberIdController,
-                  decoration: const InputDecoration(labelText: 'Member ID'),
+                  decoration: const InputDecoration(labelText: 'Your LCI '),
                 ),
                 const SizedBox(height: 16.0),
                 PopupMenuButton<String>(

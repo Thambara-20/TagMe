@@ -41,6 +41,7 @@ class _DateTimePickerState extends State<DateTimePicker> {
       if (selectedDate != null) {
         // ignore: use_build_context_synchronously
         final selectedTime = await showTimePicker(
+          // ignore: use_build_context_synchronously
           context: context,
           initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
         );
