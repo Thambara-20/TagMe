@@ -1,61 +1,43 @@
 import React, { useState } from "react";
-import Image1 from "../assets/images/image-product-1.jpg";
-import Image2 from "../assets/images/image-product-2.jpg";
-import Image3 from "../assets/images/image-product-3.jpg";
-import Image4 from "../assets/images/image-product-4.jpg";
+import Image1 from "../assets/images/5.png";
+import Image2 from "../assets/images/1.png";
+import Image3 from "../assets/images/3.png";
+import Image4 from "../assets/images/4.png";
 import ClosePrev from "../assets/images/icon-close.svg";
 import PrevBtn from "../assets/images/icon-previous.svg";
 import NextBtn from "../assets/images/icon-next.svg";
 import "../styles/Hero.css";
-import shortid from "shortid";
-import { useDispatch } from "react-redux";
 import { IconButton } from "@material-ui/core";
 import { GetApp as DownloadIcon } from "@material-ui/icons";
 import { Android } from "@material-ui/icons";
+import { useEffect } from "react";
+import Aos from "aos";
 
-// call the action I will use
-import { add_items } from "../actions";
+
 
 const Hero = () => {
-  // declare dispatch function
-  const dispatch = useDispatch();
-
-  // increase or decrease desired item quantity before checkout
-  const [itemQuantity, setItemQuantity] = useState(0);
-  const incNum = () => {
-    setItemQuantity(itemQuantity + 1);
-    setItems({
-      ...items,
-      added_items: itemQuantity + 1,
-      total_price: 125 * (itemQuantity + 1),
+  useEffect(() => {
+    Aos.init({
+      duration: 1000,
     });
-  };
-  const decNum = () => {
-    if (itemQuantity > 0) {
-      setItemQuantity(itemQuantity - 1);
-      setItems({
-        ...items,
-        added_items: itemQuantity - 1,
-        total_price: 125 * (itemQuantity - 1),
-      });
-    } else {
-      setItemQuantity(0);
-    }
-  };
+  }, []);
 
-  // add item to cart if quantity is more than 0
+
   const download = () => {
-    // Add your download logic here
-    console.log("Downloading...");
+    // Replace 'your-app.apk' with the actual name of your APK file
+    const apkUrl = 'https://docs.google.com/uc?export=download&id=1jMnaTTP80UnjqB2FujxzCk7rZBY_lJs5';
+    // Create an invisible anchor element
+    const anchor = document.createElement("a");
+    anchor.href = apkUrl;
+    anchor.download = "TagMe.apk";
+
+    // Trigger a click on the anchor to start the download
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
   };
 
-  //cart item object
-  const [items, setItems] = useState({
-    id: shortid.generate(),
-    added_items: 0,
-    total_price: 0,
-  });
-
+ 
   // desktop gallery modal
   const [photoModal, setPhotoModal] = useState(false);
   const togglePhotoModal = () => {
@@ -121,8 +103,8 @@ const Hero = () => {
   };
 
   return (
-    <main>
-      <div className="gallery">
+    <main data-aos='fade-up'>
+      <div className="gallery" data-aos='fade-up'>
         <div className="main-image">
           <button onClick={togglePhotoModal}>
             <img className="previewed-img" src={activeImage} alt="item image" />

@@ -1,8 +1,13 @@
+import Aos from "aos";
 import React from "react";
+import { useEffect } from "react";
 import styled from "styled-components";
+import AboutImg from "../assets/images/about.png";
 
 const AboutPageContainer = styled.div`
   padding: 20px;
+  margin: 20px auto;
+  max-width: 1200px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -11,7 +16,6 @@ const AboutPageContainer = styled.div`
     flex-direction: column;
   }
 `;
-
 const ImageContainer = styled.div`
   flex: 1;
   justify-content: space-between;
@@ -43,11 +47,17 @@ const SectionTitle = styled.h2`
 `;
 
 const About = () => {
+      // initialize AOS
+  useEffect(() => {
+    Aos.init({
+      duration: 1000,
+    });
+  }, []);
   return (
-    <AboutPageContainer>
+    <AboutPageContainer data-aos='fade-up'>
       <ImageContainer>
         <img
-          src="https://via.placeholder.com/400" // Placeholder image URL
+          src={AboutImg} // Placeholder image URL
           alt="About Tag Me"
         />
       </ImageContainer>

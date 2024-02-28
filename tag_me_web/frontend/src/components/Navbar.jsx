@@ -21,9 +21,9 @@ export default function Navbar() {
       <header>
         <div className="navbar">
           <div className="left-side">
-            <div className="logo-logo" to="/">
+            <Link className="logo-logo" to="/">
               <img src={Logo} alt="l" />
-            </div>
+            </Link>
             <button
               onClick={toggleNavbar}
               aria-expanded={openMenu ? "true" : "false"}
@@ -36,7 +36,6 @@ export default function Navbar() {
               </button>
               <div>
                 <Link to="/about">About</Link>
-                <Link to="/">Contact</Link>
               </div>
             </div>
           </div>

@@ -122,21 +122,10 @@ h1 {
   font-weight: 700;
   font-size: 17px;
 }
-.wrapper{
+.wrapper {
   min-width: 60px;
   align-items: center;
   margin-bottom: 1rem;
-
-}
-
-.min {
-  background-image: url(../assets/images/icon-minus.svg);
-  background-repeat: no-repeat;
-}
-
-.add {
-  background-image: url(../assets/images/icon-plus.svg);
-  background-repeat: no-repeat;
 }
 
 .add-to-cart {
@@ -195,11 +184,11 @@ h1 {
 }
 
 @media screen and (max-width: 750px) {
-	.description-btn {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	  }
+  .description-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 @media (min-width: 750px) {
@@ -267,8 +256,6 @@ h1 {
     margin-bottom: 2rem;
   }
 
- 
-
   .quantity-wrapper {
     display: flex;
     width: 200px;
@@ -314,19 +301,19 @@ h1 {
   }
 
   .img-1 {
-    background-image: url(../assets/images/image-product-1-thumbnail.jpg);
+    background-image: url(../assets/images/5.png);
   }
 
   .img-2 {
-    background-image: url(../assets/images/image-product-2-thumbnail.jpg);
+    background-image: url(../assets/images/1.png);
   }
 
   .img-3 {
-    background-image: url(../assets/images/image-product-3-thumbnail.jpg);
+    background-image: url(../assets/images/3.png);
   }
 
   .img-4 {
-    background-image: url(../assets/images/image-product-4-thumbnail.jpg);
+    background-image: url(../assets/images/4.png);
   }
 
   .images-modal {
