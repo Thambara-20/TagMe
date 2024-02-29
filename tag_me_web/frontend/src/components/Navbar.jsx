@@ -35,6 +35,7 @@ export default function Navbar() {
                 <img src={Close} alt="close navbar" />
               </button>
               <div>
+                <Link to="/">Home</Link>
                 <Link to="/about">About</Link>
               </div>
             </div>
