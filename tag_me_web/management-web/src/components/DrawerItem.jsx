@@ -44,11 +44,6 @@ const itemList = [
     to: "/dashboard",
   },
   {
-    text: "About",
-    icon: <InfoIcon />,
-    to: "/about",
-  },
-  {
     text: "Contact",
     icon: <EmailIcon />,
     to: "/contact",

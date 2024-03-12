@@ -1,5 +1,6 @@
 import React from "react";
 import { Grid } from "@mui/material";
+import Table from "./DataGrid";
 
 const Content = () => {
   return (
@@ -15,7 +16,7 @@ const Content = () => {
         px: 2,
       }}
     >
-      
+       <Table/>
     </Grid>
   );
 };

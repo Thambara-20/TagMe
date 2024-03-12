@@ -1,14 +1,14 @@
 import React from 'react'
 import Content from '../components/Content';
-import Gallery from '../components/Gallery';
+import Table from '../components/DataGrid';
 
-const About = () => {
+const Dashboard = () => {
   return (
     <>
     <Content />
-    <Gallery />
+   
     </>
   )
 }
 
-export default About
+export default Dashboard
