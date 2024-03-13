@@ -19,6 +19,12 @@ const MenuProps = {
 
 const Selecter = ({ text, onChange }) => {
   const [selectedValue, setSelectedValue] = React.useState([]);
+  const defaultValue =
+    text === "Year"
+      ? new Date().getFullYear()
+      : text === "Month"
+      ? new Date().toLocaleString("default", { month: "long" })
+      : "306A1";
 
   const handleChange = (event) => {
     setSelectedValue(event.target.value);

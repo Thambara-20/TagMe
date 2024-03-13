@@ -7,6 +7,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Title from "./Title";
 import { fetchEvents } from "../utilities";
+import EventDataGrid from "./EventDataGrid";
 
 const Content = () => {
   const [district, setDistricts] = useState("");
@@ -34,11 +35,11 @@ const Content = () => {
       setLoading(true);
       try {
         const allEvents = await fetchEvents();
-        console.log("Fetching events for district: ", district);
         const filteredEvents = allEvents.filter(
           (event) =>
-            event.district.toLowerCase() === String(district).toLowerCase() &&
-            event.startTime.getFullYear() === Number(year) &&
+            (event.district.toLowerCase() === String(district).toLowerCase() ||
+              !district) &&
+            (event.startTime.getFullYear() === Number(year) || !year) &&
             (!month || getMonthName(new Date(event.startTime)) === month)
         );
 
@@ -90,7 +91,14 @@ const Content = () => {
             { field: "district", headerName: "District", width: 150 },
             { field: "location", headerName: "Location", width: 200 },
             { field: "name", headerName: "Name", width: 200 },
-            { field: "participants", headerName: "Participants", width: 200 },
+            {
+              field: "participants",
+              headerName: "Participants",
+              width: 200,
+              renderCell: (params) => {
+                return <div>{params.value.length}</div>;
+              },
+            },
             { field: "startTime", headerName: "Start Time", width: 200 },
             { field: "endTime", headerName: "End Time", width: 200 },
           ]}
@@ -107,30 +115,9 @@ const Content = () => {
           maxWidth="lg"
         >
           <DialogContent>
-            <Title text={"Event Attendance Sheet"} />
+            <Title text={`Attendance Sheet of Project: ${selectedRow?.name}`} />
             <div style={{ height: 500, width: "100%", overflow: "auto" }}>
-              <DataGrid
-                slots={{ toolbar: GridToolbar }}
-                rows={[selectedRow]}
-                columns={[
-                  { field: "id", headerName: "ID", width: 150 },
-                  { field: "district", headerName: "District", width: 150 },
-                  { field: "endTime", headerName: "End Time", width: 200 },
-                  { field: "location", headerName: "Location", width: 150 },
-                  { field: "name", headerName: "Name", width: 150 },
-                  {
-                    field: "participants",
-                    headerName: "Participants",
-                    width: 200,
-                  },
-                  { field: "startTime", headerName: "Start Time", width: 200 },
-                ]}
-                loading={loading}
-                autoHeight
-                disableColumnMenu
-                disableColumnSelector
-                disableSelectionOnClick
-              />
+              <EventDataGrid participants={selectedRow?.participants} />
             </div>
           </DialogContent>
         </Dialog>

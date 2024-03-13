@@ -8,7 +8,7 @@ const Title = ({ text, textAlign }) => {
     component='h3'
     padding={2}
     sx={{ 
-      fontWeight: '700',
+      fontWeight: '600',
       textAlign: textAlign,
    }}
     >

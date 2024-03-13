@@ -1,14 +1,12 @@
-import React from 'react'
-import Content from '../components/Content';
-import Table from '../components/DataGrid';
+import React from "react";
+import Content from "../components/Content";
 
 const Dashboard = () => {
   return (
     <>
-    <Content />
-   
+      <Content />
     </>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
