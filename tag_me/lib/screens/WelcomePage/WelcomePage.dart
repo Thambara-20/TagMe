@@ -137,6 +137,10 @@ class _HomePageState extends State<WelcomePage> {
                   ),
                 ],
               ),
+              const Text(
+                'Developed by Leo Club of UOM!',
+                style: knormalTextGreyStyle,
+              ),
             ],
           ),
         ),

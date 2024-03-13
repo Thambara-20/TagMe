@@ -13,8 +13,6 @@ import { Android } from "@material-ui/icons";
 import { useEffect } from "react";
 import Aos from "aos";
 
-
-
 const Hero = () => {
   useEffect(() => {
     Aos.init({
@@ -22,10 +20,10 @@ const Hero = () => {
     });
   }, []);
 
-
   const download = () => {
     // Replace 'your-app.apk' with the actual name of your APK file
-    const apkUrl = 'https://docs.google.com/uc?export=download&id=1jMnaTTP80UnjqB2FujxzCk7rZBY_lJs5';
+    const apkUrl =
+      "https://docs.google.com/uc?export=download&id=1jMnaTTP80UnjqB2FujxzCk7rZBY_lJs5";
     // Create an invisible anchor element
     const anchor = document.createElement("a");
     anchor.href = apkUrl;
@@ -37,7 +35,6 @@ const Hero = () => {
     document.body.removeChild(anchor);
   };
 
- 
   // desktop gallery modal
   const [photoModal, setPhotoModal] = useState(false);
   const togglePhotoModal = () => {
@@ -103,8 +100,8 @@ const Hero = () => {
   };
 
   return (
-    <main data-aos='fade-up'>
-      <div className="gallery" data-aos='fade-up'>
+    <main data-aos="fade-up">
+      <div className="gallery" data-aos="fade-up">
         <div className="main-image">
           <button onClick={togglePhotoModal}>
             <img className="previewed-img" src={activeImage} alt="item image" />
