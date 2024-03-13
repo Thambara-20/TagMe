@@ -1,9 +1,9 @@
 import React from "react";
 //rotas
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, HashRouter } from "react-router-dom";
 //pages
 import Home from "./pages/Home";
-import About from "./pages/About";
+import Dashboard from "./pages/Dashboard";
 import Contact from "./pages/Contact";
 //componentes
 import Navbar from "./components/Navbar";
@@ -12,15 +12,14 @@ import Footer from "./components/Footer/Footer";
 function App() {
   return (
     <>
-      <BrowserRouter>
+      <HashRouter>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="dashboard" element={<h1>Dashboard</h1>} />
+          <Route path="/dashboard" element={<Dashboard/>} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
       <Footer />
     </>
   );

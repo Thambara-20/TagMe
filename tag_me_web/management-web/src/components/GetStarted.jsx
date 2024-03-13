@@ -23,10 +23,9 @@ const GetStarted = () => {
   return (
     <Grid
       container
-      
       spacing={{ xs: 4, sm: 4, md: 0 }}
       sx={{
-        py: 10,
+        py: 5,
         px: 2,
       }}
     >

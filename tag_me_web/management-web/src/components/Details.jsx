@@ -47,7 +47,6 @@ const Details = () => {
           margin="normal"
           required
           borderRadius={10}
-          
           fullWidth
           id="email"
           label="Email Address"

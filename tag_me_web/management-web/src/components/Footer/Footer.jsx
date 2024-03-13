@@ -90,6 +90,9 @@ const Footer = () => {
         >
           &copy; {new Date().getFullYear()} Tag Me. All rights reserved. {" "}
         </Typography>
+        <Typography>
+          Developed by Leo Club of UOM
+        </Typography>
       </StackColumn>
     </BoxRow>
   )

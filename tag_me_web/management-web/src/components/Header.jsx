@@ -62,9 +62,11 @@ const Header = () => {
         <Box>
           <Button
             variant="contained"
+            component={Link}
+            to={"/dashboard"}
             sx={{
               mr: 2,
-              px: 4,
+              px: 2.5,
               py: 1,
               fontSize: "0.9rem",
               textTransform: "capitalize",
@@ -82,9 +84,8 @@ const Header = () => {
           >
             Get Started
           </Button>
-          <Button
-            component={Link}
-            to={"/dashboard"}
+         <a href="https://tag-me.web.app">
+         <Button
             variant="outlined"
             sx={{
               px: 4,
@@ -107,6 +108,7 @@ const Header = () => {
           >
             Explore
           </Button>
+         </a>
         </Box>
       </BoxText>
 

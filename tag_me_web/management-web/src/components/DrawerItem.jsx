@@ -39,14 +39,9 @@ const itemList = [
     to: "/",
   },
   {
-    text: "dashboard",
+    text: "Dashboard",
     icon: <DashBoardIcon />,
     to: "/dashboard",
-  },
-  {
-    text: "About",
-    icon: <InfoIcon />,
-    to: "/about",
   },
   {
     text: "Contact",
