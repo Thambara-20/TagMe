@@ -1,6 +1,7 @@
 import React from "react";
 import { Grid } from "@mui/material";
 import Table from "./DataGrid";
+import Selecter from "./Dropdowns";
 
 const Content = () => {
   return (
@@ -16,6 +17,10 @@ const Content = () => {
         px: 2,
       }}
     >
+       <Selecter text={"District"}/>
+       <Selecter text={"club"}/>
+       <Selecter text= {"year"}/>
+       <Selecter text= {"month"}/>
        <Table/>
     </Grid>
   );
