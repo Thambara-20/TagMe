@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { useTheme } from '@mui/material/styles';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import * as React from "react";
+import { useTheme } from "@mui/material/styles";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -17,40 +17,41 @@ const MenuProps = {
   },
 };
 
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
-
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
-
-export default function Selecter({text}) {
-  const theme = useTheme();
-  const [personName, setPersonName] = React.useState([]);
+const Selecter = ({ text, onChange }) => {
+  const [selectedValue, setSelectedValue] = React.useState([]);
 
   const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      typeof value === 'string' ? value.split(',') : value,
-    );
+    setSelectedValue(event.target.value);
+    onChange(event);
   };
+
+  let names = [];
+
+  // Populate names array based on the text prop
+  if (text === "District") {
+    names = ["306A1", "306A2", "306B1", "306B2", "306C1", "306C2"];
+  } else if (text === "Month") {
+    names = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+  } else if (text === "Year") {
+    // Assuming you want to populate years from 2000 to the current year
+    const currentYear = new Date().getFullYear();
+    names = Array.from({ length: currentYear - 1999 }, (_, index) =>
+      (2000 + index).toString()
+    );
+  }
 
   return (
     <div>
@@ -59,18 +60,13 @@ export default function Selecter({text}) {
         <Select
           labelId="demo-multiple-name-label"
           id="demo-multiple-name"
-          multiple
-          value={personName}
+          value={selectedValue}
           onChange={handleChange}
           input={<OutlinedInput label={text} />}
           MenuProps={MenuProps}
         >
           {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
-            >
+            <MenuItem key={name} value={name}>
               {name}
             </MenuItem>
           ))}
@@ -78,4 +74,6 @@ export default function Selecter({text}) {
       </FormControl>
     </div>
   );
-}
+};
+
+export default Selecter;
