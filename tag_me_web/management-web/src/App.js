@@ -1,6 +1,6 @@
 import React from "react";
 //rotas
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, HashRouter } from "react-router-dom";
 //pages
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -12,14 +12,14 @@ import Footer from "./components/Footer/Footer";
 function App() {
   return (
     <>
-      <BrowserRouter>
+      <HashRouter>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/dashboard" element={<Dashboard/>} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
       <Footer />
     </>
   );
