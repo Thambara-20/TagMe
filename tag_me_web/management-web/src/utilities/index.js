@@ -44,7 +44,7 @@ const prospectData = async (uid) => {
       if (data.uid === uid) {
         prospectData.push({
           id: doc.id,
-          designation: null,
+          designation: "Prospect",
           district: data.district,
           name: data.name,
           userClub: data.userClub,

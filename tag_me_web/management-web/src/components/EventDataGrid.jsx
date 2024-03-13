@@ -17,6 +17,7 @@ const EventDataGrid = ({ participants = [] }) => {
             const member = await memberData(participant);
             if (member.length > 0) {
               setData((prevData) => [...prevData, ...member]);
+              console.log("Prospect Data:", participant, member);
             } else {
               const prospect = await prospectData(participant);
               if (prospect.length > 0) {
@@ -36,7 +37,13 @@ const EventDataGrid = ({ participants = [] }) => {
   }, [participants]);
 
   const columns = [
-    { field: "id", headerName: "ID", width: 200 },
+    { field: "id", headerName: "Member Id", width: 200 , renderCell: (params) => {
+        return (
+            <div>
+                {params.value.length<10 ? params.value : "No:"}
+            </div>
+            );
+    },},
     { field: "designation", headerName: "Designation", width: 200 },
     { field: "district", headerName: "District", width: 200 },
     { field: "name", headerName: "Name", width: 200 },
