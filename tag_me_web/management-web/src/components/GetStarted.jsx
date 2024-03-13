@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Grid, styled, Typography } from "@mui/material";
 import Title from "./Title";
 // img
-import imgDetail from "../assets/pexels-alex-staudinger-1732414.jpg";
+import imgDetail from "../assets/Design1.png";
 import imgDetail2 from "../assets/About.png";
 
 const GetStarted = () => {
@@ -38,12 +38,10 @@ const GetStarted = () => {
         >
           <Title text={"Tag Me Attendance Marker"} textAlign={"start"} />
           <CustomTypography>
-            Tag Me Attendance Marker is a Android application that helps
-            <br />
-            to keep track of the attendance of any event
-            <br />
-            in anywhere. It is a simple and easy to use application
-            <br />
+            Tag Me Attendance Marker is an Android application <br />
+            that helps to track the attendance of any event,meeting or project
+            in anywhere.
+            <br /> It is a simple and easy-to-use application
           </CustomTypography>
         </Box>
       </CustomGridItem>
@@ -53,6 +51,7 @@ const GetStarted = () => {
           src={imgDetail}
           alt=""
           style={{
+            borderRadius: "20px",
             width: "100%",
           }}
         />
@@ -72,6 +71,7 @@ const GetStarted = () => {
           alt=""
           style={{
             width: "100%",
+            borderRadius: "20px",
           }}
         />
       </Grid>
