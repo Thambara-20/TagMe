@@ -10,6 +10,7 @@ class Event {
   Map<String, double> coordinates;
   bool isParticipating;
   List<String> participants;
+  late bool isOnline;
 
   Event({
     required this.id,
@@ -23,6 +24,7 @@ class Event {
     required this.geoPoint,
     required this.coordinates,
     required this.participants,
+    required this.isOnline,
   });
 
   Map<String, dynamic> toJson() {
@@ -38,6 +40,7 @@ class Event {
       'coordinates': coordinates, // Include the coordinates field
       'isParticipating': isParticipating,
       'participants': participants,
+      'isOnline': isOnline,
     };
   }
 
@@ -54,6 +57,7 @@ class Event {
       geoPoint: List<double>.from(json['geoPoint']),
       coordinates: Map<String, double>.from(json['coordinates']),
       participants: List<String>.from(json['participants']),
+      isOnline: json['isOnline'],
     );
   }
 }

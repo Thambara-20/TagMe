@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:tag_me/utilities/locationService.dart';
 import 'package:tag_me/models/event.dart';
 
@@ -24,6 +25,14 @@ class LocationPage extends StatefulWidget {
 }
 
 class _LocationPageState extends State<LocationPage> {
+  bool isOnline = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isOnline = widget.event.isOnline;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,8 +42,73 @@ class _LocationPageState extends State<LocationPage> {
           children: [
             Expanded(
               child: Center(
-                child: Column(
-                  children: [
+                child: Column(children: [
+                  const Text(
+                    'Select Event Type:',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 15),
+                  OverflowBar(
+                    alignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(
+                        width: 100,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                isOnline ? Colors.black : Colors.grey,
+                            foregroundColor: Colors.white, // Change text color
+                            padding: const EdgeInsets.all(10), // Add padding
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  25), // Add border radius
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isOnline = true;
+                              widget.event.isOnline = isOnline;
+                              widget.event.location = 'Online Event';
+                            });
+                          },
+                          child: const Text('Online',
+                              style: TextStyle(fontSize: 16)),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      SizedBox(
+                        width: 100,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                !isOnline ? Colors.black : Colors.grey,
+                            foregroundColor: Colors.white, // Change text color
+                            padding: const EdgeInsets.all(10), // Add padding
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  25), // Add border radius
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isOnline = false;
+                              widget.event.isOnline = isOnline;
+                              widget.event.location = 'Online Event';
+                            });
+                          },
+                          child: const Text('Physical',
+                              style: TextStyle(fontSize: 16)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  if (!widget.event.isOnline) ...[
+                    const Text(
+                      'Select Location:',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 15),
                     ElevatedButton(
                       onPressed: () async {
                         var p = await showSimplePickerLocation(
@@ -77,13 +151,15 @@ class _LocationPageState extends State<LocationPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          widget.event.location,
+                          widget.event.location == "Online Event"
+                              ? ""
+                              : widget.event.location,
                           style: const TextStyle(fontSize: 20),
                         ),
                       ),
                     ),
                   ],
-                ),
+                ]),
               ),
             ),
             Row(

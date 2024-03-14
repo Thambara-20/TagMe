@@ -29,7 +29,8 @@ class NamePage extends StatelessWidget {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Event Name'),
+                      decoration:
+                          const InputDecoration(labelText: 'Event Name'),
                     ),
                   ],
                 ),

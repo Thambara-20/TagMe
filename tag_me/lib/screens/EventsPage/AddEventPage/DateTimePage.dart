@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 import 'package:tag_me/screens/EventsPage/AddEventPage/DateTimePicker.dart';
 
@@ -8,7 +10,7 @@ class DateTimePage extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onSave;
 
-  DateTimePage({
+  const DateTimePage({
     Key? key,
     required this.event,
     required this.onBack,
@@ -37,7 +39,9 @@ class DateTimePage extends StatelessWidget {
                           newDateTime.year,
                           newDateTime.month,
                           newDateTime.day,
-                        ).add(Duration(days: 1)); // Add one day to set to midnight of the next day
+                        ).add(const Duration(
+                            days:
+                                1)); // Add one day to set to midnight of the next day
                       },
                     ),
                     const SizedBox(height: 20),

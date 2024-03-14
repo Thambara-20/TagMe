@@ -14,6 +14,7 @@ List<Event> processEventData(QuerySnapshot snapshot) {
 
     return Event(
       id: document.id,
+      isOnline: data['isOnline'] ?? false,
       creator: data['creator'] ?? '',
       name: data['name'] ?? '',
       district: data['district'] ?? '',
@@ -52,6 +53,7 @@ Future<void> updateEvent(Event newEvent) async {
         'geoPoint': newEvent.geoPoint,
         'participants': newEvent.participants,
         'isParticipating': newEvent.isParticipating,
+        'isOnline': newEvent.isOnline,
       });
     }
   } catch (e) {}
@@ -83,6 +85,7 @@ Future<void> addEvent(Event newEvent) async {
       'geoPoint': newEvent.geoPoint,
       'participants': newEvent.participants,
       'isParticipating': newEvent.isParticipating,
+      'isOnline': newEvent.isOnline,
     });
 
     newEvent.id = documentReference.id;
@@ -121,6 +124,7 @@ void listenToEvents() async {
 
         return Event(
           id: document.id,
+          isOnline: data['isOnline'] ?? false,
           creator: data['creator'] ?? '',
           name: data['name'] ?? '',
           district: data['district'] ?? '',
@@ -141,7 +145,6 @@ void listenToEvents() async {
   } catch (e) {}
 }
 
-// get event location range in meters
 
 Future<void> getEventLocationRange() async {
   try {
