@@ -24,8 +24,9 @@ export default function Footer() {
   return (
     <FooterTagMe>
       <p>
-        &copy; {new Date().getFullYear()} Tag Me. All rights reserved. {" "}
-        <div to="/privacy">Privacy Policy</div> {" "}
+        &copy; {new Date().getFullYear()} Tag Me. All rights reserved.{" "}
+        <div> Developed by UoMLeos </div>
+        <div to="/privacy">Privacy Policy</div>{" "}
         <div to="/terms">Terms of Service</div>
       </p>
     </FooterTagMe>

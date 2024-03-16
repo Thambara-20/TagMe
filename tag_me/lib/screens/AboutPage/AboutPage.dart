@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({Key? key}) : super(key: key);
@@ -12,13 +13,19 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
+  Future<void> _launchUrl() async {
+    final Uri url = Uri.parse('https://tag-me.web.app');
+
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('About Tag Me'),
-
-      
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -56,19 +63,15 @@ class _AboutPageState extends State<AboutPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-
               ElevatedButton(
                 onPressed: () {
-                  // url
+                  _launchUrl();
                 },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Learn More'),
-                      Icon(Icons.arrow_outward)
-                    ],
-                  ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [Text('Learn More'), Icon(Icons.arrow_outward)],
+                ),
               ),
               const SizedBox(height: 16),
               const Text(
@@ -77,7 +80,7 @@ class _AboutPageState extends State<AboutPage> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'For support or inquiries, contact us at support@-.com',
+                'For support or inquiries, contact us at uomleoclub@gmail.com',
                 style: TextStyle(fontSize: 12),
                 textAlign: TextAlign.center,
               ),

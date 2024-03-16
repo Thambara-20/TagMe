@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, file_names
+// ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
 import 'package:tag_me/screens/EventsPage/AddEventPage/DateTimePicker.dart';
@@ -6,16 +6,16 @@ import 'package:tag_me/screens/EventsPage/AddEventPage/DateTimePicker.dart';
 import '../../../models/event.dart';
 
 class DateTimePage extends StatelessWidget {
-  Event event;
-  VoidCallback onBack;
-  VoidCallback onSave;
+  final Event event;
+  final VoidCallback onBack;
+  final VoidCallback onSave;
 
-  DateTimePage({
-    super.key,
+  const DateTimePage({
+    Key? key,
     required this.event,
     required this.onBack,
     required this.onSave,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,17 +29,27 @@ class DateTimePage extends StatelessWidget {
                 child: Column(
                   children: [
                     DateTimePicker(
-                      text:"Start Time",
+                      text: "Start Time",
                       initialDateTime: event.startTime,
                       onDateTimeChanged: (newDateTime) {
+                        // Update start time
                         event.startTime = newDateTime;
+                        // Automatically update end time to midnight of the same day
+                        event.endTime = DateTime(
+                          newDateTime.year,
+                          newDateTime.month,
+                          newDateTime.day,
+                        ).add(const Duration(
+                            days:
+                                1)); // Add one day to set to midnight of the next day
                       },
                     ),
                     const SizedBox(height: 20),
                     DateTimePicker(
-                      text:"End Time",
+                      text: "End Time",
                       initialDateTime: event.endTime,
                       onDateTimeChanged: (newDateTime) {
+                        // Update end time
                         event.endTime = newDateTime;
                       },
                     ),
@@ -51,18 +61,14 @@ class DateTimePage extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      onBack();
-                    },
+                    onPressed: onBack,
                     child: const Text('Back'),
                   ),
                 ),
                 const SizedBox(width: 20),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      onSave();
-                    },
+                    onPressed: onSave,
                     child: const Text('Save'),
                   ),
                 ),

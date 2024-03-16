@@ -215,6 +215,7 @@ class _EventBoxState extends State<EventBox> {
 
   void _verifyAttendance() {
     Map<String, double> eventGeoPoint = widget.event.coordinates;
+    bool isOnline = widget.event.isOnline;
     showDialog(
       context: context,
       builder: (context) {
@@ -226,7 +227,7 @@ class _EventBoxState extends State<EventBox> {
           actions: [
             TextButton(
               onPressed: () async {
-                isInGeoPointArea = await checkInGeoPointArea(eventGeoPoint);
+                isInGeoPointArea = await checkInGeoPointArea(eventGeoPoint) || isOnline;
                 if (isInGeoPointArea) {
                   if (mounted) {
                     setState(() {

@@ -83,15 +83,15 @@ const About = () => {
           </p>
           <SectionTitle>Key Features</SectionTitle>
           <ul style={{ listStyleType: "none", padding: 0 }}>
-            <li>Effortless attendance tracking based on the users Location</li>
+            <li>Effortless attendance tracking based on the user's location</li>
             <li>User-friendly interface</li>
             <li>Reliable and accurate results</li>
             {/* Add more key features */}
           </ul>
           <SectionTitle>Contact Us</SectionTitle>
           <p>
-            Have questions or feedback? Reach out to us at{" "}
-            <a href="mailto:info@tagme-app.com">@-.com</a>.
+            Have questions and feedbacks? Reach out to us at{" "}
+            <a href="mailto:info@tagme-app.com">uomleoclub@gmail.com</a>.
           </p>
         </div>
       </ContentContainer>

@@ -44,7 +44,7 @@ const Header = () => {
             color: "#fff",
           }}
         >
-          TagMe Attendance Marker
+          Tag Me Attendance Marker
         </Typography>
 
         <Typography
@@ -84,31 +84,31 @@ const Header = () => {
           >
             Get Started
           </Button>
-         <a href="https://tag-me.web.app">
-         <Button
-            variant="outlined"
-            sx={{
-              px: 4,
-              py: 1,
-              fontSize: "0.9rem",
-              textTransform: "capitalize",
-              borderRadius: 2,
-              color: "#fff",
-              backgroundColor: "transparent",
-              borderColor: "#fff",
-              "&&:hover": {
-                color: "#343a55",
-                borderColor: "#343a55",
-              },
-              "&&:focus": {
-                color: "#343a55",
-                borderColor: "#343a55",
-              },
-            }}
-          >
-            Explore
-          </Button>
-         </a>
+          <a href="https://tag-me.web.app">
+            <Button
+              variant="outlined"
+              sx={{
+                px: 4,
+                py: 1,
+                fontSize: "0.9rem",
+                textTransform: "capitalize",
+                borderRadius: 2,
+                color: "#fff",
+                backgroundColor: "transparent",
+                borderColor: "#fff",
+                "&&:hover": {
+                  color: "#343a55",
+                  borderColor: "#343a55",
+                },
+                "&&:focus": {
+                  color: "#343a55",
+                  borderColor: "#343a55",
+                },
+              }}
+            >
+              Explore
+            </Button>
+          </a>
         </Box>
       </BoxText>
 

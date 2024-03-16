@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Logo from "../assets/images/logo.svg";
 import Close from "../assets/images/icon-close.svg";
 import Hamburger from "../assets/images/icon-menu.svg";
-import RightNav from "./CartProfile";
 import "../styles/Navbar.css";
 
 export default function Navbar() {

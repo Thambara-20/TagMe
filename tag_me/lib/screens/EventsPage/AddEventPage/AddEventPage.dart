@@ -33,6 +33,7 @@ class _AddEventFormState extends State<AddEventForm> {
     creator: '',
     name: '',
     district: '',
+    isOnline: false,
     startTime: DateTime.now(),
     endTime: DateTime.now(),
     location: '',
@@ -47,8 +48,8 @@ class _AddEventFormState extends State<AddEventForm> {
     super.initState();
     getClub();
 
-
     if (widget.selectedEvent != null) {
+      event.isOnline = widget.selectedEvent!.isOnline;
       event.id = widget.selectedEvent!.id;
       _nameController.text = widget.selectedEvent!.name;
       event.startTime = widget.selectedEvent!.startTime;
@@ -175,7 +176,8 @@ class _AddEventFormState extends State<AddEventForm> {
 
       if (user != null) {
         Event newEvent = Event(
-          id: event.id, 
+          id: event.id,
+          isOnline: event.isOnline,
           creator: user.uid,
           name: _nameController.text,
           district: event.district,

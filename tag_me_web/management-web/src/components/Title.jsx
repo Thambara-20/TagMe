@@ -5,7 +5,6 @@ const Title = ({ text, textAlign }) => {
   return (
     <Typography 
     variant='h4'
-    component='h3'
     padding={2}
     sx={{ 
       fontWeight: '600',
